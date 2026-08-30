@@ -1,5 +1,5 @@
 {
-  "jobs_dir": "/data/zhiqi/RSI6/artifacts/probes/tb21_terminus_qwen_db_wal_recovery",
+  "jobs_dir": "/data/zhiqi/License/artifacts/probes/tb21_terminus_qwen_db_wal_recovery",
   "agent_timeout_multiplier": 0.4,
   "n_concurrent_trials": 1,
   "agents": [

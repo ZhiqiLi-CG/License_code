@@ -1,5 +1,5 @@
 {
-  "jobs_dir": "/data/zhiqi/RSI6/artifacts/probes/skillflow_terminus_qwen_invoice_images_forcebuild",
+  "jobs_dir": "/data/zhiqi/License/artifacts/probes/skillflow_terminus_qwen_invoice_images_forcebuild",
   "agent_timeout_multiplier": 0.5,
   "n_concurrent_trials": 1,
   "environment": {

@@ -1,5 +1,5 @@
 job_name: tb21-lta-db-wal-recovery-official
-jobs_dir: /data/zhiqi/RSI6/artifacts/probes/tb21_lta_db_wal_recovery_official
+jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_lta_db_wal_recovery_official
 quiet: true
 agent_timeout_multiplier: 0.5
 environment:

@@ -1,5 +1,5 @@
 job_name: skillflow-lta-invoice-materializer-official
-jobs_dir: /data/zhiqi/RSI6/artifacts/probes/skillflow_lta_invoice_materializer_official
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_invoice_materializer_official
 agent_timeout_multiplier: 0.5
 quiet: true
 

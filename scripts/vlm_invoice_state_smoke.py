@@ -7,8 +7,15 @@ import argparse
 import base64
 import json
 import re
+import sys
 from pathlib import Path
 from urllib import request
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from license_to_act.paths import artifact_path
 
 
 def image_data_url(path: Path) -> str:
@@ -84,7 +91,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=2)
     parser.add_argument(
         "--out",
-        default="/data/zhiqi/RSI6/artifacts/vlm_witness/rsi6_8012_invoice_state_smoke_n2_20260830.jsonl",
+        default=str(artifact_path("vlm_witness", "license_8012_invoice_state_smoke_n2_20260830.jsonl")),
     )
     args = parser.parse_args()
 

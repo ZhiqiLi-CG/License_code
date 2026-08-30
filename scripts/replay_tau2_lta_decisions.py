@@ -10,6 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from license_to_act.tau2_replay import replay_tau2_cancel_decisions
+from license_to_act.paths import artifact_path
 
 
 DEFAULT_CASES = {
@@ -22,7 +23,7 @@ DEFAULT_CASES = {
         "datasets/tau2-bench/data/simulations/rsi8_stage1_qwen_airline_base_19_20260830/results.json"
     ),
 }
-DEFAULT_OUTPUT = Path("/data/zhiqi/RSI6/artifacts/tau2_lta/tau2_cancel_authority_replay_20260830.json")
+DEFAULT_OUTPUT = artifact_path("tau2_lta", "tau2_cancel_authority_replay_20260830.json")
 
 
 def main(argv: list[str] | None = None) -> int:

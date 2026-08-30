@@ -9,55 +9,65 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from license_to_act.amendment_transfer import write_amendment_transfer_report
+from license_to_act.paths import artifact_path
 
 
-DEFAULT_OUTPUT = Path("/data/zhiqi/RSI6/artifacts/amendment_transfer/lta_stage1_transfer_ledger_20260830.json")
+DEFAULT_OUTPUT = artifact_path("amendment_transfer", "lta_stage1_transfer_ledger_20260830.json")
 
 DEFAULT_TAU2_PAIRS = [
-    Path("/data/zhiqi/RSI8/artifacts/experiments/tau2_airline_task1_paired_precommit.json"),
-    Path("/data/zhiqi/RSI8/artifacts/experiments/tau2_airline_task48_mistral_paired_precommit.json"),
-    Path("/data/zhiqi/RSI8/artifacts/experiments/tau2_airline_task19_qwen_nonregression_precommit.json"),
+    artifact_path("source", "tau2_pairs", "tau2_airline_task1_paired_precommit.json"),
+    artifact_path("source", "tau2_pairs", "tau2_airline_task48_mistral_paired_precommit.json"),
+    artifact_path("source", "tau2_pairs", "tau2_airline_task19_qwen_nonregression_precommit.json"),
 ]
 
-DEFAULT_TB_BASELINE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_codex_gpt55_sanitize_git_repo/"
-    "2026-08-30__17-04-40/result.json"
+DEFAULT_TB_BASELINE = artifact_path(
+    "probes", "tb21_codex_gpt55_sanitize_git_repo", "2026-08-30__17-04-40", "result.json"
 )
-DEFAULT_TB_LTA = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_lta_sanitize_materializer_official/"
-    "tb21-lta-sanitize-materializer-official/result.json"
+DEFAULT_TB_LTA = artifact_path(
+    "probes", "tb21_lta_sanitize_materializer_official", "tb21-lta-sanitize-materializer-official", "result.json"
 )
-DEFAULT_TB_EVIDENCE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_lta_sanitize_materializer_official/"
-    "tb21-lta-sanitize-materializer-official/sanitize-git-repo__W3DQ4hn/"
-    "agent/lta-govkernel-tb21-sanitize-evidence.json"
+DEFAULT_TB_EVIDENCE = artifact_path(
+    "probes",
+    "tb21_lta_sanitize_materializer_official",
+    "tb21-lta-sanitize-materializer-official",
+    "sanitize-git-repo__W3DQ4hn",
+    "agent",
+    "lta-govkernel-tb21-sanitize-evidence.json",
 )
-DEFAULT_TB_DB_WAL_BASELINE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_terminus_qwen_db_wal_recovery/"
-    "2026-08-30__17-24-47/result.json"
+DEFAULT_TB_DB_WAL_BASELINE = artifact_path(
+    "probes", "tb21_terminus_qwen_db_wal_recovery", "2026-08-30__17-24-47", "result.json"
 )
-DEFAULT_TB_DB_WAL_LTA = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_lta_db_wal_recovery_official/"
-    "tb21-lta-db-wal-recovery-official/result.json"
+DEFAULT_TB_DB_WAL_LTA = artifact_path(
+    "probes", "tb21_lta_db_wal_recovery_official", "tb21-lta-db-wal-recovery-official", "result.json"
 )
-DEFAULT_TB_DB_WAL_EVIDENCE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/tb21_lta_db_wal_recovery_official/"
-    "tb21-lta-db-wal-recovery-official/db-wal-recovery__XbXwXq3/"
-    "agent/lta-govkernel-tb21-dbwal-evidence.json"
+DEFAULT_TB_DB_WAL_EVIDENCE = artifact_path(
+    "probes",
+    "tb21_lta_db_wal_recovery_official",
+    "tb21-lta-db-wal-recovery-official",
+    "db-wal-recovery__XbXwXq3",
+    "agent",
+    "lta-govkernel-tb21-dbwal-evidence.json",
 )
 
-DEFAULT_SKILLFLOW_BASELINE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild/"
-    "2026-08-30__18-05-01/result.json"
+DEFAULT_SKILLFLOW_BASELINE = artifact_path(
+    "probes",
+    "skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild",
+    "2026-08-30__18-05-01",
+    "result.json",
 )
-DEFAULT_SKILLFLOW_LTA = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/skillflow_lta_qwen_invoice_govkernel_official_out256/"
-    "skillflow-lta-qwen-invoice-govkernel-official-out256/result.json"
+DEFAULT_SKILLFLOW_LTA = artifact_path(
+    "probes",
+    "skillflow_lta_qwen_invoice_govkernel_official_out256",
+    "skillflow-lta-qwen-invoice-govkernel-official-out256",
+    "result.json",
 )
-DEFAULT_SKILLFLOW_EVIDENCE = Path(
-    "/data/zhiqi/RSI6/artifacts/probes/skillflow_lta_qwen_invoice_govkernel_official_out256/"
-    "skillflow-lta-qwen-invoice-govkernel-official-out256/task_family_invoice_images__Fg3xp5a/"
-    "agent/lta-govkernel-invoice-evidence.json"
+DEFAULT_SKILLFLOW_EVIDENCE = artifact_path(
+    "probes",
+    "skillflow_lta_qwen_invoice_govkernel_official_out256",
+    "skillflow-lta-qwen-invoice-govkernel-official-out256",
+    "task_family_invoice_images__Fg3xp5a",
+    "agent",
+    "lta-govkernel-invoice-evidence.json",
 )
 
 

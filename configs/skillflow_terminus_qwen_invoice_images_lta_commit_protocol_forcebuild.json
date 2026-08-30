@@ -1,5 +1,5 @@
 {
-  "jobs_dir": "/data/zhiqi/RSI6/artifacts/probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild",
+  "jobs_dir": "/data/zhiqi/License/artifacts/probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild",
   "agent_timeout_multiplier": 0.5,
   "n_concurrent_trials": 1,
   "environment": {
@@ -7,7 +7,7 @@
     "force_build": true
   },
   "extra_instruction_paths": [
-    "/data/zhiqi/RSI6/prompts/lta_skillflow_invoice_commit_protocol.md"
+    "/data/zhiqi/License/prompts/lta_skillflow_invoice_commit_protocol.md"
   ],
   "agents": [
     {
