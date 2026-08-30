@@ -1,0 +1,33 @@
+{
+  "jobs_dir": "/data/zhiqi/RSI6/artifacts/probes/skillflow_terminus_mistral_invoice_images_forcebuild",
+  "agent_timeout_multiplier": 0.5,
+  "n_concurrent_trials": 1,
+  "environment": {
+    "type": "docker",
+    "force_build": true
+  },
+  "agents": [
+    {
+      "name": "terminus-2",
+      "model_name": "openai/Mistral-Small-3.2-24B-Instruct-2506",
+      "kwargs": {
+        "api_base": "http://127.0.0.1:8001/v1",
+        "temperature": 0,
+        "max_turns": 12,
+        "model_info": {
+          "max_input_tokens": 8192,
+          "max_output_tokens": 2048,
+          "input_cost_per_token": 0,
+          "output_cost_per_token": 0,
+          "cache_creation_input_token_cost": 0,
+          "cache_read_input_token_cost": 0
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "path": "/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images"
+    }
+  ]
+}

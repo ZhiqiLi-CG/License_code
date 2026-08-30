@@ -1,0 +1,16 @@
+job_name: skillflow-lta-invoice-materializer-official
+jobs_dir: /data/zhiqi/RSI6/artifacts/probes/skillflow_lta_invoice_materializer_official
+agent_timeout_multiplier: 0.5
+quiet: true
+
+environment:
+  type: docker
+  force_build: true
+
+agents:
+  - import_path: license_to_act.harbor_agents:LicenseToActInvoiceMaterializerAgent
+    model_name: null
+    kwargs: {}
+
+tasks:
+  - path: /data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images
