@@ -30,7 +30,7 @@
   ],
   "tasks": [
     {
-      "path": "/data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/sqlite-db-truncate"
+      "path": "/data/zhiqi/License/datasets/terminal-bench-2-1/tasks/sqlite-db-truncate"
     }
   ]
 }

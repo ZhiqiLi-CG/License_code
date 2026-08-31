@@ -17,7 +17,7 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
 
     summary = panel["summary"]
     assert summary["ablation_rows"] == 5
-    assert summary["reviewer_requested_rows"] == 3
+    assert summary["high_priority_rows"] == 3
     assert summary["baseline_overlap"] == 0
     assert summary["cut_passes"] == 0
     assert summary["cut_trials"] == 8
@@ -32,9 +32,9 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
         "ABLATE_POSITIVE_OBLIGATION",
         "PROMPT_ONLY_LICENSE_TEXT",
     ]
-    assert rows["ABLATE_SIDE_EFFECT_BOUNDS"]["reviewer_requested"] == "yes"
-    assert rows["ABLATE_POSITIVE_OBLIGATION"]["reviewer_requested"] == "yes"
-    assert rows["PROMPT_ONLY_LICENSE_TEXT"]["reviewer_requested"] == "yes"
+    assert rows["ABLATE_SIDE_EFFECT_BOUNDS"]["high_priority"] == "yes"
+    assert rows["ABLATE_POSITIVE_OBLIGATION"]["high_priority"] == "yes"
+    assert rows["PROMPT_ONLY_LICENSE_TEXT"]["high_priority"] == "yes"
     assert "baseline" not in rows["PROMPT_ONLY_LICENSE_TEXT"]["comparison_class"]
     assert rows["ABLATE_POSITIVE_OBLIGATION"]["cut_evidence_cases"] == "SF-INV | SF-QWEN32K-MSWE-2"
     assert rows["ABLATE_POSITIVE_OBLIGATION"]["full_evidence_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5"
@@ -61,7 +61,7 @@ def test_write_mechanism_ablation_panel_exports_csv_json_and_tex(tmp_path: Path)
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAMechanismAblationPanelRows}{5}" in tex
-    assert "\\newcommand{\\LTAMechanismAblationReviewerRows}{3}" in tex
+    assert "\\newcommand{\\LTAMechanismAblationPriorityRows}{3}" in tex
     assert "\\newcommand{\\LTAMechanismAblationCutPasses}{0}" in tex
     assert "\\newcommand{\\LTAMechanismAblationCutTrials}{8}" in tex
     assert "\\newcommand{\\LTAMechanismAblationFullPasses}{23}" in tex

@@ -27,11 +27,11 @@ DEFAULT_TRAJECTORY = Path(
     "2026-08-30__18-05-01/task_family_invoice_images__jSHw8Dy/agent/trajectory.json"
 )
 DEFAULT_IMAGE_DIR = Path(
-    "/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/"
+    "/data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/"
     "OCR-Data-Extraction/task_family_invoice_images/environment/workspace/dataset/img"
 )
 DEFAULT_ORACLE = Path(
-    "/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/"
+    "/data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/"
     "OCR-Data-Extraction/task_family_invoice_images/tests/invoice_oracle.xlsx"
 )
 DEFAULT_OUTPUT_DIR = Path("artifacts/method_slices/skillflow_invoice_qwen_lta_trace_materialized")

@@ -21,10 +21,13 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 69 passed
+2026-08-31: 73 passed
 ```
 
 ## Official Harbor Anchors
+
+Harbor configs expect benchmark mirrors under `/data/zhiqi/License/datasets/`
+so paper reproduction does not depend on another project workspace.
 
 ```bash
 env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
@@ -79,6 +82,7 @@ python scripts/export_headline_result_panel.py
 python scripts/export_submission_experiment_blueprint.py
 python scripts/export_recursive_amendment_lineage.py
 python scripts/export_mechanism_ablation_panel.py
+python scripts/export_model_in_loop_bridge.py
 python scripts/export_submission_scale_plan.py
 python scripts/export_story_gate.py
 ```
@@ -88,17 +92,19 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_story_claims.py`, `export_evidence_portfolio.py`,
 `export_comparison_manifest.py`, `export_headline_result_panel.py`,
 `export_submission_experiment_blueprint.py`, `export_recursive_amendment_lineage.py`,
-`export_mechanism_ablation_panel.py`, `export_submission_scale_plan.py`, and `export_story_gate.py` also write generated LaTeX number files under
+`export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
+`export_submission_scale_plan.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`, which the paper imports for headline result,
 evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint,
-recursive-lineage, mechanism-ablation, submission-scale, and paper-code consistency numbers.
+recursive-lineage, mechanism-ablation, model-in-loop bridge, submission-scale,
+and paper-code consistency numbers.
 
 ## Paper-Code Consistency
 
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, recursive-lineage, mechanism-ablation, submission-scale, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, recursive-lineage, mechanism-ablation, model-in-loop bridge, submission-scale, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.

@@ -8,6 +8,7 @@ from typing import Any
 from .comparison_manifest import build_comparison_manifest
 from .evidence_portfolio import build_evidence_portfolio
 from .mechanism_ablation_panel import build_mechanism_ablation_panel
+from .model_in_loop_bridge import build_model_in_loop_bridge
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
 
@@ -23,6 +24,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     portfolio = build_evidence_portfolio(root)
     comparison_manifest = build_comparison_manifest(root)
     ablation_panel = build_mechanism_ablation_panel(root)
+    model_loop_bridge = build_model_in_loop_bridge(root)
     recursive_lineage = build_recursive_amendment_lineage(root)
     claims = build_story_claims(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
@@ -37,6 +39,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _faithful_baseline_check(portfolio_rows, stage2_rows),
         _comparison_manifest_check(comparison_summary),
         _mechanism_ablation_panel_check(ablation_panel["summary"]),
+        _model_in_loop_bridge_check(model_loop_bridge["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
@@ -65,6 +68,12 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "tau2_read_correct_write_wrong_proxy": claim_metrics["tau2_read_correct_write_wrong_proxy"],
             "mechanism_ablation_cut_passes": ablation_panel["summary"]["cut_passes"],
             "mechanism_ablation_cut_trials": ablation_panel["summary"]["cut_trials"],
+            "model_in_loop_govkernel_passes": model_loop_bridge["summary"][
+                "qwen_invoice_govkernel_passes"
+            ],
+            "model_in_loop_govkernel_trials": model_loop_bridge["summary"][
+                "qwen_invoice_govkernel_trials"
+            ],
         },
         "checks": checks,
     }
@@ -219,6 +228,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_experiment_blueprint_numbers}",
         "\\input{sections/generated_recursive_numbers}",
         "\\input{sections/generated_ablation_numbers}",
+        "\\input{sections/generated_model_loop_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
@@ -227,14 +237,14 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, recursive lineage, ablation panel, scale plan, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, recursive lineage, ablation panel, model-in-loop bridge, scale plan, and consistency numbers.",
     )
 
 
 def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
     ok = (
         summary["ablation_rows"] >= 5
-        and summary["reviewer_requested_rows"] >= 3
+        and summary["high_priority_rows"] >= 3
         and summary["baseline_overlap"] == 0
         and summary["cut_passes"] == 0
         and summary["full_passes"] == summary["full_trials"]
@@ -244,9 +254,32 @@ def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
         ok,
         "The paper should include completed internal mechanism cuts without relabeling baselines as ablations.",
         (
-            f"{summary['ablation_rows']} mechanism cuts; {summary['reviewer_requested_rows']} reviewer-requested; "
+            f"{summary['ablation_rows']} mechanism cuts; {summary['high_priority_rows']} high-priority; "
             f"{summary['cut_passes']}/{summary['cut_trials']} cut passes versus "
             f"{summary['full_passes']}/{summary['full_trials']} full LTA passes."
+        ),
+    )
+
+
+def _model_in_loop_bridge_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["model_in_loop_rows"] >= 4
+        and summary["qwen_invoice_baseline_passes"] == 0
+        and summary["qwen_invoice_baseline_trials"] >= 2
+        and summary["qwen_invoice_govkernel_passes"] >= 4
+        and summary["qwen_invoice_govkernel_trials"] >= 5
+        and summary["materializer_rows_used_as_matched_agent"] == 0
+    )
+    return _check(
+        "model_in_loop_bridge_separates_materializers",
+        ok,
+        "Model-in-loop evidence should be reported separately from task-specific materializer reliability.",
+        (
+            f"Qwen invoice ordinary baselines: {summary['qwen_invoice_baseline_passes']}/"
+            f"{summary['qwen_invoice_baseline_trials']}; Qwen+GovKernel: "
+            f"{summary['qwen_invoice_govkernel_passes']}/"
+            f"{summary['qwen_invoice_govkernel_trials']}; materializer-as-agent rows: "
+            f"{summary['materializer_rows_used_as_matched_agent']}."
         ),
     )
 
@@ -337,6 +370,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_submission_experiment_blueprint.py",
         "export_recursive_amendment_lineage.py",
         "export_mechanism_ablation_panel.py",
+        "export_model_in_loop_bridge.py",
         "export_submission_scale_plan.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
@@ -348,7 +382,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, recursive lineage export, ablation panel export, scale plan export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, recursive lineage export, ablation panel export, model-in-loop bridge export, scale plan export, consistency export, figure generation, and LaTeX build.",
     )
 
 

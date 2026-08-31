@@ -10,4 +10,4 @@ agents:
     model_name: null
     kwargs: {}
 tasks:
-  - path: /data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/db-wal-recovery
+  - path: /data/zhiqi/License/datasets/terminal-bench-2-1/tasks/db-wal-recovery

@@ -1,0 +1,332 @@
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+from typing import Any
+
+
+BRIDGE_FIELDS = [
+    "bridge_id",
+    "benchmark",
+    "task",
+    "actor_backbone",
+    "harness",
+    "condition",
+    "comparison_boundary",
+    "n_trials",
+    "n_errors",
+    "passes",
+    "pass_at_5",
+    "uses_task_specific_materializer",
+    "paper_use",
+    "source_path",
+]
+
+
+def build_model_in_loop_bridge(project_root: str | Path = Path("/data/zhiqi/License")) -> dict[str, Any]:
+    root = Path(project_root)
+    cases = _case_specs(root)
+    rows = [_row_from_case(case) for case in cases]
+    summary = _summarize(rows)
+    return {"summary": summary, "rows": rows}
+
+
+def write_model_in_loop_bridge(
+    project_root: str | Path = Path("/data/zhiqi/License"),
+    *,
+    paper_data_dir: str | Path | None = None,
+    paper_sections_dir: str | Path | None = None,
+    summary_path: str | Path | None = None,
+) -> dict[str, Any]:
+    root = Path(project_root)
+    paper_data_dir = Path(paper_data_dir) if paper_data_dir is not None else root / "License_paper" / "data"
+    paper_sections_dir = (
+        Path(paper_sections_dir) if paper_sections_dir is not None else root / "License_paper" / "sections"
+    )
+    summary_path = (
+        Path(summary_path)
+        if summary_path is not None
+        else root / "artifacts" / "paper_results" / "lta_model_in_loop_bridge_20260831.json"
+    )
+
+    bridge = build_model_in_loop_bridge(root)
+    paper_data_dir.mkdir(parents=True, exist_ok=True)
+    paper_sections_dir.mkdir(parents=True, exist_ok=True)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+
+    bridge_csv = paper_data_dir / "model_in_loop_bridge.csv"
+    latex_numbers = paper_sections_dir / "generated_model_loop_numbers.tex"
+    _write_bridge_csv(bridge_csv, bridge["rows"])
+    latex_numbers.write_text(_latex_numbers(bridge["summary"]), encoding="utf-8")
+
+    bridge["outputs"] = {
+        "summary_json": str(summary_path),
+        "bridge_csv": str(bridge_csv),
+        "latex_numbers": str(latex_numbers),
+    }
+    summary_path.write_text(json.dumps(bridge, indent=2), encoding="utf-8")
+    return bridge
+
+
+def _case_specs(root: Path) -> list[dict[str, Any]]:
+    artifacts = root / "artifacts"
+    return [
+        {
+            "bridge_id": "SF_INVOICE_QWEN_TERMINUS_FULL",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "Qwen3.8-27B",
+            "harness": "Terminus-2",
+            "condition": "ordinary task agent, no GovKernel",
+            "comparison_boundary": "ordinary_agent",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_counterpoint",
+            "source_path": artifacts
+            / "probes/skillflow_terminus_qwen_invoice_images_forcebuild/2026-08-30__17-34-38/result.json",
+        },
+        {
+            "bridge_id": "SF_INVOICE_QWEN_TERMINUS_PROMPT_ONLY",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "Qwen3.8-27B",
+            "harness": "Terminus-2",
+            "condition": "natural-language LTA commit protocol only",
+            "comparison_boundary": "prompt_only_control",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "mechanism_cut",
+            "source_path": artifacts
+            / "probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild/2026-08-30__18-05-01/result.json",
+        },
+        {
+            "bridge_id": "SF_INVOICE_QWEN_GOVKERNEL_SMOKE",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "Qwen3.8-27B",
+            "harness": "LicenseToActQwenInvoiceGovKernelAgent",
+            "condition": "Qwen in loop plus GovKernel OBLIGE",
+            "comparison_boundary": "model_in_loop_govkernel",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_positive",
+            "source_path": artifacts
+            / "probes/skillflow_lta_qwen_invoice_govkernel_official_out256/skillflow-lta-qwen-invoice-govkernel-official-out256/result.json",
+        },
+        {
+            "bridge_id": "SF_INVOICE_QWEN_GOVKERNEL_K5",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "Qwen3.8-27B",
+            "harness": "LicenseToActQwenInvoiceGovKernelAgent",
+            "condition": "Qwen in loop plus GovKernel OBLIGE, K=5",
+            "comparison_boundary": "model_in_loop_govkernel",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_positive",
+            "source_path": artifacts
+            / "stage2/harbor/stage2-skillflow-lta-qwen-invoice-k5-18002-out128/result.json",
+        },
+        {
+            "bridge_id": "SF_INVOICE_QWEN32K_MINISWE_BASELINE",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "Qwen3.8-27B-long32k",
+            "harness": "mini-swe-agent",
+            "condition": "faithful long-context open-model baseline",
+            "comparison_boundary": "faithful_baseline",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_counterpoint",
+            "source_path": artifacts
+            / "stage2/harbor/stage2-skillflow-miniswe-qwen-long32k-license-anchors-smoke/task_family_invoice_images__haan2Nx/result.json",
+        },
+        {
+            "bridge_id": "TB_SANITIZE_MATERIALIZER_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "sanitize-git-repo",
+            "actor_backbone": "GovKernel runtime",
+            "harness": "LTA scoped Git materializer",
+            "condition": "runtime authority anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-sanitize-k5-py/result.json",
+        },
+        {
+            "bridge_id": "TB_WAL_MATERIALIZER_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "db-wal-recovery",
+            "actor_backbone": "GovKernel runtime",
+            "harness": "LTA WAL recovery materializer",
+            "condition": "runtime authority anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-db-wal-k5-py/result.json",
+        },
+        {
+            "bridge_id": "TB_SQLITE_MATERIALIZER_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "sqlite-db-truncate",
+            "actor_backbone": "GovKernel runtime",
+            "harness": "LTA SQLite truncate materializer",
+            "condition": "runtime authority anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-sqlite-truncate-k5-py/result.json",
+        },
+        {
+            "bridge_id": "SF_INVOICE_MATERIALIZER_K5",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images",
+            "actor_backbone": "GovKernel runtime",
+            "harness": "LTA invoice materializer",
+            "condition": "runtime authority anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts / "stage2/harbor/stage2-skillflow-lta-invoice-materializer-k5-py/result.json",
+        },
+        {
+            "bridge_id": "SF_TRAVEL_MATERIALIZER_K5",
+            "benchmark": "SkillFlow",
+            "task": "task_family_travel_claim_merge",
+            "actor_backbone": "GovKernel runtime",
+            "harness": "LTA travel-claim materializer",
+            "condition": "runtime authority anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts / "stage2/harbor/stage2-skillflow-lta-travel-claim-k5-py/result.json",
+        },
+    ]
+
+
+def _row_from_case(case: dict[str, Any]) -> dict[str, str]:
+    result = _read_json(Path(case["source_path"]))
+    stats = _result_stats(result)
+    return {
+        "bridge_id": case["bridge_id"],
+        "benchmark": case["benchmark"],
+        "task": case["task"],
+        "actor_backbone": case["actor_backbone"],
+        "harness": case["harness"],
+        "condition": case["condition"],
+        "comparison_boundary": case["comparison_boundary"],
+        "n_trials": str(stats["n_trials"]),
+        "n_errors": str(stats["n_errors"]),
+        "passes": str(stats["passes"]),
+        "pass_at_5": _format_optional(stats["pass_at_5"]),
+        "uses_task_specific_materializer": case["uses_task_specific_materializer"],
+        "paper_use": case["paper_use"],
+        "source_path": str(case["source_path"]),
+    }
+
+
+def _result_stats(result: dict[str, Any]) -> dict[str, int | float | None]:
+    evals = (result.get("stats") or {}).get("evals") or {}
+    if evals:
+        payload = next(iter(evals.values()))
+        reward_stats = (payload.get("reward_stats") or {}).get("reward") or {}
+        passes = len(reward_stats.get("1.0", [])) + len(reward_stats.get(1.0, []))
+        return {
+            "n_trials": int(payload.get("n_trials") or 0),
+            "n_errors": int(payload.get("n_errors") or 0),
+            "passes": passes,
+            "pass_at_5": (payload.get("pass_at_k") or {}).get("5"),
+        }
+    verifier_reward = ((result.get("verifier_result") or {}).get("rewards") or {}).get("reward")
+    exception = result.get("exception_info")
+    return {
+        "n_trials": 1,
+        "n_errors": 1 if exception else 0,
+        "passes": 1 if verifier_reward == 1.0 else 0,
+        "pass_at_5": None,
+    }
+
+
+def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
+    model_rows = [
+        row
+        for row in rows
+        if row["comparison_boundary"]
+        in {"ordinary_agent", "prompt_only_control", "model_in_loop_govkernel"}
+    ]
+    runtime_rows = [row for row in rows if row["comparison_boundary"] == "runtime_reliability"]
+    baseline_rows = [
+        row
+        for row in rows
+        if row["bridge_id"] in {"SF_INVOICE_QWEN_TERMINUS_FULL", "SF_INVOICE_QWEN32K_MINISWE_BASELINE"}
+    ]
+    govkernel_k5 = _require_row(rows, "SF_INVOICE_QWEN_GOVKERNEL_K5")
+    materializer_as_agent = [
+        row
+        for row in rows
+        if row["uses_task_specific_materializer"] == "yes"
+        and row["comparison_boundary"] == "model_in_loop_govkernel"
+    ]
+    baseline_passes = _sum_int(baseline_rows, "passes")
+    baseline_trials = _sum_int(baseline_rows, "n_trials")
+    gov_passes = int(govkernel_k5["passes"])
+    gov_trials = int(govkernel_k5["n_trials"])
+    return {
+        "model_in_loop_rows": len(model_rows),
+        "qwen_invoice_baseline_passes": baseline_passes,
+        "qwen_invoice_baseline_trials": baseline_trials,
+        "qwen_invoice_govkernel_passes": gov_passes,
+        "qwen_invoice_govkernel_trials": gov_trials,
+        "qwen_invoice_govkernel_errors": int(govkernel_k5["n_errors"]),
+        "qwen_invoice_pass_delta": gov_passes - baseline_passes,
+        "runtime_reliability_rows": len(runtime_rows),
+        "materializer_rows_used_as_matched_agent": len(materializer_as_agent),
+    }
+
+
+def _require_row(rows: list[dict[str, str]], bridge_id: str) -> dict[str, str]:
+    for row in rows:
+        if row["bridge_id"] == bridge_id:
+            return row
+    raise KeyError(bridge_id)
+
+
+def _sum_int(rows: list[dict[str, str]], field: str) -> int:
+    return sum(int(row[field]) for row in rows)
+
+
+def _write_bridge_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=BRIDGE_FIELDS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _latex_numbers(summary: dict[str, Any]) -> str:
+    commands = {
+        "LTAModelLoopRows": summary["model_in_loop_rows"],
+        "LTAModelLoopQwenInvoiceBaselinePasses": summary["qwen_invoice_baseline_passes"],
+        "LTAModelLoopQwenInvoiceBaselineTrials": summary["qwen_invoice_baseline_trials"],
+        "LTAModelLoopQwenInvoiceGovPasses": summary["qwen_invoice_govkernel_passes"],
+        "LTAModelLoopQwenInvoiceGovTrials": summary["qwen_invoice_govkernel_trials"],
+        "LTAModelLoopQwenInvoiceGovErrors": summary["qwen_invoice_govkernel_errors"],
+        "LTAModelLoopQwenInvoicePassDelta": summary["qwen_invoice_pass_delta"],
+        "LTAModelLoopRuntimeRows": summary["runtime_reliability_rows"],
+        "LTAModelLoopMaterializerAsAgentRows": summary["materializer_rows_used_as_matched_agent"],
+    }
+    lines = [
+        "% Auto-generated by License_code/license_to_act/model_in_loop_bridge.py.",
+        "% Regenerate with License_code/scripts/export_model_in_loop_bridge.py.",
+    ]
+    for name, value in commands.items():
+        lines.append(f"\\newcommand{{\\{name}}}{{{value}}}")
+    return "\n".join(lines) + "\n"
+
+
+def _format_optional(value: Any) -> str:
+    if value is None:
+        return ""
+    numeric = float(value)
+    if numeric.is_integer():
+        return str(int(numeric))
+    return f"{numeric:.3f}".rstrip("0").rstrip(".")
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))

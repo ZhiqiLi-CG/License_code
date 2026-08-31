@@ -100,7 +100,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "target_id": "S7_FREEZE_AND_STATISTICS",
             "story_axis": "The story earns trust by freezing the camera before the final sweep.",
             "current_positive_evidence": (
-                f"{story_gate['summary']['passed_checks']}/{story_gate['summary']['total_checks']} story-gate checks pass; "
+                f"{story_gate['summary']['passed_checks']}/{story_gate['summary']['total_checks']} claim-consistency checks pass; "
                 f"{comparison_summary['baseline_ablation_overlap']} baseline/ablation overlaps."
             ),
             "scale_target": "Freeze task selection, claim boundaries, and metrics before the final positive-mass run.",

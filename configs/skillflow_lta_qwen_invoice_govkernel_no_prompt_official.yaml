@@ -17,4 +17,4 @@ agents:
     kwargs: {}
 
 tasks:
-  - path: /data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images
+  - path: /data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images

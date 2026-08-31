@@ -8,7 +8,7 @@ from typing import Any
 
 PANEL_FIELDS = [
     "ablation_id",
-    "reviewer_requested",
+    "high_priority",
     "mechanism_removed",
     "claim_tested",
     "cut_evidence_cases",
@@ -124,7 +124,7 @@ def write_mechanism_ablation_panel(
 
 def _row(
     ablation_id: str,
-    reviewer_requested: str,
+    high_priority: str,
     mechanism_removed: str,
     claim_tested: str,
     cut_cases: list[str],
@@ -136,7 +136,7 @@ def _row(
     full_trials, full_passes = full_counts
     return {
         "ablation_id": ablation_id,
-        "reviewer_requested": reviewer_requested,
+        "high_priority": high_priority,
         "mechanism_removed": mechanism_removed,
         "claim_tested": claim_tested,
         "cut_evidence_cases": _join(cut_cases),
@@ -178,7 +178,7 @@ def _add_counts(left: tuple[int, int], right: tuple[int, int]) -> tuple[int, int
 def _summarize(rows: list[dict[str, str]]) -> dict[str, int]:
     return {
         "ablation_rows": len(rows),
-        "reviewer_requested_rows": sum(1 for row in rows if row["reviewer_requested"] == "yes"),
+        "high_priority_rows": sum(1 for row in rows if row["high_priority"] == "yes"),
         "baseline_overlap": sum(1 for row in rows if "baseline" in row["comparison_class"]),
         "cut_trials": sum(int(row["cut_trials"]) for row in rows),
         "cut_passes": sum(int(row["cut_passes"]) for row in rows),
@@ -197,7 +197,7 @@ def _write_panel_csv(path: Path, rows: list[dict[str, str]]) -> None:
 def _latex_numbers(summary: dict[str, int]) -> str:
     commands = {
         "LTAMechanismAblationPanelRows": summary["ablation_rows"],
-        "LTAMechanismAblationReviewerRows": summary["reviewer_requested_rows"],
+        "LTAMechanismAblationPriorityRows": summary["high_priority_rows"],
         "LTAMechanismAblationCutPasses": summary["cut_passes"],
         "LTAMechanismAblationCutTrials": summary["cut_trials"],
         "LTAMechanismAblationFullPasses": summary["full_passes"],

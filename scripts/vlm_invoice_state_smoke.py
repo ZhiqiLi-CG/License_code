@@ -84,7 +84,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--img-dir",
-        default="/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/"
+        default="/data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/"
         "task_family_invoice_images/environment/workspace/dataset/img",
     )
     parser.add_argument("--endpoint", default="http://127.0.0.1:8012/v1/chat/completions")
