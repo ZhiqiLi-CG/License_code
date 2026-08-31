@@ -43,6 +43,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
+        _transaction_story_check(paper_dir),
         _story_language_check(paper_dir),
         _main_text_style_check(paper_dir),
         _reproduction_chain_check(root),
@@ -237,7 +238,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, recursive lineage, ablation panel, model-in-loop bridge, scale plan, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, scale plan, and consistency numbers.",
     )
 
 
@@ -256,7 +257,7 @@ def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
         (
             f"{summary['ablation_rows']} mechanism cuts; {summary['high_priority_rows']} high-priority; "
             f"{summary['cut_passes']}/{summary['cut_trials']} cut passes versus "
-            f"{summary['full_passes']}/{summary['full_trials']} full LTA passes."
+            f"{summary['full_passes']}/{summary['full_trials']} full StateTx passes."
         ),
     )
 
@@ -276,7 +277,7 @@ def _model_in_loop_bridge_check(summary: dict[str, Any]) -> dict[str, str]:
         "Model-in-loop evidence should be reported separately from task-specific materializer reliability.",
         (
             f"Qwen invoice ordinary baselines: {summary['qwen_invoice_baseline_passes']}/"
-            f"{summary['qwen_invoice_baseline_trials']}; Qwen+GovKernel: "
+            f"{summary['qwen_invoice_baseline_trials']}; Qwen+CommitController: "
             f"{summary['qwen_invoice_govkernel_passes']}/"
             f"{summary['qwen_invoice_govkernel_trials']}; materializer-as-agent rows: "
             f"{summary['materializer_rows_used_as_matched_agent']}."
@@ -293,12 +294,12 @@ def _recursive_lineage_check(summary: dict[str, Any]) -> dict[str, str]:
         and summary["pass_to_failure_regressions"] == 0
     )
     return _check(
-        "recursive_lineage_has_automatic_amendments",
+        "contract_lineage_has_generated_refinements",
         ok,
-        "The recursive claim should have a generated amendment lineage, not only prose.",
+        "The refinement claim should have a generated State Contract lineage, not only prose.",
         (
-            f"{summary['accepted_amendments']}/{summary['candidate_amendments']} automatic amendments accepted "
-            f"over {summary['compiler_generations']} compiler generations with "
+            f"{summary['accepted_amendments']}/{summary['candidate_amendments']} generated refinements accepted "
+            f"over {summary['compiler_generations']} contract generations with "
             f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
         ),
     )
@@ -310,18 +311,72 @@ def _story_language_check(paper_dir: Path) -> dict[str, str]:
         for relative in ["main.tex", "sections/01_introduction.tex", "sections/04_experiments.tex"]
     )
     anchors = [
-        "Intelligence proposes actions; institutions decide",
-        "agency gap",
-        "Action License",
-        "proposal must earn authority",
-        "positive obligation",
+        "Reasoning is speculative",
+        "commit gap",
+        "Candidate Change",
+        "State Contract",
+        "Commit Controller",
     ]
     missing = [anchor for anchor in anchors if anchor not in combined]
     return _check(
         "story_language_anchors",
         not missing,
         "The main paper should expose the idea before defensive details.",
-        "Core story anchors appear in abstract, introduction, and experiment setup.",
+        "Core transaction story anchors appear in abstract, introduction, and experiment setup.",
+    )
+
+
+def _transaction_story_check(paper_dir: Path) -> dict[str, str]:
+    main = (paper_dir / "main.tex").read_text(encoding="utf-8")
+    intro = (paper_dir / "sections" / "01_introduction.tex").read_text(encoding="utf-8")
+    formulation = (paper_dir / "sections" / "02_formulation.tex").read_text(encoding="utf-8")
+    method = (paper_dir / "sections" / "03_method.tex").read_text(encoding="utf-8")
+
+    front_matter = main.split("\\input{sections/01_introduction}", maxsplit=1)[0]
+    opening = "\n".join([front_matter, intro, formulation, method])
+    required = [
+        "Stateful Agents Need Transactions",
+        "Reasoning is speculative",
+        "external state is durable",
+        "commit gap",
+        "transactional execution layer",
+        "Candidate Change",
+        "State Contract",
+        "Commit Controller",
+        "ready",
+        "write scope",
+        "preserve",
+        "done",
+        "CONTINUE",
+        "REVISE",
+        "COMMIT",
+    ]
+    retired_front_matter = [
+        "institutions decide",
+        "agency gap",
+        "Action License",
+        "authority compiler",
+        "positive obligation",
+        "institutional channel",
+        "institution of action",
+    ]
+    missing = [phrase for phrase in required if phrase not in opening]
+    retired_hits = [phrase for phrase in retired_front_matter if phrase in front_matter]
+    section_ok = (
+        "\\section{The Commit Gap}" in formulation
+        and "\\section{Transactional Execution for Agents}" in method
+    )
+    ok = not missing and not retired_hits and section_ok
+    evidence = (
+        "Commit gap, State Contract, Candidate Change, and Commit Controller lead the front matter."
+        if ok
+        else f"missing={missing}; retired_front_matter={retired_hits}; section_ok={section_ok}"
+    )
+    return _check(
+        "transaction_story_framing",
+        ok,
+        "The paper should lead with transactional execution rather than legal or institutional terminology.",
+        evidence,
     )
 
 
@@ -368,10 +423,11 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_comparison_manifest.py",
         "export_headline_result_panel.py",
         "export_submission_experiment_blueprint.py",
-        "export_recursive_amendment_lineage.py",
+        "export_contract_refinement_lineage.py",
         "export_mechanism_ablation_panel.py",
         "export_model_in_loop_bridge.py",
         "export_submission_scale_plan.py",
+        "export_state_contract_examples.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
         "latexmk -pdf",
@@ -382,7 +438,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, recursive lineage export, ablation panel export, model-in-loop bridge export, scale plan export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, scale plan export, consistency export, figure generation, and LaTeX build.",
     )
 
 
@@ -419,7 +475,7 @@ def _appendix_story_check(appendix_path: Path) -> dict[str, str]:
     text = appendix_path.read_text(encoding="utf-8")
     anchors = [
         "Portfolio construction",
-        "proposal/evidence/authority/commit",
+        "reason/prepare/commit",
         "Runs that only diagnose infrastructure or unrelated model behavior remain in the artifact record",
     ]
     missing = [anchor for anchor in anchors if anchor not in text]

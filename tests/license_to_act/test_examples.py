@@ -28,7 +28,7 @@ def test_tau2_cancel_example_denies_user_confirmation_only():
 
     assert decision.allowed is False
     assert decision.reason == "missing_required_evidence"
-    assert decision.missing_evidence == {"PolicyAuthorizationEvidence"}
+    assert decision.missing_evidence == {"CommitReadinessEvidence"}
 
 
 def test_tb21_trace_line_maps_git_filter_repo_to_denied_history_rewrite():

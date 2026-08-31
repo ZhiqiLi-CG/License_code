@@ -26,7 +26,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["clean_positive_passes"] == 25
     assert summary["faithful_baseline_trials"] == 5
     assert summary["faithful_baseline_passes"] == 0
-    assert summary["tau2_read_correct_write_wrong_proxy"] == 16
+    assert summary["tau2_read_correct_write_wrong_proxy"] == 19
 
     rows = portfolio["rows"]
     assert [row["portfolio_id"] for row in rows] == [
@@ -35,7 +35,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
         "P3_TB_OFFICIAL_RERUNS",
         "P4_SKILLFLOW_OFFICIAL_RERUNS",
         "P5_LONGCTX_FAITHFUL_BASELINE",
-        "P6_QWEN_GOVKERNEL_STRESS",
+        "P6_QWEN_COMMIT_CONTROLLER_BRIDGE",
     ]
     assert rows[4]["comparison_kind"] == "faithful_baseline"
     assert rows[4]["paper_use"] == "main_counterpoint"

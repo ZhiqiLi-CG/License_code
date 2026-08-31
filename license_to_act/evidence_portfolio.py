@@ -25,7 +25,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     stage1_rows = _read_csv(data_dir / "stage1_cases.csv")
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     transfer_rows = _read_csv(data_dir / "transfer_ledger.csv")
-    tau2_rows = _read_csv(data_dir / "tau2_authority_mining.csv")
+    tau2_rows = _read_csv(data_dir / "tau2_commit_mining.csv")
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
@@ -48,7 +48,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     rows = [
         {
             "portfolio_id": "P1_STAGE1_TRANSFER",
-            "story_role": "same amendment moves across state substrates",
+            "story_role": "same commit-contract refinement moves across state substrates",
             "benchmarks": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
             "state_substrates": "business records | terminal state | workflow artifacts",
             "actor_backbones": "Qwen3.8-27B | Mistral-Small-3.2-24B | Codex GPT-5.5",
@@ -59,7 +59,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P2_TAU2_MINING",
-            "story_role": "authority failures are not missing-read failures",
+            "story_role": "commit failures are not missing-read failures",
             "benchmarks": "tau2-Bench",
             "state_substrates": "business records",
             "actor_backbones": "Qwen3.8-27B | Mistral-Small-3.2-24B",
@@ -69,14 +69,14 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
                 f"cancellation commits from {int(tau2_metrics['result_files'])} result files"
             ),
             "paper_use": "main_spine",
-            "source_data": "tau2_authority_mining.csv",
+            "source_data": "tau2_commit_mining.csv",
         },
         {
             "portfolio_id": "P3_TB_OFFICIAL_RERUNS",
-            "story_role": "executable authority is stable in terminal state",
+            "story_role": "transaction controller is stable in terminal state",
             "benchmarks": "Terminal-Bench 2.1",
             "state_substrates": "terminal state",
-            "actor_backbones": "GovKernel runtime",
+            "actor_backbones": "CommitController runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(tb_clean_rows)}/{_sum_int(tb_clean_rows, 'n_trials')} official passes",
             "paper_use": "main_spine",
@@ -84,10 +84,10 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P4_SKILLFLOW_OFFICIAL_RERUNS",
-            "story_role": "authority can compel missing workflow artifacts",
+            "story_role": "completion triggers finalize missing workflow artifacts",
             "benchmarks": "SkillFlow",
             "state_substrates": "workflow artifacts",
-            "actor_backbones": "GovKernel runtime",
+            "actor_backbones": "CommitController runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(sf_clean_rows)}/{_sum_int(sf_clean_rows, 'n_trials')} official passes",
             "paper_use": "main_spine",
@@ -95,7 +95,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P5_LONGCTX_FAITHFUL_BASELINE",
-            "story_role": "stronger long context alone does not solve the authority boundary",
+            "story_role": "stronger long context alone does not solve the commit boundary",
             "benchmarks": "Terminal-Bench 2.1 | SkillFlow",
             "state_substrates": "terminal state | workflow artifacts",
             "actor_backbones": "Qwen3.8-27B-long32k",
@@ -105,8 +105,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "source_data": "stage2_reliability.csv",
         },
         {
-            "portfolio_id": "P6_QWEN_GOVKERNEL_STRESS",
-            "story_role": "model integration remains separate from clean executable authority",
+            "portfolio_id": "P6_QWEN_COMMIT_CONTROLLER_BRIDGE",
+            "story_role": "model integration remains separate from clean transaction reliability",
             "benchmarks": "SkillFlow",
             "state_substrates": "workflow artifacts",
             "actor_backbones": "Qwen3.8-27B",
@@ -181,7 +181,7 @@ def _actor_backbones(stage1_rows: list[dict[str, str]], stage2_rows: list[dict[s
         raw_names.add(row["condition"])
     normalized = {_normalize_actor_name(name) for name in raw_names}
     normalized.discard("")
-    normalized.discard("GovKernel runtime")
+    normalized.discard("CommitController runtime")
     return sorted(normalized)
 
 
@@ -194,8 +194,8 @@ def _normalize_actor_name(name: str) -> str:
         return "Qwen3.8-27B-long32k"
     if "Qwen" in name:
         return "Qwen3.8-27B"
-    if "LTA" in name or "GovKernel" in name:
-        return "GovKernel runtime"
+    if "LTA" in name or "GovKernel" in name or "CommitController" in name:
+        return "CommitController runtime"
     return ""
 
 
@@ -228,6 +228,10 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
+
+
+def _preferred_existing(primary: Path, fallback: Path) -> Path:
+    return primary if primary.exists() else fallback
 
 
 def _parse_number(value: str) -> int | float | str:

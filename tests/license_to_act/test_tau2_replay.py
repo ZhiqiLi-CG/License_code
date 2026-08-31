@@ -60,6 +60,6 @@ def test_replays_tau2_result_as_license_decisions(tmp_path):
             "evidence_types": ["ReservationStateEvidence", "UserIntentEvidence"],
             "allowed": False,
             "reason": "missing_required_evidence",
-            "missing_evidence": ["PolicyAuthorizationEvidence"],
+            "missing_evidence": ["CommitReadinessEvidence"],
         }
     ]

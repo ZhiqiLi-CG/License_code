@@ -12,7 +12,7 @@ from license_to_act.recursive_amendment_lineage import (
 )
 
 
-def test_build_recursive_amendment_lineage_exposes_automatic_compiler_generations() -> None:
+def test_build_recursive_amendment_lineage_exposes_contract_refinement_generations() -> None:
     lineage = build_recursive_amendment_lineage(Path("/data/zhiqi/License"))
 
     summary = lineage["summary"]
@@ -26,11 +26,11 @@ def test_build_recursive_amendment_lineage_exposes_automatic_compiler_generation
     assert summary["mean_generation_gain"] > 0
 
     rows = lineage["rows"]
-    assert [row["amendment_id"] for row in rows] == [
-        "A1_POLICY_AUTHORIZATION_EVIDENCE",
-        "A2_REGION_AND_SIDE_EFFECT_BOUNDS",
-        "A3_EVIDENCE_CONSUMING_READ_LICENSE",
-        "A4_POSITIVE_OUTPUT_OBLIGATION",
+    assert [row["refinement_id"] for row in rows] == [
+        "C1_COMMIT_READINESS_EVIDENCE",
+        "C2_WRITE_SCOPE_AND_PRESERVE",
+        "C3_PRESERVING_READ_CONTRACT",
+        "C4_COMPLETION_TRIGGER",
     ]
     assert all(row["synthesis_method"] == "automatic_failure_signature_rule" for row in rows)
     assert all(row["admission_decision"] == "accept" for row in rows)
@@ -40,12 +40,12 @@ def test_build_recursive_amendment_lineage_exposes_automatic_compiler_generation
 def test_recursive_amendment_lineage_keeps_baselines_and_ablation_boundaries_separate() -> None:
     rows = build_recursive_amendment_lineage(Path("/data/zhiqi/License"))["rows"]
 
-    assert all(row["comparison_class"] == "compiler_amendment" for row in rows)
-    assert all("task-ID" not in row["license_diff"] for row in rows)
-    assert any("PolicyAuthorizationEvidence" in row["license_diff"] for row in rows)
-    assert any("OBLIGE" in row["license_diff"] for row in rows)
-    assert any("read_license" in row["license_diff"] for row in rows)
-    assert any("forbidden_side_effects" in row["license_diff"] for row in rows)
+    assert all(row["comparison_class"] == "contract_refinement" for row in rows)
+    assert all("task-ID" not in row["contract_diff"] for row in rows)
+    assert any("READY_PREDICATE" in row["contract_diff"] for row in rows)
+    assert any("DONE_TRIGGER" in row["contract_diff"] for row in rows)
+    assert any("PRESERVING_READ" in row["contract_diff"] for row in rows)
+    assert any("preserve constraints" in row["contract_diff"] for row in rows)
 
 
 def test_write_recursive_amendment_lineage_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -53,11 +53,12 @@ def test_write_recursive_amendment_lineage_exports_csv_json_and_tex(tmp_path: Pa
         Path("/data/zhiqi/License"),
         paper_data_dir=tmp_path / "paper-data",
         paper_sections_dir=tmp_path / "sections",
-        summary_path=tmp_path / "artifacts" / "recursive_amendment_lineage.json",
+        summary_path=tmp_path / "artifacts" / "contract_refinement_lineage.json",
     )
 
     assert Path(output["outputs"]["summary_json"]).exists()
     assert Path(output["outputs"]["lineage_csv"]).exists()
+    assert "legacy_lineage_csv" not in output["outputs"]
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["lineage_csv"]).open(newline="", encoding="utf-8")))
@@ -78,11 +79,11 @@ def test_write_recursive_amendment_lineage_exports_csv_json_and_tex(tmp_path: Pa
 
 
 def test_export_recursive_amendment_lineage_cli_writes_requested_outputs(tmp_path: Path) -> None:
-    summary_path = tmp_path / "artifacts" / "recursive_amendment_lineage.json"
+    summary_path = tmp_path / "artifacts" / "contract_refinement_lineage.json"
     result = subprocess.run(
         [
             sys.executable,
-            "scripts/export_recursive_amendment_lineage.py",
+            "scripts/export_contract_refinement_lineage.py",
             "--paper-data-dir",
             str(tmp_path / "paper-data"),
             "--paper-sections-dir",
@@ -98,5 +99,6 @@ def test_export_recursive_amendment_lineage_cli_writes_requested_outputs(tmp_pat
 
     assert result.returncode == 0, result.stderr
     assert str(summary_path) in result.stdout
-    assert (tmp_path / "paper-data" / "recursive_amendment_lineage.csv").exists()
+    assert (tmp_path / "paper-data" / "contract_refinement_lineage.csv").exists()
+    assert not (tmp_path / "paper-data" / "recursive_amendment_lineage.csv").exists()
     assert (tmp_path / "sections" / "generated_recursive_numbers.tex").exists()

@@ -24,15 +24,15 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["clean_positive_trials"] == 25
     assert summary["faithful_baseline_passes"] == 0
     assert summary["faithful_baseline_trials"] == 5
-    assert summary["tau2_read_correct_write_wrong_proxy"] == 16
+    assert summary["tau2_read_correct_write_wrong_proxy"] == 19
     assert summary["submission_scale_rows"] == 7
 
     assert [row["panel_id"] for row in panel["rows"]] == [
         "H1_BREADTH",
         "H2_CLEAN_POSITIVE_MASS",
         "H3_FAITHFUL_BASELINE_COUNTERPOINT",
-        "H4_TAU2_AUTHORITY_MINING",
-        "H5_AMENDMENT_TRANSFER",
+        "H4_TAU2_COMMIT_MINING",
+        "H5_CONTRACT_REFINEMENT_TRANSFER",
         "H6_SUBMISSION_SCALE_PATH",
     ]
     assert all(row["story_question"] for row in panel["rows"])
@@ -64,7 +64,7 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTAHeadlineMainPositiveRows}{4}" in tex
     assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{5}" in tex
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{25}" in tex
-    assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{16}" in tex
+    assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{19}" in tex
     assert "\\newcommand{\\LTAHeadlineSubmissionScaleRows}{7}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

@@ -35,8 +35,8 @@ TAU2_BY_GROUP_FIELDS = [
     "group_type",
     "group",
     "n_cancel_decisions",
-    "n_lta_vetoes",
-    "n_lta_allows",
+    "n_revision_targets",
+    "n_ready_commits",
     "n_read_correct_write_wrong_proxy",
     "mean_reward_on_cancel_decisions",
 ]
@@ -80,12 +80,12 @@ def build_tau2_mining_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
             "Runs separated from agent-behavior claims, mostly context or runner failures.",
         ),
         _metric("cancel_decisions", summary["n_cancel_decisions"], "Observed cancel_reservation commits."),
-        _metric("lta_veto_targets", summary["n_lta_vetoes"], "Commits lacking policy authorization under LTA."),
-        _metric("lta_allows", summary["n_lta_allows"], "Commits licensed by the cancellation policy model."),
+        _metric("revision_targets", summary["n_lta_vetoes"], "Commits lacking readiness under StateTx."),
+        _metric("ready_commits", summary["n_lta_allows"], "Cancellation commits accepted by the readiness model."),
         _metric(
             "vetoes_with_user_intent",
             summary["n_vetoes_with_user_intent"],
-            "User wanted cancellation, but intent alone did not authorize the commit.",
+            "User wanted cancellation, but intent alone did not make the commit ready.",
         ),
         _metric(
             "vetoes_with_reservation_state",
@@ -102,12 +102,12 @@ def build_tau2_mining_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
         _metric(
             "read_correct_write_wrong_proxy",
             summary["n_read_correct_write_wrong_proxy"],
-            "Matched evidence existed before a policy-invalid state-changing write.",
+            "Matched evidence existed before a policy-invalid durable write.",
         ),
         _metric(
-            "license_allows_with_reward_one",
+            "ready_commits_with_reward_one",
             summary["n_license_allows_with_reward_one"],
-            "Licensed cancel commits that received full task reward.",
+            "Ready cancel commits that received full task reward.",
         ),
     ]
     return rows
@@ -126,8 +126,8 @@ def build_tau2_by_group_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
                     "group_type": group_type,
                     "group": group,
                     "n_cancel_decisions": values["n_cancel_decisions"],
-                    "n_lta_vetoes": values["n_lta_vetoes"],
-                    "n_lta_allows": values["n_lta_allows"],
+                    "n_revision_targets": values["n_lta_vetoes"],
+                    "n_ready_commits": values["n_lta_allows"],
                     "n_read_correct_write_wrong_proxy": values["n_read_correct_write_wrong_proxy"],
                     "mean_reward_on_cancel_decisions": _format_optional(
                         values["mean_reward_on_cancel_decisions"]
@@ -151,9 +151,8 @@ def write_stage2_paper_results(
 
     paper_data_dir.mkdir(parents=True, exist_ok=True)
     _write_csv(paper_data_dir / "stage2_reliability.csv", RELIABILITY_FIELDS, reliability_rows)
-    _write_csv(paper_data_dir / "tau2_authority_mining.csv", TAU2_MINING_FIELDS, tau2_mining_rows)
-    _write_csv(paper_data_dir / "tau2_authority_by_group.csv", TAU2_BY_GROUP_FIELDS, tau2_by_group_rows)
-
+    _write_csv(paper_data_dir / "tau2_commit_mining.csv", TAU2_MINING_FIELDS, tau2_mining_rows)
+    _write_csv(paper_data_dir / "tau2_commit_by_group.csv", TAU2_BY_GROUP_FIELDS, tau2_by_group_rows)
     clean_rows = [row for row in reliability_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_baseline_rows = [row for row in reliability_rows if row["paper_use"] == "faithful_baseline"]
     summary = {

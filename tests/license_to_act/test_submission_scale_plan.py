@@ -20,19 +20,19 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     assert summary["current_faithful_baseline_trials"] == 5
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 5
-    assert summary["story_gate_checks"] == 15
+    assert summary["story_gate_checks"] == 16
 
     rows = plan["rows"]
     assert [row["target_id"] for row in rows] == [
         "S1_TAU2_WRITE_FAMILIES",
-        "S2_TERMINAL_AUTHORITY_PILOT",
-        "S3_SKILLFLOW_OBLIGATION_FAMILIES",
+        "S2_TERMINAL_TRANSACTION_PILOT",
+        "S3_SKILLFLOW_FINALIZATION_FAMILIES",
         "S4_MODEL_BREADTH",
         "S5_FAITHFUL_BASELINE_LADDER",
         "S6_MECHANISM_ABLATION_COMPLETION",
         "S7_FREEZE_AND_STATISTICS",
     ]
-    assert all("proposal/evidence/authority/commit" in row["inclusion_rule"] for row in rows)
+    assert all("reason/prepare/commit" in row["inclusion_rule"] for row in rows)
     assert all("RSI" not in " ".join(row.values()) for row in rows)
 
 

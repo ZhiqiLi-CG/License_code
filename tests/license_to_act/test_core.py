@@ -19,14 +19,14 @@ def test_denies_commit_when_required_evidence_type_is_missing():
         actor_role="customer_service_agent",
         state_region="reservation:*",
         operation="CommitCancelReservation",
-        required_evidence={"PolicyAuthorizationEvidence"},
+        required_evidence={"CommitReadinessEvidence"},
     )
 
     decision = evaluate_event(event, [license_])
 
     assert decision.allowed is False
     assert decision.reason == "missing_required_evidence"
-    assert decision.missing_evidence == {"PolicyAuthorizationEvidence"}
+    assert decision.missing_evidence == {"CommitReadinessEvidence"}
 
 
 def test_denies_git_history_rewrite_when_license_only_allows_working_tree_files():

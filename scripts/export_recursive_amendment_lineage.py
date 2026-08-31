@@ -15,13 +15,15 @@ from license_to_act.recursive_amendment_lineage import write_recursive_amendment
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Export recursive amendment lineage data for the LTA paper.")
+    parser = argparse.ArgumentParser(
+        description="Legacy entry point for exporting contract-refinement lineage data."
+    )
     parser.add_argument("--paper-data-dir", type=Path, default=project_root() / "License_paper" / "data")
     parser.add_argument("--paper-sections-dir", type=Path, default=project_root() / "License_paper" / "sections")
     parser.add_argument(
         "--summary",
         type=Path,
-        default=artifact_path("paper_results", "lta_recursive_amendment_lineage_20260831.json"),
+        default=artifact_path("paper_results", "contract_refinement_lineage_20260831.json"),
     )
     args = parser.parse_args(argv)
 

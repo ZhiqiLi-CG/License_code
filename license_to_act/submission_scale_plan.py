@@ -31,47 +31,47 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
     rows = [
         {
             "target_id": "S1_TAU2_WRITE_FAMILIES",
-            "story_axis": "Intent proposes; policy and source state authorize.",
+            "story_axis": "Candidate changes must be ready before business writes commit.",
             "current_positive_evidence": (
                 f"{metrics['tau2_read_correct_write_wrong_proxy']} read-correct/write-wrong cancellation commits "
                 f"from {metrics['tau2_result_files']} local result files; "
                 f"{metrics['stage1_preserved_positive']} legal tau2 commit preserved."
             ),
             "scale_target": "Run authorized and unauthorized write families across airline, retail, banking, and telecom.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "next_run": "Freeze write-family task list, then run full, prompt, static-license, and LTA conditions.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "next_run": "Freeze write-family task list, then run full, prompt, static-contract, and transactional conditions.",
         },
         {
-            "target_id": "S2_TERMINAL_AUTHORITY_PILOT",
-            "story_axis": "Shell proposals need region, side-effect, and witness authority.",
+            "target_id": "S2_TERMINAL_TRANSACTION_PILOT",
+            "story_axis": "Shell proposals need scoped write sets and preservation checks.",
             "current_positive_evidence": (
                 f"{metrics['stage2_terminal_clean_trials']}/{metrics['stage2_terminal_clean_trials']} "
                 "official Terminal-Bench passes across Git, WAL, and truncated-SQLite anchors."
             ),
-            "scale_target": "Expand to a 12-task authority pilot, then a 45-60 task Terminal-Bench sweep.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "next_run": "Add build, security, data, image/document, and process-state authority anchors.",
+            "scale_target": "Expand to a 12-task transaction pilot, then a 45-60 task Terminal-Bench sweep.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "next_run": "Add build, security, data, image/document, and process-state commit anchors.",
         },
         {
-            "target_id": "S3_SKILLFLOW_OBLIGATION_FAMILIES",
-            "story_axis": "Complete evidence can oblige missing workflow artifacts.",
+            "target_id": "S3_SKILLFLOW_FINALIZATION_FAMILIES",
+            "story_axis": "Complete evidence can trigger missing workflow artifacts.",
             "current_positive_evidence": (
                 f"{metrics['stage2_skillflow_clean_trials']}/{metrics['stage2_skillflow_clean_trials']} "
                 "official SkillFlow passes across invoice and travel-claim materialization."
             ),
-            "scale_target": "Add at least two more artifact/authority SkillFlow families before submission.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "next_run": "Prioritize healthcare, cross-format reconciliation, and document-fraud obligation families.",
+            "scale_target": "Add at least two more artifact/finalization SkillFlow families before submission.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "next_run": "Prioritize healthcare, cross-format reconciliation, and document-fraud finalization families.",
         },
         {
             "target_id": "S4_MODEL_BREADTH",
-            "story_axis": "The institution should help frozen actors, not one wrapper.",
+            "story_axis": "The transaction layer should help frozen actors, not one wrapper.",
             "current_positive_evidence": (
                 f"{metrics['faithful_baseline_trials']} matched Qwen3.8-27B-long32k faithful-baseline trials; "
-                "Qwen3.8-27B, Mistral-Small-3.2-24B, Codex GPT-5.5, and GovKernel appear in the current spine."
+                "Qwen3.8-27B, Mistral-Small-3.2-24B, Codex GPT-5.5, and CommitController appear in the current spine."
             ),
-            "scale_target": "Add one additional open model and one high-capability terminal agent after compiler freeze.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "scale_target": "Add one additional open model and one high-capability terminal agent after contract freeze.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "next_run": "Run Gemma or Mistral held-out slices plus Codex or Claude terminal baselines if budget allows.",
         },
         {
@@ -82,19 +82,19 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"{metrics['faithful_baseline_trials']} trials, mean reward {metrics['faithful_baseline_mean_reward']:.1f}."
             ),
             "scale_target": "Add faithful external-agent baselines for each scaled benchmark family.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "next_run": "Keep baseline configs faithful; do not relabel mechanism cuts as external baselines.",
         },
         {
             "target_id": "S6_MECHANISM_ABLATION_COMPLETION",
-            "story_axis": "Ablations are our controlled cuts through the institution.",
+            "story_axis": "Ablations are our controlled cuts through the transaction layer.",
             "current_positive_evidence": (
                 f"{comparison_summary['mechanism_ablation_rows']} planned mechanism ablation rows; "
                 f"{comparison_summary['completed_mechanism_ablation_rows']} already have seed evidence."
             ),
-            "scale_target": "Complete executable ablations for authority, obligation, side-effect, read, and amendment cuts.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "next_run": "Run ablations after the full LTA condition and task selection are frozen.",
+            "scale_target": "Complete executable ablations for readiness, finalization, side-effect, read, and refinement cuts.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "next_run": "Run ablations after the full transaction condition and task selection are frozen.",
         },
         {
             "target_id": "S7_FREEZE_AND_STATISTICS",
@@ -104,7 +104,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"{comparison_summary['baseline_ablation_overlap']} baseline/ablation overlaps."
             ),
             "scale_target": "Freeze task selection, claim boundaries, and metrics before the final positive-mass run.",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "next_run": "Report confidence intervals, paired tests, and pass-to-fail regression after final runs.",
         },
     ]

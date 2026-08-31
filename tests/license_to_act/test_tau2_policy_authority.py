@@ -9,7 +9,7 @@ from license_to_act.tau2_policy_authority import (
 )
 
 
-def test_cancel_event_distinguishes_user_intent_from_policy_authorization():
+def test_cancel_event_distinguishes_user_intent_from_commit_readiness():
     messages = [
         {"role": "user", "content": "I need to cancel because of a change of plans."},
         {"role": "tool", "content": json.dumps(_reservation())},
@@ -22,10 +22,10 @@ def test_cancel_event_distinguishes_user_intent_from_policy_authorization():
     assert event.evidence.types == {"UserIntentEvidence", "ReservationStateEvidence"}
     assert decision.allowed is False
     assert decision.reason == "missing_required_evidence"
-    assert decision.missing_evidence == {"PolicyAuthorizationEvidence"}
+    assert decision.missing_evidence == {"CommitReadinessEvidence"}
 
 
-def test_cancel_event_adds_policy_authorization_when_precondition_is_met():
+def test_cancel_event_adds_commit_readiness_when_precondition_is_met():
     messages = [
         {"role": "user", "content": "I need to cancel because my plans changed."},
         {"role": "tool", "content": json.dumps(_reservation(cabin="business"))},
@@ -35,7 +35,7 @@ def test_cancel_event_adds_policy_authorization_when_precondition_is_met():
     event = cancel_reservation_event_from_trace(messages, tool_call, "2024-05-15T15:00:00")
     decision = evaluate_tau2_tool_call(messages, tool_call, "2024-05-15T15:00:00", [tau2_cancel_license()])
 
-    assert "PolicyAuthorizationEvidence" in event.evidence.types
+    assert "CommitReadinessEvidence" in event.evidence.types
     assert decision.allowed is True
     assert decision.reason == "licensed"
 

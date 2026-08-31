@@ -73,8 +73,8 @@ def mine_tau2_authority_results(
 
     return {
         "benchmark": "tau2-Bench",
-        "analysis": "authority_mining_for_cancel_reservation",
-        "license": "tau2_airline_cancel_policy",
+        "analysis": "commit_gap_mining_for_cancel_reservation",
+        "contract": "tau2_airline_cancel_policy",
         "result_files": result_files,
         "summary": _summarize(result_files, decisions, infrastructure_errors),
         "by_model": _group_summary(decisions, "model"),
@@ -141,7 +141,7 @@ def infer_condition_family(run_id: str) -> str:
     )
     memory_terms = ("prompt_checklist", "memory_lesson", "proofhandle", "recuris")
     if any(term in text for term in lta_terms):
-        return "license_to_act_or_gate"
+        return "transaction_layer_or_gate"
     if any(term in text for term in memory_terms):
         return "prompt_or_memory"
     return "baseline_or_probe"
@@ -208,7 +208,7 @@ def _mine_simulation(
                     "lta_veto": veto,
                     "has_user_intent": "UserIntentEvidence" in event.evidence.types,
                     "has_reservation_state": has_reservation_state,
-                    "has_policy_authorization": "PolicyAuthorizationEvidence" in event.evidence.types,
+                    "has_commit_readiness": "CommitReadinessEvidence" in event.evidence.types,
                     "matched_reservation_read": reservation_id in read_matches,
                     "read_correct_write_wrong_proxy": read_correct_write_wrong,
                     "outcome_bucket": _outcome_bucket(decision.allowed, reward, db_reward),
@@ -263,13 +263,13 @@ def _summarize_group(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def _outcome_bucket(allowed: bool, reward: float | None, db_reward: float | None) -> str:
     if not allowed and (reward == 0.0 or db_reward == 0.0):
-        return "veto_target_failed_commit"
+        return "revision_target_failed_commit"
     if not allowed:
-        return "veto_target_nonfailing_or_unscored"
+        return "revision_target_nonfailing_or_unscored"
     if allowed and reward == 1.0:
-        return "licensed_success"
+        return "ready_commit_success"
     if allowed:
-        return "licensed_failure_or_partial"
+        return "ready_commit_failure_or_partial"
     return "unscored"
 
 

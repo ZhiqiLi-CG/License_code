@@ -2,28 +2,28 @@
 
 Date: 2026-08-30
 
-This document freezes the second-stage experimental spine for License-to-Act before expanding the result matrix. The goal is not to make a cautious audit paper. The goal is to support one bold story with enough real benchmark evidence that the story feels inevitable:
+This document freezes the second-stage experimental spine for StateTx before expanding the result matrix. The goal is not to make a cautious audit paper. The goal is to support one bold story with enough real benchmark evidence that the story feels inevitable:
 
 ```text
-Self-improving agents need an executable institution. User intent, task phrasing,
-model confidence, and observed evidence can propose an action, but a state-changing
-commit needs an explicit license.
+Reasoning is speculative, but external state is durable. User intent, task phrasing,
+model confidence, and observed evidence can propose a change, but a state-changing
+commit needs a transaction.
 ```
 
 ## Core Claim
 
-License-to-Act shifts recursive self-improvement from editing advice to editing the authority compiler that decides when a proposal may become a state transition. The persistent object is an Action License, not a reflection:
+StateTx shifts recursive self-improvement from editing advice to editing the State Contracts that decide when a Candidate Change may become a durable transition. The persistent object is a transaction contract, not a reflection:
 
 ```text
-actor, operation, state region, required evidence, side-effect bounds,
-positive obligation, expiry/inheritance, recovery protocol
+ready evidence, write scope, preserve constraints, done predicate,
+completion trigger, expiry/inheritance, recovery protocol
 ```
 
 The narrative must stay unified across the required benchmark families:
 
-- tau2-Bench: dialogue agents confuse user intent with business-record authorization.
-- Terminal-Bench 2.1: terminal agents confuse a local task goal with authority to mutate collateral repository, database, process, or artifact state.
-- SkillFlow: workflow agents confuse extraction evidence with the obligation and authority to materialize verifier-visible artifacts.
+- tau2-Bench: dialogue agents confuse user intent with commit readiness for business records.
+- Terminal-Bench 2.1: terminal agents confuse a local task goal with permission to mutate collateral repository, database, process, or artifact state.
+- SkillFlow: workflow agents confuse extraction evidence with the done predicate for verifier-visible artifacts.
 
 ## Frozen Baseline Contract
 
@@ -32,16 +32,16 @@ Faithful baselines are not ablations. They must use the same task harness, offic
 Baseline ladder:
 
 1. Vanilla actor on official harness.
-2. Prompt-only commit protocol, where the model receives the LTA language but no executable GovKernel.
+2. Prompt-only commit protocol, where the model receives transaction language but no executable Commit Controller.
 3. Reflection/history or Recuris-style memory evolution, implemented as faithfully as local infrastructure permits.
-4. Fixed license ledger without recursive amendment.
-5. Full License-to-Act with GovKernel decisions and amendment transfer.
+4. Fixed State Contract ledger without failure-derived refinement.
+5. Full StateTx with Commit Controller decisions and contract-refinement transfer.
 
 Ablations are our mechanism probes and may be intentionally narrower:
 
 - remove side-effect bounds;
-- remove source-state authorization;
-- remove positive obligations;
+- remove source-state readiness;
+- remove completion triggers;
 - remove recovery protocol;
 - allow proposal evidence to satisfy commit evidence.
 
@@ -50,7 +50,7 @@ Ablations are our mechanism probes and may be intentionally narrower:
 Source/amendment split:
 
 - tau2 airline cancellation tasks that motivated the first amendment, including task 1 and task 48.
-- The amendment is: proposal evidence cannot license a commit without independent policy/source-state authorization.
+- The refinement is: proposal evidence cannot commit without independent policy/source-state readiness.
 
 Control split:
 
@@ -61,7 +61,7 @@ Control split:
 Held-out split:
 
 - tau2: at least one non-airline domain after the license schema is frozen, preferring retail or telecom.
-- Terminal-Bench 2.1: a stratified slice covering repo mutation, database recovery, artifact production, process state, and data/schema authority.
+- Terminal-Bench 2.1: a stratified slice covering repo mutation, database recovery, artifact production, process state, and data/schema commit boundaries.
 - SkillFlow: OCR/Data Extraction plus at least two additional families with workbook/schema/materialization pressure.
 
 Gemma-4-31B-it remains held out until licenses, task slices, and parser decisions are frozen.
@@ -97,11 +97,11 @@ Batch A: Reproducibility K-5 anchors.
 - Run official Harbor K=5 repeats for `sanitize-git-repo`, `db-wal-recovery`, `sqlite-db-truncate`, SkillFlow invoice materialization, and SkillFlow travel-claim OCR merge.
 - Purpose: turn single official wins into reliability bars.
 
-Batch B: tau2 authority mining.
+Batch B: tau2 commit mining.
 
 - Scan all local tau2 result files.
 - Separate infrastructure failures from agent decisions.
-- Count cancel commits where LTA would veto, where reservation reads were already matched, and where official reward or DB reward failed.
+- Count cancel commits where StateTx would request revision, where reservation reads were already matched, and where official reward or DB reward failed.
 - Purpose: convert the tau2 story from three examples into a distributional diagnosis.
 
 Batch C: held-out task expansion.
@@ -120,8 +120,8 @@ Batch D: ablations and transfer.
 The main paper should contain positive, story-serving results:
 
 - failure-to-pass changes under official verifiers;
-- non-regression on licensed positive controls;
-- reduction in false authority, overbroad side effects, missing commit obligations, and evidence-consuming reads.
+- non-regression on ready positive controls;
+- reduction in premature commits, overbroad side effects, missing finalization, and destructive reads.
 
 Infrastructure errors, weak context-window failures, and noisy failed probes may be stored in artifacts but should only enter the paper when they clarify resource needs or boundary conditions.
 

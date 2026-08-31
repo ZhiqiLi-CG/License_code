@@ -42,7 +42,7 @@ def cancel_reservation_event_from_trace(
         evidence_types.add("ReservationStateEvidence")
         evidence_refs.add(f"reservation:{reservation_id}")
         if cancellation_preconditions_met(reservation, reason, current_time):
-            evidence_types.add("PolicyAuthorizationEvidence")
+            evidence_types.add("CommitReadinessEvidence")
             evidence_refs.add(f"policy:cancel:{reason}")
 
     return StateChangeEvent(

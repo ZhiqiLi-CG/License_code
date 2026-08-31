@@ -65,15 +65,16 @@ def build_amendment_transfer_report(
 
     return {
         "amendment": {
-            "name": "separate_intent_from_authorization",
+            "name": "separate_proposal_from_commit",
             "source_benchmark": "tau2-Bench",
             "rule": (
-                "User intent, task phrasing, and model confidence are admissible proposal evidence, "
-                "but state-changing commits require independent policy or source-state authorization evidence."
+                "User intent, task phrasing, and model confidence may propose a Candidate Change, "
+                "but durable commits require ready evidence, bounded write scope, preservation checks, "
+                "and a done predicate."
             ),
             "compiler_effect": (
-                "Split proposal rights from commit rights; attach evidence requirements and collateral-state "
-                "invariants to each commit operation."
+                "Split proposals from commits; attach readiness, write-scope, preserve, and done checks "
+                "to each durable operation."
             ),
         },
         "source": {
@@ -81,10 +82,10 @@ def build_amendment_transfer_report(
         },
         "projected_distinctions": {
             "terminal_bench_2_1": (
-                "Task goal evidence is not authorization to rewrite repository history, remove remote config, "
-                "or perform evidence-consuming reads before the recovery protocol is licensed."
+                "Task goal evidence is not enough to rewrite repository history, remove remote config, "
+                "or perform destructive reads before the recovery protocol preserves the source."
             ),
-            "skillflow": "Observed OCR text is not a completed artifact until the licensed output schema is materialized.",
+            "skillflow": "Observed OCR text is not a completed artifact until the output schema is materialized.",
         },
         "transfer_checks": {
             "terminal_bench_2_1": summarize_transfer_checks(terminal_bench_checks),
@@ -99,7 +100,7 @@ def build_amendment_transfer_report(
             },
         },
         "claim_boundary": (
-            "This report is a stage-1 transfer ledger: it supports the authority-language hypothesis, "
+            "This report is a stage-1 transfer ledger: it supports the commit-gap hypothesis, "
             "but full paper claims still require scaling across more held-out tasks and models."
         ),
     }

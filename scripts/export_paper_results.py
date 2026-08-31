@@ -25,7 +25,7 @@ DEFAULT_CLINIC_CONTROL = artifact_path(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Export paper CSVs from License-to-Act result artifacts.")
+    parser = argparse.ArgumentParser(description="Export paper CSVs from StateTx result artifacts.")
     parser.add_argument("--transfer-report", type=Path, default=DEFAULT_TRANSFER_REPORT)
     parser.add_argument("--paper-data-dir", type=Path, default=DEFAULT_PAPER_DATA_DIR)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)

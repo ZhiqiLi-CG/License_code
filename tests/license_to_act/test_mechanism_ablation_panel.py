@@ -26,19 +26,19 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
 
     rows = {row["ablation_id"]: row for row in panel["rows"]}
     assert list(rows) == [
-        "ABLATE_POLICY_AUTHORIZATION_EVIDENCE",
-        "ABLATE_SIDE_EFFECT_BOUNDS",
-        "ABLATE_READ_LICENSE",
-        "ABLATE_POSITIVE_OBLIGATION",
-        "PROMPT_ONLY_LICENSE_TEXT",
+        "ABLATE_COMMIT_READINESS",
+        "ABLATE_WRITE_SCOPE_AND_PRESERVE",
+        "ABLATE_PRESERVING_READ",
+        "ABLATE_COMPLETION_TRIGGER",
+        "PROMPT_ONLY_TRANSACTION_TEXT",
     ]
-    assert rows["ABLATE_SIDE_EFFECT_BOUNDS"]["high_priority"] == "yes"
-    assert rows["ABLATE_POSITIVE_OBLIGATION"]["high_priority"] == "yes"
-    assert rows["PROMPT_ONLY_LICENSE_TEXT"]["high_priority"] == "yes"
-    assert "baseline" not in rows["PROMPT_ONLY_LICENSE_TEXT"]["comparison_class"]
-    assert rows["ABLATE_POSITIVE_OBLIGATION"]["cut_evidence_cases"] == "SF-INV | SF-QWEN32K-MSWE-2"
-    assert rows["ABLATE_POSITIVE_OBLIGATION"]["full_evidence_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5"
-    assert rows["ABLATE_SIDE_EFFECT_BOUNDS"]["paper_result"] == "0/1 cut pass versus 5/5 full LTA pass"
+    assert rows["ABLATE_WRITE_SCOPE_AND_PRESERVE"]["high_priority"] == "yes"
+    assert rows["ABLATE_COMPLETION_TRIGGER"]["high_priority"] == "yes"
+    assert rows["PROMPT_ONLY_TRANSACTION_TEXT"]["high_priority"] == "yes"
+    assert "baseline" not in rows["PROMPT_ONLY_TRANSACTION_TEXT"]["comparison_class"]
+    assert rows["ABLATE_COMPLETION_TRIGGER"]["cut_evidence_cases"] == "SF-INV | SF-QWEN32K-MSWE-2"
+    assert rows["ABLATE_COMPLETION_TRIGGER"]["full_evidence_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5"
+    assert rows["ABLATE_WRITE_SCOPE_AND_PRESERVE"]["paper_result"] == "0/1 cut pass versus 5/5 full StateTx pass"
     assert all(row["comparison_class"] == "mechanism_ablation" for row in rows.values())
 
 
@@ -56,8 +56,8 @@ def test_write_mechanism_ablation_panel_exports_csv_json_and_tex(tmp_path: Path)
 
     rows = list(csv.DictReader(Path(output["outputs"]["panel_csv"]).open(newline="", encoding="utf-8")))
     assert len(rows) == 5
-    assert rows[0]["ablation_id"] == "ABLATE_POLICY_AUTHORIZATION_EVIDENCE"
-    assert rows[-1]["ablation_id"] == "PROMPT_ONLY_LICENSE_TEXT"
+    assert rows[0]["ablation_id"] == "ABLATE_COMMIT_READINESS"
+    assert rows[-1]["ablation_id"] == "PROMPT_ONLY_TRANSACTION_TEXT"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAMechanismAblationPanelRows}{5}" in tex

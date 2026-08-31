@@ -24,14 +24,14 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
 
     rows = manifest["rows"]
     assert [row["comparison_id"] for row in rows] == [
-        "M1_FULL_LTA_CLEAN_ANCHORS",
+        "M1_FULL_STATETX_CLEAN_ANCHORS",
         "B1_QWEN32K_MINISWE_MATCHED",
-        "A1_PROMPT_ONLY_TEXT_LICENSE",
-        "A2_NO_POSITIVE_OBLIGATION",
-        "A3_NO_SIDE_EFFECT_BOUNDS",
-        "A4_NO_EVIDENCE_PRESERVING_READ",
-        "A5_NO_RECURSIVE_AMENDMENT",
-        "S1_QWEN_GOVKERNEL_INTEGRATION",
+        "A1_PROMPT_ONLY_TEXT_CONTRACT",
+        "A2_NO_COMPLETION_TRIGGER",
+        "A3_NO_PRESERVE_CONSTRAINTS",
+        "A4_NO_PRESERVING_READ_CONTRACT",
+        "A5_NO_CONTRACT_REFINEMENT",
+        "S1_QWEN_COMMIT_CONTROLLER_INTEGRATION",
     ]
 
     baseline = rows[1]

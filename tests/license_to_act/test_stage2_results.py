@@ -96,6 +96,7 @@ def test_exports_stage2_reliability_and_tau2_mining(tmp_path):
     assert (paper_data_dir / "stage2_reliability.csv").read_text(encoding="utf-8").splitlines()[1].startswith(
         "TB-K5,"
     )
-    assert "read_correct_write_wrong_proxy,1," in (paper_data_dir / "tau2_authority_mining.csv").read_text(
+    assert "read_correct_write_wrong_proxy,1," in (paper_data_dir / "tau2_commit_mining.csv").read_text(
         encoding="utf-8"
     )
+    assert not (paper_data_dir / "tau2_authority_mining.csv").exists()

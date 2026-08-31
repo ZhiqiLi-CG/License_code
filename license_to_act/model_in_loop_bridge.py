@@ -78,7 +78,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "task": "task_family_invoice_images",
             "actor_backbone": "Qwen3.8-27B",
             "harness": "Terminus-2",
-            "condition": "ordinary task agent, no GovKernel",
+            "condition": "ordinary task agent, no Commit Controller",
             "comparison_boundary": "ordinary_agent",
             "uses_task_specific_materializer": "no",
             "paper_use": "model_in_loop_counterpoint",
@@ -91,7 +91,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "task": "task_family_invoice_images",
             "actor_backbone": "Qwen3.8-27B",
             "harness": "Terminus-2",
-            "condition": "natural-language LTA commit protocol only",
+            "condition": "natural-language transaction protocol only",
             "comparison_boundary": "prompt_only_control",
             "uses_task_specific_materializer": "no",
             "paper_use": "mechanism_cut",
@@ -99,26 +99,26 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             / "probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild/2026-08-30__18-05-01/result.json",
         },
         {
-            "bridge_id": "SF_INVOICE_QWEN_GOVKERNEL_SMOKE",
+            "bridge_id": "SF_INVOICE_QWEN_COMMIT_CONTROLLER_SMOKE",
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images",
             "actor_backbone": "Qwen3.8-27B",
-            "harness": "LicenseToActQwenInvoiceGovKernelAgent",
-            "condition": "Qwen in loop plus GovKernel OBLIGE",
-            "comparison_boundary": "model_in_loop_govkernel",
+            "harness": "StateTxQwenInvoiceCommitControllerAgent",
+            "condition": "Qwen in loop plus Commit Controller completion trigger",
+            "comparison_boundary": "model_in_loop_commit_controller",
             "uses_task_specific_materializer": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
             / "probes/skillflow_lta_qwen_invoice_govkernel_official_out256/skillflow-lta-qwen-invoice-govkernel-official-out256/result.json",
         },
         {
-            "bridge_id": "SF_INVOICE_QWEN_GOVKERNEL_K5",
+            "bridge_id": "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5",
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images",
             "actor_backbone": "Qwen3.8-27B",
-            "harness": "LicenseToActQwenInvoiceGovKernelAgent",
-            "condition": "Qwen in loop plus GovKernel OBLIGE, K=5",
-            "comparison_boundary": "model_in_loop_govkernel",
+            "harness": "StateTxQwenInvoiceCommitControllerAgent",
+            "condition": "Qwen in loop plus Commit Controller completion trigger, K=5",
+            "comparison_boundary": "model_in_loop_commit_controller",
             "uses_task_specific_materializer": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
@@ -141,9 +141,9 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "bridge_id": "TB_SANITIZE_MATERIALIZER_K5",
             "benchmark": "Terminal-Bench 2.1",
             "task": "sanitize-git-repo",
-            "actor_backbone": "GovKernel runtime",
-            "harness": "LTA scoped Git materializer",
-            "condition": "runtime authority anchor, K=5",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "scoped Git transaction executor",
+            "condition": "runtime transaction anchor, K=5",
             "comparison_boundary": "runtime_reliability",
             "uses_task_specific_materializer": "yes",
             "paper_use": "runtime_reliability",
@@ -153,9 +153,9 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "bridge_id": "TB_WAL_MATERIALIZER_K5",
             "benchmark": "Terminal-Bench 2.1",
             "task": "db-wal-recovery",
-            "actor_backbone": "GovKernel runtime",
-            "harness": "LTA WAL recovery materializer",
-            "condition": "runtime authority anchor, K=5",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "WAL recovery transaction executor",
+            "condition": "runtime transaction anchor, K=5",
             "comparison_boundary": "runtime_reliability",
             "uses_task_specific_materializer": "yes",
             "paper_use": "runtime_reliability",
@@ -165,9 +165,9 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "bridge_id": "TB_SQLITE_MATERIALIZER_K5",
             "benchmark": "Terminal-Bench 2.1",
             "task": "sqlite-db-truncate",
-            "actor_backbone": "GovKernel runtime",
-            "harness": "LTA SQLite truncate materializer",
-            "condition": "runtime authority anchor, K=5",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "SQLite truncate transaction executor",
+            "condition": "runtime transaction anchor, K=5",
             "comparison_boundary": "runtime_reliability",
             "uses_task_specific_materializer": "yes",
             "paper_use": "runtime_reliability",
@@ -177,9 +177,9 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "bridge_id": "SF_INVOICE_MATERIALIZER_K5",
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images",
-            "actor_backbone": "GovKernel runtime",
-            "harness": "LTA invoice materializer",
-            "condition": "runtime authority anchor, K=5",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "invoice completion-trigger executor",
+            "condition": "runtime transaction anchor, K=5",
             "comparison_boundary": "runtime_reliability",
             "uses_task_specific_materializer": "yes",
             "paper_use": "runtime_reliability",
@@ -189,9 +189,9 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "bridge_id": "SF_TRAVEL_MATERIALIZER_K5",
             "benchmark": "SkillFlow",
             "task": "task_family_travel_claim_merge",
-            "actor_backbone": "GovKernel runtime",
-            "harness": "LTA travel-claim materializer",
-            "condition": "runtime authority anchor, K=5",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "travel-claim completion-trigger executor",
+            "condition": "runtime transaction anchor, K=5",
             "comparison_boundary": "runtime_reliability",
             "uses_task_specific_materializer": "yes",
             "paper_use": "runtime_reliability",
@@ -248,7 +248,7 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         row
         for row in rows
         if row["comparison_boundary"]
-        in {"ordinary_agent", "prompt_only_control", "model_in_loop_govkernel"}
+        in {"ordinary_agent", "prompt_only_control", "model_in_loop_commit_controller"}
     ]
     runtime_rows = [row for row in rows if row["comparison_boundary"] == "runtime_reliability"]
     baseline_rows = [
@@ -256,24 +256,24 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         for row in rows
         if row["bridge_id"] in {"SF_INVOICE_QWEN_TERMINUS_FULL", "SF_INVOICE_QWEN32K_MINISWE_BASELINE"}
     ]
-    govkernel_k5 = _require_row(rows, "SF_INVOICE_QWEN_GOVKERNEL_K5")
+    commit_controller_k5 = _require_row(rows, "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5")
     materializer_as_agent = [
         row
         for row in rows
         if row["uses_task_specific_materializer"] == "yes"
-        and row["comparison_boundary"] == "model_in_loop_govkernel"
+        and row["comparison_boundary"] == "model_in_loop_commit_controller"
     ]
     baseline_passes = _sum_int(baseline_rows, "passes")
     baseline_trials = _sum_int(baseline_rows, "n_trials")
-    gov_passes = int(govkernel_k5["passes"])
-    gov_trials = int(govkernel_k5["n_trials"])
+    gov_passes = int(commit_controller_k5["passes"])
+    gov_trials = int(commit_controller_k5["n_trials"])
     return {
         "model_in_loop_rows": len(model_rows),
         "qwen_invoice_baseline_passes": baseline_passes,
         "qwen_invoice_baseline_trials": baseline_trials,
         "qwen_invoice_govkernel_passes": gov_passes,
         "qwen_invoice_govkernel_trials": gov_trials,
-        "qwen_invoice_govkernel_errors": int(govkernel_k5["n_errors"]),
+        "qwen_invoice_govkernel_errors": int(commit_controller_k5["n_errors"]),
         "qwen_invoice_pass_delta": gov_passes - baseline_passes,
         "runtime_reliability_rows": len(runtime_rows),
         "materializer_rows_used_as_matched_agent": len(materializer_as_agent),

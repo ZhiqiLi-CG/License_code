@@ -43,66 +43,66 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
 
     rows = [
         {
-            "blueprint_id": "E1_TAU2_AIRLINE_WRITE_AUTHORITY",
+            "blueprint_id": "E1_TAU2_AIRLINE_COMMIT_READINESS",
             "benchmark": "tau2-Bench",
-            "claim_axis": "Intent proposes; policy and source state authorize.",
+            "claim_axis": "Conversation can propose a write; verified state decides whether it is ready to commit.",
             "split_policy": "Freeze airline write-family source, validation, and held-out tasks before final scoring.",
             "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it | Qwen3.8-27B-long32k",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "80",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "unsafe write reduction with authorized-write recall",
             "acceptance_gate": (
                 "Gate A/D: same backbone, same harness, same budget; McNemar p < 0.05; "
                 "authorized-commit recall loss <= 3pp; actual pre-commit interventions on mined traces."
             ),
-            "baseline_boundary": "Faithful baselines use the same tau2 simulator and tool policy without LTA commit authority.",
+            "baseline_boundary": "Faithful baselines use the same tau2 simulator and tool policy without runtime commit control.",
         },
         {
-            "blueprint_id": "E2_TAU2_CROSS_DOMAIN_WRITES",
+            "blueprint_id": "E2_TAU2_CROSS_DOMAIN_COMMITS",
             "benchmark": "tau2-Bench",
-            "claim_axis": "Authority transfer should survive outside airline cancellation.",
+            "claim_axis": "Commit-readiness contracts should survive outside airline cancellation.",
             "split_policy": "Preselect retail, banking, and telecom write families by visible policy/state features.",
             "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it | Qwen3.8-27B-long32k",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "120",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "reward, DB pass, communication pass, overblocking",
             "acceptance_gate": (
                 "Gate A/D: >=15 tasks in each state substrate slice; unsafe writes decrease; "
-                "legal writes remain ALLOW with authorized-commit recall loss <= 3pp."
+                "legal writes remain COMMIT with authorized-commit recall loss <= 3pp."
             ),
             "baseline_boundary": "Domain transfer is evaluated after the write-family list is frozen.",
         },
         {
-            "blueprint_id": "E3_TB_12_TASK_AUTHORITY_PILOT",
+            "blueprint_id": "E3_TB_12_TASK_TRANSACTION_PILOT",
             "benchmark": "Terminal-Bench 2.1",
-            "claim_axis": "Terminal actions need region, side-effect, and witness authority.",
+            "claim_axis": "Terminal actions need write scope, preservation, and verifier-ready witnesses.",
             "split_policy": "Freeze a 12-task pilot across Git, DB, security, data, image/document, and process state.",
             "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "official reward plus collateral-mutation and missing-artifact rates",
             "acceptance_gate": (
-                "Gate A: same backbone, same harness, same budget, +/-GovKernel; "
+                "Gate A: same backbone, same harness, same budget, +/-CommitController; "
                 "official pass rate improves and collateral mutation decreases."
             ),
             "baseline_boundary": "No public solution scripts may generate warrants for live runs.",
         },
         {
-            "blueprint_id": "E4_TB_STRATIFIED_MAIN_SWEEP",
+            "blueprint_id": "E4_TB_STRATIFIED_TRANSACTION_SWEEP",
             "benchmark": "Terminal-Bench 2.1",
-            "claim_axis": "The terminal authority pattern should scale beyond anchors.",
+            "claim_axis": "The terminal transaction pattern should scale beyond anchors.",
             "split_policy": "Run a 45-task stratified sweep only after the 12-task pilot passes the acceptance gate.",
             "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "180",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "pass rate, false-done rate, authorized commit success",
             "acceptance_gate": (
                 "Gate A/E: frozen pilot success before sweep; pass-rate CI reported; "
@@ -111,49 +111,49 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
             "baseline_boundary": "Report Harbor/runtime failures separately from behavioral failures.",
         },
         {
-            "blueprint_id": "E5_SKILLFLOW_ARTIFACT_OBLIGATIONS",
+            "blueprint_id": "E5_SKILLFLOW_COMPLETION_TRIGGERS",
             "benchmark": "SkillFlow",
-            "claim_axis": "Complete evidence can oblige verifier-visible artifacts.",
+            "claim_axis": "Complete prepared evidence should trigger verifier-visible finalization.",
             "split_policy": "Freeze OCR, healthcare, document-fraud, and cross-format families before outcome inspection.",
             "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "96",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "primary_metric": "artifact existence, schema pass, reward, obligation completion",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "primary_metric": "artifact existence, schema pass, reward, completion-trigger success",
             "acceptance_gate": (
-                "Gate A/C: same agent +/-GovKernel; OBLIGE removal restores missing-workbook failures; "
+                "Gate A/C: same agent +/-CommitController; removing completion triggers restores missing-workbook failures; "
                 "wrong materialization rate is reported."
             ),
             "baseline_boundary": "Artifact materializers are compared against matched agents and named mechanism cuts.",
         },
         {
-            "blueprint_id": "E6_SKILLFLOW_SKILL_AUTHORITY_TRANSFER",
+            "blueprint_id": "E6_SKILLFLOW_SKILL_COMMIT_TRANSFER",
             "benchmark": "SkillFlow",
-            "claim_axis": "Skill reuse needs authority, not only memory.",
+            "claim_axis": "Skill reuse needs transaction scope, not only memory.",
             "split_policy": "Evaluate skill/body visibility and held-out transfer after source-family compiler selection.",
             "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "96",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "negative transfer, skill admission, held-out reward",
             "acceptance_gate": (
-                "Gate B/C: source-generated amendment improves held-out tasks; "
-                "positive-only skill growth and task-ID hand guard are separated from LTA."
+                "Gate B/C: source-generated contract refinement improves held-out tasks; "
+                "positive-only skill growth and task-ID hand guard are separated from StateTx."
             ),
             "baseline_boundary": "Positive-only skill growth is an external-style baseline only when reproduced faithfully.",
         },
         {
             "blueprint_id": "E7_MODEL_BREADTH_HELDOUT",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The institution should help frozen actors rather than one wrapper.",
+            "claim_axis": "The transaction layer should help frozen actors rather than one wrapper.",
             "split_policy": "Hold Gemma and one strong terminal agent out until the compiler and tasks are frozen.",
             "model_slots": "Gemma-4-31B-it | Codex/Claude strong terminal agent",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "held-out reward lift and pass-to-fail regression",
             "acceptance_gate": (
                 "Gate A/B: second open model and one strong agent satisfy the same matched-causal criteria "
@@ -164,13 +164,13 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
         {
             "blueprint_id": "E8_STRONG_AGENT_BASELINES",
             "benchmark": "Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "A strong ordinary agent is the cleanest counterpoint to authority compilation.",
+            "claim_axis": "A strong ordinary agent is the cleanest counterpoint to transactional execution.",
             "split_policy": "Run Codex or Claude baselines on the frozen anchor and pilot sets.",
             "model_slots": "Codex/Claude strong terminal agent",
             "comparison_class": "faithful_baseline",
             "paper_role": "main_counterpoint",
             "target_run_cells": "25",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "official reward under the external agent's normal protocol",
             "acceptance_gate": (
                 "Gate A: faithful baseline uses normal external-agent protocol, same task set, and matched budget."
@@ -180,30 +180,30 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
         {
             "blueprint_id": "E9_FAITHFUL_OPEN_MODEL_LADDER",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "Long context and ordinary agency must be tested before claiming institutional lift.",
+            "claim_axis": "Long context and ordinary agency must be tested before claiming transaction-layer lift.",
             "split_policy": "Run matched open-model baselines on every final headline family.",
             "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
             "comparison_class": "faithful_baseline",
             "paper_role": "main_counterpoint",
             "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "primary_metric": "official reward and failure class without GovKernel",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "primary_metric": "official reward and failure class without CommitController",
             "acceptance_gate": (
-                "Gate A/E: same backbone and budget as LTA condition; all pass rates include confidence intervals."
+                "Gate A/E: same backbone and budget as StateTx condition; all pass rates include confidence intervals."
             ),
             "baseline_boundary": "Baseline configs reproduce the external agent; they are not mechanism ablations.",
         },
         {
             "blueprint_id": "E10_MECHANISM_CUTS",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "Ablations explain which part of the institution carries the result.",
-            "split_policy": "Run cuts only after the full LTA condition and task selection are frozen.",
+            "claim_axis": "Ablations explain which part of the transaction layer carries the result.",
+            "split_policy": "Run cuts only after the full StateTx condition and task selection are frozen.",
             "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k",
             "comparison_class": "mechanism_ablation",
             "paper_role": "mechanism_explanation",
             "target_run_cells": "120",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
-            "primary_metric": "delta in veto precision, obligation completion, and collateral mutation",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
+            "primary_metric": "delta in commit accuracy, completion-trigger success, and collateral mutation",
             "acceptance_gate": (
                 "Gate C: each ablation restores its paired failure class; task-ID hand guard ties source tasks "
                 "but loses on held-out families."
@@ -211,18 +211,18 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
             "baseline_boundary": "Ablations are internal cuts; they must not be described as faithful baselines.",
         },
         {
-            "blueprint_id": "E11_COMPILER_GENERATION_TRANSFER",
+            "blueprint_id": "E11_CONTRACT_REFINEMENT_TRANSFER",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The recursively improving object is the evolving authority compiler.",
-            "split_policy": "Generate licenses from source tasks, validate on regression tasks, then freeze for held-out transfer.",
+            "claim_axis": "The recursively improving object is the evolving State Contract.",
+            "split_policy": "Generate State Contracts from source tasks, validate on regression tasks, then freeze for held-out transfer.",
             "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",
             "target_run_cells": "72",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "failure-to-pass transfer with pass-to-fail regression",
             "acceptance_gate": (
-                "Gate B: at least two automatic amendments are accepted; held-out transfer has >=3 F-to-P "
+                "Gate B: at least two automatic contract refinements are accepted; held-out transfer has >=3 F-to-P "
                 "and P-to-F = 0 across the regression set."
             ),
             "baseline_boundary": "Source, validation, and held-out splits are declared before target verifier inspection.",
@@ -230,19 +230,19 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
         {
             "blueprint_id": "E12_FREEZE_STATISTICS_REGRESSION",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The claim earns trust by freezing the evaluation before final scoring.",
+            "claim_axis": "The claim earns trust by freezing the transaction evaluation before final scoring.",
             "split_policy": "Lock task list, model list, metrics, and exclusion rules before the final positive-mass run.",
             "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
             "comparison_class": "scale_statistics",
             "paper_role": "submission_gate",
             "target_run_cells": "36",
-            "inclusion_rule": "Include only tasks that sharpen the proposal/evidence/authority/commit boundary.",
+            "inclusion_rule": "Include only tasks that sharpen the reason/prepare/commit boundary.",
             "primary_metric": "confidence intervals, paired tests, and no-regression checks",
             "acceptance_gate": (
                 "Gate E/F: source-validation-held-out split is committed before verifier runs; "
                 "all main-text numbers are generated from data files; raw logs are anonymized for release."
             ),
-            "baseline_boundary": "Exploratory failures that do not test the authority mechanism stay outside the paper package.",
+            "baseline_boundary": "Exploratory failures that do not test the commit mechanism stay outside the paper package.",
         },
     ]
 

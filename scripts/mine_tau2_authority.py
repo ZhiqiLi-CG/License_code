@@ -17,11 +17,11 @@ from license_to_act.tau2_authority_mining import (
 )
 
 
-DEFAULT_OUTPUT = artifact_path("stage2", "tau2_authority_mining_20260830.json")
+DEFAULT_OUTPUT = artifact_path("stage2", "tau2_commit_mining_20260830.json")
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Mine tau2 traces for License-to-Act authority failures.")
+    parser = argparse.ArgumentParser(description="Mine tau2 traces for commit-gap failures.")
     parser.add_argument("--root", type=Path, default=DEFAULT_TAU2_SIMULATION_ROOT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--current-time", default="2024-05-15T15:00:00")
@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     print(
         "result_files={n_result_files} simulations={n_simulations} "
         "infra_errors={n_infrastructure_error_simulations} cancel_decisions={n_cancel_decisions} "
-        "veto_targets={n_lta_vetoes} read_correct_write_wrong={n_read_correct_write_wrong_proxy}".format(
+        "revision_targets={n_lta_vetoes} read_correct_write_wrong={n_read_correct_write_wrong_proxy}".format(
             **summary
         )
     )

@@ -22,7 +22,7 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     stage1_summary = _read_json(root / "artifacts/paper_results/lta_stage2_paper_tables_20260830.json")
     stage2_summary = _read_json(root / "artifacts/stage2/lta_stage2_paper_results_20260830.json")
     stage2_rows = _read_csv(root / "License_paper/data/stage2_reliability.csv")
-    tau2_rows = _read_csv(root / "License_paper/data/tau2_authority_mining.csv")
+    tau2_rows = _read_csv(root / "License_paper/data/tau2_commit_mining.csv")
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
@@ -65,18 +65,17 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     }
 
     return {
-        "thesis_slug": "proposal_is_not_authority",
-        "title_line": "License to Act: Recursive Authority Compilation for State-Changing Agents",
+        "thesis_slug": "commit_gap_transactions",
+        "title_line": "Stateful Agents Need Transactions: Separating Reasoning from Durable Effects",
         "central_sentence": (
-            "A model may be competent to propose a state change while lacking the authority "
-            "to commit it; conversely, complete authority and evidence can create an "
-            "executable obligation to act."
+            "Reasoning is speculative, but external state is durable; agents need a "
+            "separate prepare-validate-commit layer for state changes."
         ),
         "headline_metrics": headline_metrics,
         "claims": _claims(headline_metrics, clean_rows, faithful_rows),
         "source_policy": (
             "Story claims use License workspace artifacts only. Faithful baselines and "
-            "License-to-Act ablations are kept as different evidence categories."
+            "StateTx mechanism cuts are kept as different evidence categories."
         ),
     }
 
@@ -89,11 +88,11 @@ def _claims(
     clean_tasks = ", ".join(row["case_id"] for row in clean_rows)
     baseline_tasks = ", ".join(row["case_id"] for row in faithful_rows)
     return {
-        "agency_gap_is_distinct_from_task_failure": {
+        "commit_gap_is_distinct_from_task_failure": {
             "paper_section": "Introduction",
             "claim": (
-                "State-changing agents fail at the durability boundary: proposal, evidence, "
-                "and commit rights are collapsed into one channel."
+                "State-changing agents fail at the durability boundary: reasoning, preparation, "
+                "and commit are collapsed into one loop."
             ),
             "positive_evidence": [
                 f"{metrics['stage1_cases']} audited Stage-1 cases across tau2, Terminal-Bench, and SkillFlow",
@@ -101,29 +100,29 @@ def _claims(
             ],
             "source_artifacts": [
                 "artifacts/paper_results/lta_stage2_paper_tables_20260830.json",
-                "artifacts/stage2/tau2_authority_mining_20260830.json",
+                "artifacts/stage2/tau2_commit_mining_20260830.json",
             ],
         },
-        "proposal_evidence_is_not_commit_authority": {
+        "candidate_change_is_not_commit": {
             "paper_section": "tau2 Results",
             "claim": (
-                "User intent, task phrasing, and model confidence can propose a business write, "
-                "but policy/source-state evidence must authorize the commit."
+                "User intent, task phrasing, and model confidence can motivate a business write, "
+                "but policy/source-state evidence must make the candidate ready before commit."
             ),
             "positive_evidence": [
                 f"{metrics['tau2_cancel_decisions']} tau2 cancel decisions mined",
                 f"{metrics['tau2_read_correct_write_wrong_proxy']} policy-invalid cancel commits had matched reservation reads",
             ],
             "source_artifacts": [
-                "License_paper/data/tau2_authority_mining.csv",
-                "License_paper/data/tau2_authority_by_group.csv",
+                "License_paper/data/tau2_commit_mining.csv",
+                "License_paper/data/tau2_commit_by_group.csv",
             ],
         },
-        "licenses_are_not_operation_blacklists": {
+        "contracts_are_not_operation_blacklists": {
             "paper_section": "Results",
             "claim": (
-                "The method blocks unlicensed commits while preserving licensed positive controls; "
-                "authority is actor-operation-region-evidence specific."
+                "The method blocks unready or overbroad commits while preserving positive controls; "
+                "the contract is specific to readiness, write scope, preservation, and done state."
             ),
             "positive_evidence": [
                 f"{metrics['stage1_preserved_positive']} Stage-1 legal tau2 commit remains pass-to-pass",
@@ -134,10 +133,10 @@ def _claims(
                 "License_paper/data/diagnostic_cases.csv",
             ],
         },
-        "govkernel_stabilizes_executable_authority": {
+        "commit_controller_stabilizes_transactions": {
             "paper_section": "Stage-2 Reliability",
             "claim": (
-                "Executable Action Licenses are stable under official reruns, not just one-off scripts."
+                "Executable transaction protocols are stable under official reruns, not just one-off scripts."
             ),
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} clean Stage-2 anchors: {clean_tasks}",
@@ -149,10 +148,10 @@ def _claims(
                 "artifacts/stage2/lta_stage2_paper_results_20260830.json",
             ],
         },
-        "authority_can_compel_missing_commits": {
+        "completion_triggers_repair_missing_finalization": {
             "paper_section": "SkillFlow Results",
             "claim": (
-                "Authority is not only a veto: complete evidence can oblige a missing verifier-visible artifact."
+                "Runtime control is not only a veto: complete evidence can trigger a missing verifier-visible artifact."
             ),
             "positive_evidence": [
                 "SkillFlow invoice materializer reaches 5/5 clean official passes",
@@ -164,10 +163,10 @@ def _claims(
                 "artifacts/method_slices/skillflow_invoice_qwen_lta_trace_materialized/result.json",
             ],
         },
-        "amendments_transfer_across_state_substrates": {
-            "paper_section": "Amendment Transfer",
+        "contract_refinements_transfer_across_state_substrates": {
+            "paper_section": "Contract Refinement Transfer",
             "claim": (
-                "A failure-derived authority amendment transfers across business tools, terminal state, "
+                "A failure-derived commit-contract refinement transfers across business tools, terminal state, "
                 "and workflow artifacts."
             ),
             "positive_evidence": [
@@ -243,7 +242,7 @@ def _write_metrics_csv(path: Path, metrics: dict[str, Any]) -> None:
     roles = {
         "stage2_clean_trials": "Main reliability numerator/denominator",
         "faithful_baseline_trials": "Matched long-context baseline denominator",
-        "tau2_read_correct_write_wrong_proxy": "Authority-failure mining headline",
+        "tau2_read_correct_write_wrong_proxy": "Commit-failure mining headline",
     }
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=METRIC_FIELDS, lineterminator="\n")
@@ -297,6 +296,10 @@ def _read_json(path: Path) -> dict[str, Any]:
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
+
+
+def _preferred_existing(primary: Path, fallback: Path) -> Path:
+    return primary if primary.exists() else fallback
 
 
 def _parse_number(value: str) -> int | float | str:

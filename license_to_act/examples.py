@@ -11,7 +11,7 @@ def tau2_cancel_license() -> ActionLicense:
         actor_role="customer_service_agent",
         state_region="reservation:*",
         operation="CommitCancelReservation",
-        required_evidence={"PolicyAuthorizationEvidence"},
+        required_evidence={"CommitReadinessEvidence"},
     )
 
 

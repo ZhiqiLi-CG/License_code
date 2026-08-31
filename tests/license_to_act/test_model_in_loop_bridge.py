@@ -29,14 +29,14 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     rows = {row["bridge_id"]: row for row in bridge["rows"]}
     assert rows["SF_INVOICE_QWEN_TERMINUS_FULL"]["comparison_boundary"] == "ordinary_agent"
     assert rows["SF_INVOICE_QWEN_TERMINUS_PROMPT_ONLY"]["comparison_boundary"] == "prompt_only_control"
-    assert rows["SF_INVOICE_QWEN_GOVKERNEL_K5"]["comparison_boundary"] == "model_in_loop_govkernel"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["comparison_boundary"] == "model_in_loop_commit_controller"
     assert rows["SF_INVOICE_QWEN32K_MINISWE_BASELINE"]["comparison_boundary"] == "faithful_baseline"
     assert rows["SF_TRAVEL_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
-    assert rows["SF_INVOICE_QWEN_GOVKERNEL_K5"]["passes"] == "4"
-    assert rows["SF_INVOICE_QWEN_GOVKERNEL_K5"]["pass_at_5"] == "1"
-    assert rows["SF_INVOICE_QWEN_GOVKERNEL_K5"]["uses_task_specific_materializer"] == "no"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["passes"] == "4"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["pass_at_5"] == "1"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["uses_task_specific_materializer"] == "no"
     assert all(
-        row["comparison_boundary"] != "model_in_loop_govkernel"
+        row["comparison_boundary"] != "model_in_loop_commit_controller"
         for row in rows.values()
         if row["uses_task_specific_materializer"] == "yes"
     )
@@ -57,7 +57,7 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
     rows = list(csv.DictReader(Path(output["outputs"]["bridge_csv"]).open(newline="", encoding="utf-8")))
     assert len(rows) == 10
     assert rows[0]["bridge_id"] == "SF_INVOICE_QWEN_TERMINUS_FULL"
-    assert rows[3]["bridge_id"] == "SF_INVOICE_QWEN_GOVKERNEL_K5"
+    assert rows[3]["bridge_id"] == "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAModelLoopRows}{4}" in tex

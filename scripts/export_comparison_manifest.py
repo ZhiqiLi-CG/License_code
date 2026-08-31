@@ -15,7 +15,7 @@ from license_to_act.paths import artifact_path, project_root  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Export the License-to-Act comparison manifest.")
+    parser = argparse.ArgumentParser(description="Export the StateTx comparison manifest.")
     parser.add_argument("--paper-data-dir", type=Path, default=project_root() / "License_paper" / "data")
     parser.add_argument("--paper-sections-dir", type=Path, default=project_root() / "License_paper" / "sections")
     parser.add_argument(

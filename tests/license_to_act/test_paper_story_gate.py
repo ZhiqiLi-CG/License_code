@@ -13,8 +13,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 15
-    assert summary["passed_checks"] == 15
+    assert summary["total_checks"] == 16
+    assert summary["passed_checks"] == 16
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 25
     assert summary["clean_positive_trials"] == 25
@@ -37,10 +37,11 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "headline panel" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "experiment blueprint" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "model-in-loop bridge" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "recursive lineage" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "contract lineage" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "ablation" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "scale plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert checks["recursive_lineage_has_automatic_amendments"]["status"] == "pass"
+    assert checks["contract_lineage_has_generated_refinements"]["status"] == "pass"
+    assert checks["transaction_story_framing"]["status"] == "pass"
     assert checks["story_language_anchors"]["status"] == "pass"
     assert checks["main_text_avoids_meta_curation_language"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
@@ -48,7 +49,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "headline panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "experiment blueprint" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "model-in-loop bridge" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "recursive lineage" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "contract lineage" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "ablation panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "scale plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert checks["appendix_serves_story"]["status"] == "pass"
@@ -72,12 +73,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 15
+    assert len(rows) == 16
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{15}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{15}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{16}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{16}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

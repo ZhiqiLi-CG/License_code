@@ -8,11 +8,11 @@ from typing import Any
 
 
 LINEAGE_FIELDS = [
-    "amendment_id",
+    "refinement_id",
     "generation",
     "synthesis_method",
     "trigger_signature",
-    "license_diff",
+    "contract_diff",
     "source_cases",
     "validation_cases",
     "heldout_cases",
@@ -27,34 +27,38 @@ LINEAGE_FIELDS = [
 
 RULES = [
     {
-        "amendment_id": "A1_POLICY_AUTHORIZATION_EVIDENCE",
+        "refinement_id": "C1_COMMIT_READINESS_EVIDENCE",
         "generation": 1,
-        "trigger_signature": "False authority",
-        "license_diff": "ADD_REQUIRED_EVIDENCE PolicyAuthorizationEvidence before state-changing business commits",
+        "trigger_signature": "Premature commit",
+        "source_signatures": ["Premature commit", "False authority"],
+        "contract_diff": "ADD_READY_PREDICATE verified policy/state evidence before business commits",
         "validation_cases": ["T2-A19"],
         "heldout_case_ids": [],
     },
     {
-        "amendment_id": "A2_REGION_AND_SIDE_EFFECT_BOUNDS",
+        "refinement_id": "C2_WRITE_SCOPE_AND_PRESERVE",
         "generation": 2,
-        "trigger_signature": "Overbroad authority",
-        "license_diff": "ADD_REGION_BOUNDARY with forbidden_side_effects for repository and filesystem commits",
+        "trigger_signature": "Overbroad commit",
+        "source_signatures": ["Overbroad commit", "Overbroad authority"],
+        "contract_diff": "ADD_WRITE_SCOPE with preserve constraints for repository and filesystem commits",
         "validation_cases": [],
         "heldout_case_ids": ["TB-SAN-K5"],
     },
     {
-        "amendment_id": "A3_EVIDENCE_CONSUMING_READ_LICENSE",
+        "refinement_id": "C3_PRESERVING_READ_CONTRACT",
         "generation": 2,
-        "trigger_signature": "Evidence-consuming read",
-        "license_diff": "ADD_READ_LICENSE read_license requires source preservation before recovery reads",
+        "trigger_signature": "Destructive observation",
+        "source_signatures": ["Destructive observation", "Evidence-consuming read"],
+        "contract_diff": "ADD_PRESERVING_READ preserve source evidence before recovery reads",
         "validation_cases": [],
         "heldout_case_ids": ["TB-WAL-K5", "TB-SQLITE-K5"],
     },
     {
-        "amendment_id": "A4_POSITIVE_OUTPUT_OBLIGATION",
+        "refinement_id": "C4_COMPLETION_TRIGGER",
         "generation": 3,
-        "trigger_signature": "Missing commit obligation",
-        "license_diff": "ADD_OBLIGE_OUTPUT OBLIGE materializes verifier-visible artifacts when evidence is complete",
+        "trigger_signature": "Missing finalization",
+        "source_signatures": ["Missing finalization", "Missing commit obligation"],
+        "contract_diff": "ADD_DONE_TRIGGER materialize verifier-visible artifacts when ready evidence is complete",
         "validation_cases": ["SF-INV-MAT-K5"],
         "heldout_case_ids": ["SF-TRAVEL-MAT-K5"],
     },
@@ -70,7 +74,7 @@ def build_recursive_amendment_lineage(project_root: str | Path = Path("/data/zhi
 
     rows = []
     for rule in RULES:
-        source_rows = _source_rows_for_signature(stage1_rows, rule["trigger_signature"])
+        source_rows = _source_rows_for_signatures(stage1_rows, rule["source_signatures"])
         heldout_rows = [stage2_by_case[case_id] for case_id in rule["heldout_case_ids"]]
         validation_rows = [stage2_by_case[case_id] for case_id in rule["validation_cases"] if case_id in stage2_by_case]
         source_cases = [row["case_id"] for row in source_rows]
@@ -81,11 +85,11 @@ def build_recursive_amendment_lineage(project_root: str | Path = Path("/data/zhi
         pass_to_failure = _count_pass_to_failure(source_rows)
         rows.append(
             {
-                "amendment_id": rule["amendment_id"],
+                "refinement_id": rule["refinement_id"],
                 "generation": str(rule["generation"]),
                 "synthesis_method": "automatic_failure_signature_rule",
                 "trigger_signature": rule["trigger_signature"],
-                "license_diff": rule["license_diff"],
+                "contract_diff": rule["contract_diff"],
                 "source_cases": _join(source_cases),
                 "validation_cases": _join(validation_cases),
                 "heldout_cases": _join(heldout_cases),
@@ -93,8 +97,8 @@ def build_recursive_amendment_lineage(project_root: str | Path = Path("/data/zhi
                 "heldout_clean_trials": str(heldout_trials),
                 "pass_to_failure_regressions": str(pass_to_failure),
                 "admission_decision": _admission_decision(source_f_to_p, heldout_rows + validation_rows, pass_to_failure),
-                "comparison_class": "compiler_amendment",
-                "baseline_boundary": "not_baseline: generated compiler amendment; compare task-ID hand guards as ablations",
+                "comparison_class": "contract_refinement",
+                "baseline_boundary": "not_baseline: generated State Contract refinement; compare task-ID hand guards as ablations",
             }
         )
 
@@ -117,7 +121,7 @@ def write_recursive_amendment_lineage(
     summary_path = (
         Path(summary_path)
         if summary_path is not None
-        else root / "artifacts" / "paper_results" / "lta_recursive_amendment_lineage_20260831.json"
+        else root / "artifacts" / "paper_results" / "contract_refinement_lineage_20260831.json"
     )
 
     lineage = build_recursive_amendment_lineage(root)
@@ -125,7 +129,7 @@ def write_recursive_amendment_lineage(
     paper_sections_dir.mkdir(parents=True, exist_ok=True)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
 
-    lineage_csv = paper_data_dir / "recursive_amendment_lineage.csv"
+    lineage_csv = paper_data_dir / "contract_refinement_lineage.csv"
     latex_numbers = paper_sections_dir / "generated_recursive_numbers.tex"
     _write_lineage_csv(lineage_csv, lineage["rows"])
     latex_numbers.write_text(_latex_numbers(lineage["summary"]), encoding="utf-8")
@@ -139,11 +143,11 @@ def write_recursive_amendment_lineage(
     return lineage
 
 
-def _source_rows_for_signature(stage1_rows: list[dict[str, str]], signature: str) -> list[dict[str, str]]:
+def _source_rows_for_signatures(stage1_rows: list[dict[str, str]], signatures: list[str]) -> list[dict[str, str]]:
     return [
         row
         for row in stage1_rows
-        if row["failure_type"] == signature and row["baseline_reward"] == "0" and row["lta_reward"] == "1"
+        if row["failure_type"] in signatures and row["baseline_reward"] == "0" and row["lta_reward"] == "1"
     ]
 
 
@@ -212,7 +216,7 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
     }
     lines = [
         "% Auto-generated by License_code/license_to_act/recursive_amendment_lineage.py.",
-        "% Regenerate with License_code/scripts/export_recursive_amendment_lineage.py.",
+        "% Regenerate with License_code/scripts/export_contract_refinement_lineage.py.",
     ]
     for name, value in commands.items():
         lines.append(f"\\newcommand{{\\{name}}}{{{value}}}")

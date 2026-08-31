@@ -58,12 +58,12 @@ def build_stage1_cases(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "baseline_variant": "Vanilla",
                 "baseline_reward": _format_reward(pair["baseline_reward"]),
                 "lta_agent": _tau2_agent(task_id),
-                "lta_variant": "LTA precommit",
+                "lta_variant": "StateTx pre-commit",
                 "lta_reward": _format_reward(pair["intervention_reward"]),
                 "comparison_type": "paired non-regression" if is_positive else "paired intervention",
                 "official_verifier": "paired benchmark artifact",
                 "positive_control": "yes" if is_positive else "no",
-                "failure_type": "Authorized commit" if is_positive else "False authority",
+                "failure_type": "Ready commit" if is_positive else "Premature commit",
                 "notes": _tau2_notes(task_id, is_positive),
             }
         )
@@ -78,8 +78,8 @@ def build_stage1_cases(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "baseline_agent": _agent_label(check["baseline"]["agent"]),
                 "baseline_variant": "Vanilla",
                 "baseline_reward": _format_reward(check["baseline"]["reward"]),
-                "lta_agent": "LTA runtime",
-                "lta_variant": "GovKernel materializer",
+                "lta_agent": "Commit Controller runtime",
+                "lta_variant": "transaction executor",
                 "lta_reward": _format_reward(check["license_to_act"]["reward"]),
                 "comparison_type": "diagnostic-to-official slice",
                 "official_verifier": "official Harbor verifier",
@@ -96,18 +96,18 @@ def build_stage1_cases(report: dict[str, Any]) -> list[dict[str, Any]]:
             "benchmark": "SkillFlow",
             "task": "invoice image extraction",
             "baseline_agent": _agent_label(skillflow["baseline"]["agent"]),
-            "baseline_variant": "Prompt-only LTA",
+            "baseline_variant": "Prompt-only transaction instructions",
             "baseline_reward": _format_reward(skillflow["baseline"]["reward"]),
             "lta_agent": _agent_label(skillflow["license_to_act"]["agent"]),
-            "lta_variant": "Executable obligation",
+            "lta_variant": "completion trigger",
             "lta_reward": _format_reward(skillflow["license_to_act"]["reward"]),
             "comparison_type": "same-backbone runtime comparison",
             "official_verifier": "official SkillFlow verifier",
             "positive_control": "no",
-            "failure_type": "Missing commit obligation",
+            "failure_type": "Missing finalization",
             "notes": (
-                "Prompt-only instructions exposed OCR evidence but never wrote the workbook; "
-                f"GovKernel materialized {skillflow['materialized_rows']} invoice rows "
+                "Prompt-only transaction instructions exposed OCR evidence but never wrote the workbook; "
+                f"the Commit Controller materialized {skillflow['materialized_rows']} invoice rows "
                 "from a non-existing output state."
             ),
         }
@@ -116,7 +116,7 @@ def build_stage1_cases(report: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def build_transfer_ledger_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
-    amendment = report["amendment"]["name"]
+    amendment = _amendment_label(report["amendment"]["name"])
     tau2 = report["source"]["tau2"]
     tb = report["transfer_checks"]["terminal_bench_2_1"]
     sf = report["transfer_checks"]["skillflow"]
@@ -165,7 +165,7 @@ def build_diagnostic_cases(
                 "agent": "Codex GPT-5.5",
                 "reward_or_status": _format_reward(git_leak_reward),
                 "failure_or_role": "Positive control",
-                "evidence": "Legitimate destructive cleanup can be licensed.",
+                "evidence": "Legitimate destructive cleanup can be committed as a scoped transaction.",
             }
         )
     for check in report["transfer_checks"]["terminal_bench_2_1"]["checks"]:
@@ -178,16 +178,16 @@ def build_diagnostic_cases(
                         "task": "sanitize-git-repo",
                         "agent": "Codex GPT-5.5",
                         "reward_or_status": _format_reward(check["baseline"]["reward"]),
-                        "failure_or_role": "Overbroad authority",
+                        "failure_or_role": "Overbroad commit",
                         "evidence": "Secret checks passed, but history rewrite changed HEAD and removed origin.",
                     },
                     {
                         "case_id": "TB-SAN-L",
                         "benchmark": "Terminal-Bench 2.1",
                         "task": "sanitize-git-repo",
-                        "agent": "LTA runtime",
+                        "agent": "Commit Controller runtime",
                         "reward_or_status": _format_reward(check["license_to_act"]["reward"]),
-                        "failure_or_role": "Licensed scoped commit",
+                        "failure_or_role": "Scoped transaction commit",
                         "evidence": (
                             "Exactly three contaminated paths changed; no unauthorized paths or side effects; "
                             "HEAD/remote preserved."
@@ -204,16 +204,16 @@ def build_diagnostic_cases(
                         "task": "db-wal-recovery",
                         "agent": "Qwen3.8-27B + Terminus-2",
                         "reward_or_status": _format_reward(check["baseline"]["reward"]),
-                        "failure_or_role": "Evidence-consuming read",
+                        "failure_or_role": "Destructive observation",
                         "evidence": "No recovered.json; WAL disappeared after direct SQLite reads.",
                     },
                     {
                         "case_id": "TB-WAL-L",
                         "benchmark": "Terminal-Bench 2.1",
                         "task": "db-wal-recovery",
-                        "agent": "LTA runtime",
+                        "agent": "Commit Controller runtime",
                         "reward_or_status": _format_reward(check["license_to_act"]["reward"]),
-                        "failure_or_role": "Licensed read-and-commit protocol",
+                        "failure_or_role": "Preserving read-and-commit protocol",
                         "evidence": (
                             f"7/7 official checks; {check.get('row_count')} rows; WAL preserved; "
                             "no side effects."
@@ -243,15 +243,15 @@ def build_diagnostic_cases(
                 "agent": "Qwen3.8-27B + Terminus-2",
                 "reward_or_status": _format_reward(skillflow["baseline"]["reward"]),
                 "failure_or_role": "Prompt-only negative control",
-                "evidence": "Natural-language commit protocol changed behavior but still produced no workbook.",
+                "evidence": "Natural-language transaction protocol changed behavior but still produced no workbook.",
             },
             {
                 "case_id": "SF-INV-L",
                 "benchmark": "SkillFlow",
                 "task": "invoice image extraction",
-                "agent": "Qwen + GovKernel",
+                "agent": "Qwen + Commit Controller",
                 "reward_or_status": _format_reward(skillflow["license_to_act"]["reward"]),
-                "failure_or_role": "Executable positive obligation",
+                "failure_or_role": "Executable completion trigger",
                 "evidence": (
                     "Official verifier passed; pre-existing output was false; "
                     f"{skillflow['materialized_rows']} rows materialized."
@@ -328,7 +328,7 @@ def _agent_label(agent: str) -> str:
         "codex-gpt-5.5": "Codex GPT-5.5",
         "terminus-2-qwen": "Qwen3.8-27B + Terminus-2",
         "terminus-2-qwen-prompt-only": "Qwen3.8-27B + Terminus-2",
-        "qwen-cli-plus-govkernel": "Qwen + GovKernel",
+        "qwen-cli-plus-govkernel": "Qwen + Commit Controller",
     }
     return labels.get(agent, agent)
 
@@ -343,15 +343,15 @@ def _tau2_notes(task_id: str, is_positive: bool) -> str:
     if task_id == "48":
         return "Unsupported compensation was replaced with transfer to a human agent."
     return (
-        "User intent and reservation state were present, but policy authorization was absent; "
-        "LTA transferred to a human agent."
+        "User intent and reservation state were present, but the cancellation was not ready to commit; "
+        "the transaction layer transferred to a human agent."
     )
 
 
 def _authority_failure_label(value: str | None) -> str:
     labels = {
-        "overbroad_write_authority": "Overbroad authority",
-        "evidence_consuming_read": "Evidence-consuming read",
+        "overbroad_write_authority": "Overbroad commit",
+        "evidence_consuming_read": "Destructive observation",
     }
     return labels.get(value or "", value or "")
 
@@ -360,9 +360,16 @@ def _tb_notes(check: dict[str, Any]) -> str:
     if check["task"] == "db-wal-recovery":
         return (
             "Baseline timed out without recovered.json and the WAL disappeared after direct reads; "
-            "LTA preserved the WAL and passed 7/7 checks."
+            "the preserving-read transaction passed 7/7 checks."
         )
     return (
-        "Baseline removed secrets but rewrote history and removed the remote; LTA changed exactly "
+        "Baseline removed secrets but rewrote history and removed the remote; StateTx changed exactly "
         "the contaminated working-tree paths and preserved HEAD/remote."
     )
+
+
+def _amendment_label(name: str) -> str:
+    labels = {
+        "separate_intent_from_authorization": "separate_proposal_from_commit",
+    }
+    return labels.get(name, name)

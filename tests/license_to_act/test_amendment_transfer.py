@@ -63,7 +63,7 @@ def test_builds_cross_benchmark_transfer_report_from_artifacts(tmp_path):
         skillflow_evidence_path=skill_evidence,
     )
 
-    assert report["amendment"]["name"] == "separate_intent_from_authorization"
+    assert report["amendment"]["name"] == "separate_proposal_from_commit"
     assert report["source"]["tau2"]["f_to_p"] == 1
     assert report["source"]["tau2"]["unchanged_positive"] == 1
     terminal_bench = report["transfer_checks"]["terminal_bench_2_1"]

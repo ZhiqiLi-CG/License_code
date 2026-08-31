@@ -1,4 +1,4 @@
-"""License-to-Act trace replay primitives."""
+"""StateTx trace replay and commit-control primitives."""
 
 from .core import (
     ActionLicense,

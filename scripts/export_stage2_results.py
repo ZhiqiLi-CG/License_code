@@ -13,7 +13,8 @@ from license_to_act.paths import artifact_path, project_root
 from license_to_act.stage2_results import write_stage2_paper_results
 
 
-DEFAULT_TAU2_MINING = artifact_path("stage2", "tau2_authority_mining_20260830.json")
+_COMMIT_TAU2_MINING = artifact_path("stage2", "tau2_commit_mining_20260830.json")
+DEFAULT_TAU2_MINING = _COMMIT_TAU2_MINING
 DEFAULT_PAPER_DATA_DIR = project_root() / "License_paper" / "data"
 DEFAULT_SUMMARY = artifact_path("stage2", "lta_stage2_paper_results_20260830.json")
 
@@ -23,8 +24,8 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-SAN-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "sanitize-git-repo",
-        "condition": "LTA scoped Git materializer",
-        "role": "side-effect authority",
+        "condition": "StateTx scoped Git transaction",
+        "role": "write-scope/preserve anchor",
         "result_path": artifact_path("stage2", "harbor", "stage2-tb21-lta-sanitize-k5-py", "result.json"),
         "paper_use": "clean_reliability_anchor",
         "interpretation": "Scoped replacement preserves HEAD and remote while passing the official verifier.",
@@ -33,8 +34,8 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-WAL-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "db-wal-recovery",
-        "condition": "LTA WAL recovery materializer",
-        "role": "evidence-consuming read",
+        "condition": "StateTx WAL recovery transaction",
+        "role": "preserving-read anchor",
         "result_path": artifact_path("stage2", "harbor", "stage2-tb21-lta-db-wal-k5-py", "result.json"),
         "paper_use": "clean_reliability_anchor",
         "interpretation": "Recovery captures evidence before reads and preserves the WAL across official checks.",
@@ -43,7 +44,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-SQLITE-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "sqlite-db-truncate",
-        "condition": "LTA truncated SQLite recovery",
+        "condition": "StateTx truncated SQLite recovery",
         "role": "binary evidence recovery",
         "result_path": artifact_path(
             "stage2",
@@ -58,8 +59,8 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "SF-INV-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
-        "condition": "LTA invoice materializer",
-        "role": "positive output obligation",
+        "condition": "StateTx invoice completion trigger",
+        "role": "completion trigger",
         "result_path": artifact_path(
             "stage2",
             "harbor",
@@ -67,7 +68,7 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "clean_reliability_anchor",
-        "interpretation": "Executable obligation materializes the verifier-visible workbook from OCR evidence.",
+        "interpretation": "Executable completion trigger materializes the verifier-visible workbook from OCR evidence.",
     },
     {
         "case_id": "TB-QWEN32K-MSWE-3",
@@ -82,7 +83,7 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "faithful_baseline",
-        "interpretation": "The 32k open-model agent fails all three Terminal-Bench authority anchors without runtime errors.",
+        "interpretation": "The 32k open-model agent fails all three Terminal-Bench transaction anchors without runtime errors.",
     },
     {
         "case_id": "SF-QWEN32K-MSWE-2",
@@ -97,13 +98,13 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "faithful_baseline",
-        "interpretation": "The 32k open-model agent reads OCR evidence but fails both verifier-visible workbook obligations.",
+        "interpretation": "The 32k open-model agent reads OCR evidence but fails both verifier-visible workbook finalizations.",
     },
     {
         "case_id": "SF-INV-QG-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
-        "condition": "Qwen + LTA GovKernel, out128",
+        "condition": "Qwen + Commit Controller, out128",
         "role": "model integration stress",
         "result_path": artifact_path(
             "stage2",
@@ -112,14 +113,14 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "integration_stress",
-        "interpretation": "Four of five trials pass; the failed trial is a Qwen context-window API error before GovKernel evidence.",
+        "interpretation": "Four of five trials pass; the failed trial is a Qwen context-window API error before controller evidence.",
     },
     {
         "case_id": "SF-TRAVEL-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "travel claim OCR merge",
-        "condition": "LTA travel-claim materializer",
-        "role": "OCR-to-workbook obligation",
+        "condition": "StateTx travel-claim completion trigger",
+        "role": "OCR-to-workbook completion",
         "result_path": artifact_path(
             "stage2",
             "harbor",
@@ -127,7 +128,7 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "clean_reliability_anchor",
-        "interpretation": "OCR evidence is joined with the authoritative roster and committed as the verifier-visible workbook.",
+        "interpretation": "OCR evidence is joined with the source roster and committed as the verifier-visible workbook.",
     },
 ]
 

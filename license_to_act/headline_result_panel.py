@@ -39,15 +39,15 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         {
             "panel_id": "H1_BREADTH",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does the authority story span more than one substrate?",
+            "story_question": "Does the commit-gap story span more than one durable substrate?",
             "result_sentence": (
                 f"The evidence spine spans {portfolio_summary['benchmark_count']} benchmark families, "
                 f"{portfolio_summary['state_substrate_count']} state substrates, and "
                 f"{portfolio_summary['actor_backbone_count']} actor backbones."
             ),
             "why_it_matters": (
-                "The same proposal/evidence/authority/commit boundary appears in business records, "
-                "terminal state, and workflow artifacts."
+                "The same reason-prepare-commit boundary appears in business records, terminal state, "
+                "and workflow artifacts."
             ),
             "source_data": "evidence_portfolio.csv",
         },
@@ -56,18 +56,18 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "main_positive_evidence",
             "story_question": "Is the positive evidence a stable block rather than one lucky case?",
             "result_sentence": (
-                f"GovKernel-backed clean anchors achieve {portfolio_summary['clean_positive_passes']}/"
+                f"Commit-controller clean anchors achieve {portfolio_summary['clean_positive_passes']}/"
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors."
             ),
             "why_it_matters": (
-                "The paper can lead with verifier-backed positive mass instead of a defensive case report."
+                "The paper can lead with verifier-backed positive mass around one transaction mechanism."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
         },
         {
             "panel_id": "H3_FAITHFUL_BASELINE_COUNTERPOINT",
             "paper_role": "faithful_baseline_counterpoint",
-            "story_question": "Does a stronger ordinary task agent solve the same authority boundary?",
+            "story_question": "Does a stronger ordinary task agent solve the same commit boundary?",
             "result_sentence": (
                 f"A matched Qwen3.8-27B-long32k mini-swe-agent baseline scores "
                 f"{comparison_summary['faithful_baseline_passes']}/"
@@ -81,31 +81,31 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "comparison_manifest.csv | stage2_reliability.csv",
         },
         {
-            "panel_id": "H4_TAU2_AUTHORITY_MINING",
+            "panel_id": "H4_TAU2_COMMIT_MINING",
             "paper_role": "main_positive_evidence",
-            "story_question": "Are authority failures visible beyond hand-picked examples?",
+            "story_question": "Are premature commits visible beyond hand-picked examples?",
             "result_sentence": (
                 f"Mining {metrics['tau2_result_files']} local tau2 result files finds "
                 f"{metrics['tau2_read_correct_write_wrong_proxy']} cancellation commits where the "
                 "reservation read was matched but the policy-invalid write failed database or total reward."
             ),
             "why_it_matters": (
-                "The result supports the core intuition: proposal evidence is present, but commit "
-                "authority is missing."
+                "The result supports the core intuition: reasoning had evidence, but the durable commit "
+                "boundary was not controlled."
             ),
-            "source_data": "tau2_authority_mining.csv",
+            "source_data": "tau2_commit_mining.csv",
         },
         {
-            "panel_id": "H5_AMENDMENT_TRANSFER",
+            "panel_id": "H5_CONTRACT_REFINEMENT_TRANSFER",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does a failure-derived amendment transfer across benchmarks?",
+            "story_question": "Does a failure-derived contract refinement transfer across benchmarks?",
             "result_sentence": (
-                f"The amendment ledger records {metrics['transfer_failure_to_pass']} failure-to-pass "
+                f"The contract-refinement ledger records {metrics['transfer_failure_to_pass']} failure-to-pass "
                 f"repairs across {metrics['transfer_cases']} audited cases with "
                 f"{metrics['transfer_pass_to_failure']} pass-to-failure regressions."
             ),
             "why_it_matters": (
-                "The paper's self-improvement object is the authority compiler amendment, not a "
+                "The paper's self-improvement object is the reusable State Contract refinement, not a "
                 "single-task wrapper."
             ),
             "source_data": "transfer_ledger.csv | stage1_cases.csv",
@@ -116,7 +116,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "story_question": "What must be scaled before final top-conference claim freeze?",
             "result_sentence": (
                 f"The submission plan contains {scale_summary['scale_target_rows']} frozen scale targets "
-                "covering tau2 write families, Terminal-Bench authority pilots, SkillFlow obligations, "
+                "covering tau2 write families, Terminal-Bench transaction pilots, SkillFlow completion triggers, "
                 "model breadth, faithful baselines, mechanism cuts, and statistics."
             ),
             "why_it_matters": (

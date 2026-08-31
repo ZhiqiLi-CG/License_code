@@ -41,7 +41,7 @@ class LicenseToActInvoiceMaterializerAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "License-to-Act invoice materializer failed with return code "
+                "StateTx invoice transaction executor failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -72,7 +72,7 @@ class LicenseToActTravelClaimMaterializerAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "License-to-Act travel claim materializer failed with return code "
+                "StateTx travel-claim transaction executor failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -103,7 +103,7 @@ class LicenseToActTB21SanitizeAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "License-to-Act TB21 sanitizer failed with return code "
+                "StateTx TB21 sanitizer failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -134,7 +134,7 @@ class LicenseToActTB21DbWalRecoveryAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "License-to-Act TB21 db-wal recovery failed with return code "
+                "StateTx TB21 db-wal recovery failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -165,7 +165,7 @@ class LicenseToActTB21SqliteTruncateRecoveryAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "License-to-Act TB21 sqlite truncate recovery failed with return code "
+                "StateTx TB21 sqlite truncate recovery failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -193,7 +193,7 @@ if NoInstallQwenCodeBareLocal is not None:
             )
             if result.return_code != 0:
                 raise RuntimeError(
-                    "License-to-Act post-Qwen GovKernel failed with return code "
+                    "StateTx post-Qwen Commit Controller failed with return code "
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
@@ -416,7 +416,7 @@ if unauthorized_paths:
 if side_effects:
     raise SystemExit(f'prohibited side effects: {side_effects}')
 
-print(f'LTA_GOVKERNEL sanitized {len(changed_paths)} licensed files')
+print(f'STATETX sanitized {len(changed_paths)} scoped files')
 PY"""
 
 
