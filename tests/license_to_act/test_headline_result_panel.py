@@ -23,8 +23,8 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["actor_backbones"] == 4
     assert summary["clean_positive_passes"] == 25
     assert summary["clean_positive_trials"] == 25
-    assert summary["faithful_baseline_passes"] == 1
-    assert summary["faithful_baseline_trials"] == 13
+    assert summary["faithful_baseline_passes"] == 4
+    assert summary["faithful_baseline_trials"] == 25
     assert summary["tau2_read_correct_write_wrong_proxy"] == 19
     assert summary["submission_scale_rows"] == 24
     assert summary["commit_pair_accuracy"] == 1.0
@@ -78,7 +78,7 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTAHeadlinePanelRows}{8}" in tex
     assert "\\newcommand{\\LTAHeadlineMainPositiveRows}{5}" in tex
     assert "\\newcommand{\\LTAHeadlineRuntimeReliabilityRows}{1}" in tex
-    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{13}" in tex
+    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{25}" in tex
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{25}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{10}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{10}" in tex

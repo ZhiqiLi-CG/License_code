@@ -71,19 +71,22 @@ DEFAULT_RELIABILITY_CASES = [
         "interpretation": "Executable completion trigger materializes the verifier-visible workbook from OCR evidence.",
     },
     {
-        "case_id": "TB-QWEN32K-MSWE-3",
+        "case_id": "TB-QWEN32K-MSWE-K15",
         "benchmark": "Terminal-Bench 2.1",
         "task": "three Terminal-Bench anchors",
         "condition": "Qwen3.8-27B-long32k + mini-swe-agent",
-        "role": "faithful long-context baseline",
+        "role": "faithful long-context baseline, K=5 per terminal anchor",
         "result_path": artifact_path(
-            "stage2",
+            "stage3",
             "harbor",
-            "stage2-tb21-miniswe-qwen-long32k-license-anchors-smoke",
+            "stage3-tb21-miniswe-qwen-long32k-anchors-k5-real-20260831",
             "result.json",
         ),
         "paper_use": "faithful_baseline",
-        "interpretation": "The 32k open-model agent fails all three Terminal-Bench transaction anchors without runtime errors.",
+        "interpretation": (
+            "The 32k open-model agent solves some Git/WAL trials but remains unreliable "
+            "across Terminal-Bench transaction anchors, with sqlite truncation at 0/5."
+        ),
     },
     {
         "case_id": "SF-QWEN32K-MSWE-K10",

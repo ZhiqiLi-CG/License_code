@@ -15,8 +15,8 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     summary = manifest["summary"]
     assert summary["method_condition_rows"] == 1
     assert summary["faithful_baseline_rows"] == 1
-    assert summary["faithful_baseline_trials"] == 13
-    assert summary["faithful_baseline_passes"] == 1
+    assert summary["faithful_baseline_trials"] == 25
+    assert summary["faithful_baseline_passes"] == 4
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 5
     assert summary["integration_stress_rows"] == 1

@@ -53,8 +53,14 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
         "stage2_clean_errors": int(stage2_summary["clean_reliability_errors"]),
         "stage2_clean_mean_reward": float(stage2_summary["clean_reliability_mean_reward"]),
         "faithful_baseline_trials": int(stage2_summary["faithful_baseline_trials"]),
+        "faithful_baseline_passes": _sum_passes(faithful_rows),
+        "faithful_baseline_errors": int(stage2_summary["faithful_baseline_errors"]),
         "faithful_terminal_baseline_trials": _sum_int(terminal_faithful_rows, "n_trials"),
+        "faithful_terminal_baseline_passes": _sum_passes(terminal_faithful_rows),
+        "faithful_terminal_baseline_errors": _sum_int(terminal_faithful_rows, "n_errors"),
         "faithful_skillflow_baseline_trials": _sum_int(skillflow_faithful_rows, "n_trials"),
+        "faithful_skillflow_baseline_passes": _sum_passes(skillflow_faithful_rows),
+        "faithful_skillflow_baseline_errors": _sum_int(skillflow_faithful_rows, "n_errors"),
         "faithful_baseline_mean_reward": float(stage2_summary["faithful_baseline_mean_reward"]),
         "tau2_cancel_decisions": int(stage2_summary["tau2_cancel_decisions"]),
         "tau2_read_correct_write_wrong_proxy": int(stage2_summary["tau2_read_correct_write_wrong_proxy"]),
@@ -152,7 +158,11 @@ def _claims(
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} clean Stage-2 anchors: {clean_tasks}",
                 f"{metrics['stage2_clean_trials']} clean trials, {metrics['stage2_clean_errors']} errors, mean reward {metrics['stage2_clean_mean_reward']:.1f}",
-                f"Matched faithful baseline rows: {baseline_tasks}; {metrics['faithful_baseline_trials']} trials, mean reward {metrics['faithful_baseline_mean_reward']:.1f}",
+                (
+                    f"Matched faithful baseline rows: {baseline_tasks}; "
+                    f"{metrics['faithful_baseline_passes']}/{metrics['faithful_baseline_trials']} passes, "
+                    f"{metrics['faithful_baseline_errors']} errors, mean reward {metrics['faithful_baseline_mean_reward']:.2f}"
+                ),
             ],
             "source_artifacts": [
                 "License_paper/data/stage2_reliability.csv",
@@ -291,8 +301,14 @@ def _latex_numbers(metrics: dict[str, Any]) -> str:
         "LTAStageTwoSFCleanTrials": metrics["stage2_skillflow_clean_trials"],
         "LTAStageTwoCleanErrors": metrics["stage2_clean_errors"],
         "LTAFaithfulBaselineTrials": metrics["faithful_baseline_trials"],
+        "LTAFaithfulBaselinePasses": metrics["faithful_baseline_passes"],
+        "LTAFaithfulBaselineErrors": metrics["faithful_baseline_errors"],
         "LTAFaithfulTBBaselineTrials": metrics["faithful_terminal_baseline_trials"],
+        "LTAFaithfulTBBaselinePasses": metrics["faithful_terminal_baseline_passes"],
+        "LTAFaithfulTBBaselineErrors": metrics["faithful_terminal_baseline_errors"],
         "LTAFaithfulSFBaselineTrials": metrics["faithful_skillflow_baseline_trials"],
+        "LTAFaithfulSFBaselinePasses": metrics["faithful_skillflow_baseline_passes"],
+        "LTAFaithfulSFBaselineErrors": metrics["faithful_skillflow_baseline_errors"],
         "LTATauTwoCancelDecisions": metrics["tau2_cancel_decisions"],
         "LTATauTwoResultFiles": metrics["tau2_result_files"],
         "LTATauTwoSimulations": metrics["tau2_simulations"],
@@ -335,6 +351,10 @@ def _parse_number(value: str) -> int | float | str:
 
 def _sum_int(rows: list[dict[str, str]], field: str) -> int:
     return sum(int(row[field]) for row in rows)
+
+
+def _sum_passes(rows: list[dict[str, str]]) -> int:
+    return sum(round(float(row["mean_reward"]) * int(row["n_trials"])) for row in rows)
 
 
 def _format_value(value: Any) -> str:

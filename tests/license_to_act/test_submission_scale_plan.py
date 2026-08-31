@@ -23,7 +23,7 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     assert summary["total_target_trials"] >= 180
     assert summary["current_clean_positive_passes"] == 25
     assert summary["current_clean_positive_trials"] == 25
-    assert summary["current_faithful_baseline_trials"] == 13
+    assert summary["current_faithful_baseline_trials"] == 25
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 5
     assert summary["story_gate_checks"] == 19

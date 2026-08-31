@@ -68,9 +68,9 @@ The paper includes matched open-model baselines using the newly available `Qwen3
 ```bash
 env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run \
   -c configs/tb21_miniswe_qwen_long32k_license_anchors.json \
-  --job-name stage2-tb21-miniswe-qwen-long32k-statetx-anchors-smoke \
-  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
-  --n-attempts 1 --n-concurrent 1 -y
+  --job-name stage3-tb21-miniswe-qwen-long32k-anchors-k5-real-20260831 \
+  --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
 
 env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/SkillFlow OPENAI_API_KEY=dummy harbor run \
   -c configs/skillflow_miniswe_qwen_long32k_license_anchors.json \
@@ -79,7 +79,7 @@ env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/Ski
   --n-attempts 5 --n-concurrent 1 -y
 ```
 
-Current artifacts record 0/3 Terminal-Bench passes and 1/10 SkillFlow OCR passes with zero runtime exceptions, or 1/13 across the current matched faithful-baseline pool. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same commit boundary without the Commit Controller.
+Current artifacts record 3/15 Terminal-Bench passes and 1/10 SkillFlow OCR passes, or 4/25 across the current matched faithful-baseline pool. The Terminal-Bench K=15 job has one `NonZeroAgentExitCodeError`; the SkillFlow K=10 job has zero runtime exceptions. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same commit boundary without the Commit Controller.
 
 ## Paper Result Exports
 

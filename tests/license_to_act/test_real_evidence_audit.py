@@ -26,6 +26,7 @@ def test_real_evidence_audit_separates_real_results_from_scale_plans() -> None:
     assert all(row["paper_role"] == "planned_scale_target" for row in scale_target_rows)
     assert all("target role:" in row["notes"] for row in scale_target_rows)
     assert rows["stage2:TB-WAL-K5"]["evidence_kind"] == "real_official_harbor"
+    assert rows["stage2:TB-QWEN32K-MSWE-K15"]["evidence_kind"] == "real_official_harbor"
     assert rows["stage2:SF-QWEN32K-MSWE-K10"]["evidence_kind"] == "real_official_harbor"
     assert rows["model_loop:SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["evidence_kind"] == "real_official_harbor"
     assert rows["model_loop:SF_OCR_QWEN32K_MINISWE_BASELINE_K5"]["notes"] == "1/10 passes; mixed"

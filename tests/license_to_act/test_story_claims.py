@@ -21,10 +21,16 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["stage2_skillflow_clean_trials"] == 10
     assert metrics["stage2_clean_errors"] == 0
     assert metrics["stage2_clean_mean_reward"] == 1.0
-    assert metrics["faithful_baseline_trials"] == 13
-    assert metrics["faithful_terminal_baseline_trials"] == 3
+    assert metrics["faithful_baseline_trials"] == 25
+    assert metrics["faithful_baseline_passes"] == 4
+    assert metrics["faithful_baseline_errors"] == 1
+    assert metrics["faithful_terminal_baseline_trials"] == 15
+    assert metrics["faithful_terminal_baseline_passes"] == 3
+    assert metrics["faithful_terminal_baseline_errors"] == 1
     assert metrics["faithful_skillflow_baseline_trials"] == 10
-    assert round(metrics["faithful_baseline_mean_reward"], 3) == 0.077
+    assert metrics["faithful_skillflow_baseline_passes"] == 1
+    assert metrics["faithful_skillflow_baseline_errors"] == 0
+    assert round(metrics["faithful_baseline_mean_reward"], 3) == 0.160
     assert metrics["tau2_cancel_decisions"] == 62
     assert metrics["tau2_read_correct_write_wrong_proxy"] == 19
     assert metrics["tau2_result_files"] >= 64
@@ -70,13 +76,19 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
         )
     }
     assert metrics["stage2_clean_trials"] == "25"
-    assert metrics["faithful_baseline_mean_reward"] == "0.0769231"
+    assert metrics["faithful_baseline_mean_reward"] == "0.16"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     output_metrics = output["headline_metrics"]
     assert "\\newcommand{\\LTAStageTwoCleanTrials}{25}" in tex
     assert "\\newcommand{\\LTAStageTwoTBCleanTrials}{15}" in tex
     assert "\\newcommand{\\LTAStageTwoSFCleanTrials}{10}" in tex
+    assert "\\newcommand{\\LTAFaithfulBaselinePasses}{4}" in tex
+    assert "\\newcommand{\\LTAFaithfulBaselineErrors}{1}" in tex
+    assert "\\newcommand{\\LTAFaithfulTBBaselinePasses}{3}" in tex
+    assert "\\newcommand{\\LTAFaithfulTBBaselineErrors}{1}" in tex
+    assert "\\newcommand{\\LTAFaithfulSFBaselinePasses}{1}" in tex
+    assert "\\newcommand{\\LTAFaithfulSFBaselineErrors}{0}" in tex
     assert f"\\newcommand{{\\LTATauTwoResultFiles}}{{{output_metrics['tau2_result_files']}}}" in tex
     assert f"\\newcommand{{\\LTATauTwoSimulations}}{{{output_metrics['tau2_simulations']}}}" in tex
     assert (
