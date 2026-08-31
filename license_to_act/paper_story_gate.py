@@ -206,6 +206,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_story_numbers}",
         "\\input{sections/generated_portfolio_numbers}",
         "\\input{sections/generated_comparison_numbers}",
+        "\\input{sections/generated_headline_panel_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
@@ -214,7 +215,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, scale plan, and story gate numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, scale plan, and story gate numbers.",
     )
 
 
@@ -246,6 +247,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_story_claims.py",
         "export_evidence_portfolio.py",
         "export_comparison_manifest.py",
+        "export_headline_result_panel.py",
         "export_submission_scale_plan.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
@@ -257,7 +259,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, scale plan export, story gate export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, scale plan export, story gate export, figure generation, and LaTeX build.",
     )
 
 
