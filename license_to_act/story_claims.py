@@ -139,7 +139,7 @@ def _claims(
             "paper_section": "Results",
             "claim": (
                 "The method blocks unready or overbroad commits while preserving positive controls; "
-                "the contract is specific to readiness, write scope, preservation, and done state."
+                "the boundary rule is specific to readiness, write scope, preservation, and done state."
             ),
             "positive_evidence": [
                 f"{metrics['stage1_preserved_positive']} Stage-1 legal tau2 commit remains pass-to-pass",
@@ -156,8 +156,8 @@ def _claims(
                 "Executable boundary protocols are stable under official reruns, not just one-off scripts."
             ),
             "positive_evidence": [
-                f"{metrics['stage2_clean_anchor_count']} clean Stage-2 anchors: {clean_tasks}",
-                f"{metrics['stage2_clean_trials']} clean trials, {metrics['stage2_clean_errors']} errors, mean reward {metrics['stage2_clean_mean_reward']:.1f}",
+                f"{metrics['stage2_clean_anchor_count']} reliability tasks: {clean_tasks}",
+                f"{metrics['stage2_clean_trials']} reliability trials, {metrics['stage2_clean_errors']} errors, mean reward {metrics['stage2_clean_mean_reward']:.1f}",
                 (
                     f"Matched faithful baseline rows: {baseline_tasks}; "
                     f"{metrics['faithful_baseline_passes']}/{metrics['faithful_baseline_trials']} passes, "
@@ -176,7 +176,7 @@ def _claims(
             ),
             "positive_evidence": [
                 (
-                    "Qwen3.8-27B-long32k plus commit controller reaches "
+                    "Qwen3.8-27B-long32k plus action boundary reaches "
                     f"{metrics['qwen_skillflow_govkernel_passes']}/"
                     f"{metrics['qwen_skillflow_govkernel_trials']} official passes "
                     "on invoice and travel-claim OCR anchors"

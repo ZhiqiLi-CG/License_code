@@ -1,5 +1,5 @@
-job_name: skillflow-lta-qwen-invoice-govkernel-no-prompt-official
-jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_qwen_invoice_govkernel_no_prompt_official
+job_name: skillflow-action-boundary-qwen-invoice-official-out256
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_action_boundary_qwen_invoice_official_out256
 agent_timeout_multiplier: 0.5
 quiet: true
 
@@ -8,7 +8,7 @@ environment:
   force_build: true
 
 agents:
-  - import_path: license_to_act.harbor_agents:LicenseToActQwenInvoiceGovKernelAgent
+  - import_path: license_to_act.harbor_agents:LicenseToActQwenInvoiceActionBoundaryAgent
     model_name: openai/Qwen3.8-27B-long32k
     env:
       OPENAI_BASE_URL: http://172.17.0.1:18010/v1
@@ -18,3 +18,6 @@ agents:
 
 tasks:
   - path: /data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images
+
+extra_instruction_paths:
+  - /data/zhiqi/License/License_code/prompts/action_boundary_skillflow_invoice_commit_protocol.md

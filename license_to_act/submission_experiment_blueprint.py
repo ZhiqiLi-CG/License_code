@@ -213,8 +213,8 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
         {
             "blueprint_id": "E11_CONTRACT_REFINEMENT_TRANSFER",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The recursively improving object is the evolving State Contract.",
-            "split_policy": "Generate State Contracts from source tasks, validate on regression tasks, then freeze for held-out transfer.",
+            "claim_axis": "The recursively improving object is the action boundary.",
+            "split_policy": "Generate boundary updates from source tasks, validate on regression tasks, then freeze for held-out transfer.",
             "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
             "comparison_class": "method_condition",
             "paper_role": "main_positive_scale",

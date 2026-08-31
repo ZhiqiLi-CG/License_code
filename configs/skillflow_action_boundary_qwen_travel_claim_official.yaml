@@ -1,5 +1,5 @@
-job_name: skillflow-lta-qwen-travel-claim-govkernel-official
-jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_qwen_travel_claim_govkernel_official
+job_name: skillflow-action-boundary-qwen-travel-claim-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_action_boundary_qwen_travel_claim_official
 agent_timeout_multiplier: 0.5
 quiet: true
 
@@ -8,7 +8,7 @@ environment:
   force_build: true
 
 agents:
-  - import_path: license_to_act.harbor_agents:LicenseToActQwenTravelClaimGovKernelAgent
+  - import_path: license_to_act.harbor_agents:LicenseToActQwenTravelClaimActionBoundaryAgent
     model_name: openai/Qwen3.8-27B-long32k
     env:
       OPENAI_BASE_URL: http://172.17.0.1:18010/v1
@@ -20,4 +20,4 @@ tasks:
   - path: /data/zhiqi/License/datasets/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_travel_claim_merge
 
 extra_instruction_paths:
-  - /data/zhiqi/License/License_code/prompts/lta_skillflow_travel_claim_commit_protocol.md
+  - /data/zhiqi/License/License_code/prompts/action_boundary_skillflow_travel_claim_commit_protocol.md

@@ -62,11 +62,11 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "runtime_reliability_evidence",
             "story_question": "Is the positive evidence a stable block rather than one lucky case?",
             "result_sentence": (
-                f"Commit-controller clean anchors achieve {portfolio_summary['clean_positive_passes']}/"
+                f"Action-boundary reliability tasks achieve {portfolio_summary['clean_positive_passes']}/"
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors."
             ),
             "why_it_matters": (
-                "The paper can lead with verifier-backed positive mass around one executable boundary."
+                "The paper can report verifier-backed positive mass while keeping matched-agent rows separate."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
         },
@@ -75,11 +75,11 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "main_positive_evidence",
             "story_question": "Does the action boundary help when the same model stays in the official trial?",
             "result_sentence": (
-                f"Qwen3.8-27B-long32k plus commit controller reaches "
+                f"Qwen3.8-27B-long32k plus action boundary reaches "
                 f"{bridge_summary['qwen_all_govkernel_passes']}/"
                 f"{bridge_summary['qwen_all_govkernel_trials']} official passes on Terminal-Bench log-summary "
                 "and two SkillFlow OCR tasks with zero errors. The same faithful mini-swe actor without "
-                f"the controller reaches {bridge_summary['qwen_terminal_log_faithful_baseline_passes']}/"
+                f"the boundary reaches {bridge_summary['qwen_terminal_log_faithful_baseline_passes']}/"
                 f"{bridge_summary['qwen_terminal_log_faithful_baseline_trials']} on log-summary and "
                 f"{bridge_summary['qwen_skillflow_faithful_baseline_passes']}/"
                 f"{bridge_summary['qwen_skillflow_faithful_baseline_trials']} on the OCR tasks."

@@ -36,6 +36,6 @@
     "arm_type": "faithful_baseline",
     "model_key": "qwen_long32k",
     "task_count": 3,
-    "notes": "Matched long-context open-model agent baseline for the three Terminal-Bench anchors used by the License-to-Act Stage-2 paper."
+    "notes": "Matched long-context open-model agent baseline for the three Terminal-Bench action-boundary anchors used by the Stage-2 paper."
   }
 }

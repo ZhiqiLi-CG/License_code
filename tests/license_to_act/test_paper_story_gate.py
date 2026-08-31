@@ -17,8 +17,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 22
-    assert summary["passed_checks"] == 22
+    assert summary["total_checks"] == 24
+    assert summary["passed_checks"] == 24
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
@@ -53,7 +53,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "run-plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "model-in-loop" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "tau2" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "contract-update" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "boundary-update" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "proposal/effect" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "meta-agent patch" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "ablation" in checks["paper_imports_generated_numbers"]["evidence"].lower()
@@ -65,12 +65,14 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["public_surface_uses_action_boundary_terms"]["status"] == "pass"
     assert checks["story_language_anchors"]["status"] == "pass"
     assert checks["main_text_avoids_meta_curation_language"]["status"] == "pass"
+    assert checks["main_text_keeps_terminology_light"]["status"] == "pass"
+    assert checks["abstract_prioritizes_matched_action_boundary_evidence"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
     assert "consistency export" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "full-study plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "model-in-loop exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "matched tau2 exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "contract-update" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "boundary-update" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "proposal/effect" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "meta-agent patch" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "ablation exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
@@ -97,12 +99,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 22
+    assert len(rows) == 24
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{22}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{22}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{24}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{24}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

@@ -249,7 +249,7 @@ def build_diagnostic_cases(
                 "case_id": "SF-INV-L",
                 "benchmark": "SkillFlow",
                 "task": "invoice image extraction",
-                "agent": "Qwen + commit controller",
+                "agent": "Qwen + action boundary",
                 "reward_or_status": _format_reward(skillflow["license_to_act"]["reward"]),
                 "failure_or_role": "Executable completion trigger",
                 "evidence": (
@@ -328,7 +328,7 @@ def _agent_label(agent: str) -> str:
         "codex-gpt-5.5": "Codex GPT-5.5",
         "terminus-2-qwen": "Qwen3.8-27B + Terminus-2",
         "terminus-2-qwen-prompt-only": "Qwen3.8-27B + Terminus-2",
-        "qwen-cli-plus-govkernel": "Qwen + commit controller",
+        "qwen-cli-plus-govkernel": "Qwen + action boundary",
     }
     return labels.get(agent, agent)
 

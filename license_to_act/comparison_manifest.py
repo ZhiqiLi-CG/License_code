@@ -38,7 +38,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "M1_FULL_ACTION_BOUNDARY_CLEAN_ANCHORS",
             "comparison_class": "method_condition",
             "paper_role": "main_positive",
-            "condition": "Full action boundary with executable commit controller",
+            "condition": "Full action boundary with executable finalization checks",
             "tests": "Does the executable boundary produce stable verifier-backed durable effects?",
             "evidence_status": "completed",
             "current_result": f"{clean_passes}/{clean_trials} official passes",
@@ -98,7 +98,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "A5_NO_CONTRACT_REFINEMENT",
             "comparison_class": "mechanism_ablation",
             "paper_role": "mechanism_evidence",
-            "condition": "Static State Contracts without failure-driven boundary updates",
+            "condition": "Static boundary rules without failure-driven updates",
             "tests": "Do gains remain local when the boundary cannot be updated from failures?",
             "evidence_status": "seed_evidence",
             "current_result": "Generated lineage accepts 4/4 boundary updates over three generations",
@@ -108,7 +108,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "S1_QWEN_COMMIT_CONTROLLER_INTEGRATION",
             "comparison_class": "integration_stress",
             "paper_role": "supporting_stress",
-            "condition": "Qwen3.8-27B-long32k plus commit controller under the same official Harbor task",
+            "condition": "Qwen3.8-27B-long32k plus action boundary under the same official Harbor task",
             "tests": (
                 "Can a real model feed staged evidence into the action boundary across Terminal-Bench "
                 "log-summary and two SkillFlow OCR tasks under endpoint pressure?"

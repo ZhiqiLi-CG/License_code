@@ -31,10 +31,10 @@ Faithful baselines are not ablations. They must use the same task harness, offic
 Baseline ladder:
 
 1. Vanilla actor on official harness.
-2. Prompt-only commit protocol, where the model receives boundary language but no executable commit controller.
+2. Prompt-only action protocol, where the model receives boundary language but no executable boundary.
 3. Reflection/history or Recuris-style memory evolution, implemented as faithfully as local infrastructure permits.
-4. Fixed State Contract boundary without failure-derived update.
-5. Full action-boundary system with commit-controller decisions and boundary-update transfer.
+4. Fixed action boundary without failure-derived update.
+5. Full action-boundary system with executable decisions and boundary-update transfer.
 
 Ablations are our mechanism probes and may be intentionally narrower:
 

@@ -1,5 +1,5 @@
-job_name: tb21-lta-qwen-log-summary-govkernel-official
-jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_lta_qwen_log_summary_govkernel_official
+job_name: tb21-action-boundary-qwen-log-summary-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_action_boundary_qwen_log_summary_official
 agent_timeout_multiplier: 1.0
 quiet: true
 
@@ -8,7 +8,7 @@ environment:
   force_build: true
 
 agents:
-  - import_path: license_to_act.harbor_agents:LicenseToActMiniSweLogSummaryGovKernelAgent
+  - import_path: license_to_act.harbor_agents:LicenseToActMiniSweLogSummaryActionBoundaryAgent
     model_name: openai/Qwen3.8-27B-long32k
     env:
       OPENAI_BASE_URL: http://172.17.0.1:18010/v1
@@ -22,4 +22,4 @@ tasks:
   - path: /data/zhiqi/License/datasets/terminal-bench-2-1/tasks/log-summary-date-ranges
 
 extra_instruction_paths:
-  - /data/zhiqi/License/License_code/prompts/lta_tb21_log_summary_commit_protocol.md
+  - /data/zhiqi/License/License_code/prompts/action_boundary_tb21_log_summary_commit_protocol.md

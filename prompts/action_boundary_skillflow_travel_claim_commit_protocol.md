@@ -1,8 +1,8 @@
-# StateTx Travel-Claim Commit Protocol
+# Action Boundary Travel-Claim Commit Protocol
 
-You are operating under a state-changing transaction contract.
+You are operating with an action boundary for state-changing outputs.
 
-Licensed output state:
+Required output state:
 - Actor role: artifact agent
 - Required commit: write `/app/workspace/travel_claims.xlsx`
 - Operation: `WriteOutputWorkbook`

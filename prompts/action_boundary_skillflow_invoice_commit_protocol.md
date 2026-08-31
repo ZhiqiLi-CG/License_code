@@ -1,8 +1,8 @@
-# License-to-Act Commit Protocol
+# Action Boundary Invoice Commit Protocol
 
-You are operating under a state-changing action license.
+You are operating with an action boundary for state-changing outputs.
 
-Licensed output state:
+Required output state:
 - Actor role: artifact agent
 - Required commit: write `/app/workspace/invoice_summary.xlsx`
 - Operation: `WriteOutputWorkbook`

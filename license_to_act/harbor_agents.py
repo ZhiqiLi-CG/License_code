@@ -149,7 +149,7 @@ class LicenseToActInvoiceMaterializerAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx invoice transaction executor failed with return code "
+                "Action-boundary invoice executor failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -180,7 +180,7 @@ class LicenseToActTravelClaimMaterializerAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx travel-claim transaction executor failed with return code "
+                "Action-boundary travel-claim executor failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -211,7 +211,7 @@ class LicenseToActTB21SanitizeAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx TB21 sanitizer failed with return code "
+                "Action-boundary TB21 sanitizer failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -242,7 +242,7 @@ class LicenseToActTB21DbWalRecoveryAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx TB21 db-wal recovery failed with return code "
+                "Action-boundary TB21 db-wal recovery failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -273,7 +273,7 @@ class LicenseToActTB21SqliteTruncateRecoveryAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx TB21 sqlite truncate recovery failed with return code "
+                "Action-boundary TB21 sqlite truncate recovery failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
@@ -304,19 +304,19 @@ class LicenseToActTB21LogSummaryAgent(BaseAgent):
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "StateTx TB21 log summary failed with return code "
+                "Action-boundary TB21 log summary failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
 
 if MiniSweAgent is not None:
 
-    class LicenseToActMiniSweLogSummaryGovKernelAgent(MiniSweAgent):
+    class LicenseToActMiniSweLogSummaryActionBoundaryAgent(MiniSweAgent):
         """Run mini-swe-agent, then execute the log-summary CSV commit."""
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-miniswe-log-summary-govkernel"
+            return "action-boundary-miniswe-log-summary"
 
         async def run(
             self,
@@ -332,19 +332,21 @@ if MiniSweAgent is not None:
             )
             if result.return_code != 0:
                 raise RuntimeError(
-                    "StateTx post-mini-swe log-summary commit failed with return code "
+                    "Action-boundary post-mini-swe log-summary commit failed with return code "
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
+
+    LicenseToActMiniSweLogSummaryGovKernelAgent = LicenseToActMiniSweLogSummaryActionBoundaryAgent
 
 
 if NoInstallQwenCodeBareLocal is not None:
 
-    class LicenseToActQwenInvoiceGovKernelAgent(NoInstallQwenCodeBareLocal):
+    class LicenseToActQwenInvoiceActionBoundaryAgent(NoInstallQwenCodeBareLocal):
         """Run Qwen, then execute the invoice workbook obligation in the same trial."""
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-invoice-govkernel"
+            return "action-boundary-qwen-invoice"
 
         async def run(
             self,
@@ -364,12 +366,12 @@ if NoInstallQwenCodeBareLocal is not None:
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
-    class LicenseToActQwenTravelClaimGovKernelAgent(NoInstallQwenCodeBareLocal):
+    class LicenseToActQwenTravelClaimActionBoundaryAgent(NoInstallQwenCodeBareLocal):
         """Run Qwen, then execute the travel-claim workbook obligation in the same trial."""
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-travel-claim-govkernel"
+            return "action-boundary-qwen-travel-claim"
 
         async def run(
             self,
@@ -389,12 +391,12 @@ if NoInstallQwenCodeBareLocal is not None:
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
-    class LicenseToActQwenLogSummaryGovKernelAgent(NoInstallQwenCodeBareLocal):
+    class LicenseToActQwenLogSummaryActionBoundaryAgent(NoInstallQwenCodeBareLocal):
         """Run Qwen, then execute the log-summary CSV obligation in the same trial."""
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-log-summary-govkernel"
+            return "action-boundary-qwen-log-summary"
 
         async def run(
             self,
@@ -414,32 +416,40 @@ if NoInstallQwenCodeBareLocal is not None:
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
+    LicenseToActQwenInvoiceGovKernelAgent = LicenseToActQwenInvoiceActionBoundaryAgent
+    LicenseToActQwenTravelClaimGovKernelAgent = LicenseToActQwenTravelClaimActionBoundaryAgent
+    LicenseToActQwenLogSummaryGovKernelAgent = LicenseToActQwenLogSummaryActionBoundaryAgent
+
 
 else:
 
-    class LicenseToActQwenInvoiceGovKernelAgent:  # pragma: no cover
+    class LicenseToActQwenInvoiceActionBoundaryAgent:  # pragma: no cover
         def __init__(self, *args, **kwargs):
             raise ModuleNotFoundError("SkillFlow NoInstallQwenCodeBareLocal is not available")
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-invoice-govkernel"
+            return "action-boundary-qwen-invoice"
 
-    class LicenseToActQwenTravelClaimGovKernelAgent:  # pragma: no cover
+    class LicenseToActQwenTravelClaimActionBoundaryAgent:  # pragma: no cover
         def __init__(self, *args, **kwargs):
             raise ModuleNotFoundError("SkillFlow NoInstallQwenCodeBareLocal is not available")
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-travel-claim-govkernel"
+            return "action-boundary-qwen-travel-claim"
 
-    class LicenseToActQwenLogSummaryGovKernelAgent:  # pragma: no cover
+    class LicenseToActQwenLogSummaryActionBoundaryAgent:  # pragma: no cover
         def __init__(self, *args, **kwargs):
             raise ModuleNotFoundError("SkillFlow NoInstallQwenCodeBareLocal is not available")
 
         @staticmethod
         def name() -> str:
-            return "license-to-act-qwen-log-summary-govkernel"
+            return "action-boundary-qwen-log-summary"
+
+    LicenseToActQwenInvoiceGovKernelAgent = LicenseToActQwenInvoiceActionBoundaryAgent
+    LicenseToActQwenTravelClaimGovKernelAgent = LicenseToActQwenTravelClaimActionBoundaryAgent
+    LicenseToActQwenLogSummaryGovKernelAgent = LicenseToActQwenLogSummaryActionBoundaryAgent
 
 
 def _invoice_materializer_command() -> str:

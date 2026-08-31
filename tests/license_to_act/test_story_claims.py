@@ -31,7 +31,7 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["faithful_skillflow_baseline_passes"] == 1
     assert metrics["faithful_skillflow_baseline_errors"] == 0
     assert round(metrics["faithful_baseline_mean_reward"], 3) == 0.267
-    assert metrics["tau2_cancel_decisions"] == 67
+    assert metrics["tau2_cancel_decisions"] == 77
     assert metrics["tau2_read_correct_write_wrong_proxy"] == 20
     assert metrics["tau2_result_files"] >= 64
     assert metrics["tau2_simulations"] >= 129

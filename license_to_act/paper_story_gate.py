@@ -66,6 +66,8 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _public_surface_hygiene_check(root),
         _story_language_check(paper_dir),
         _main_text_style_check(paper_dir),
+        _main_text_plain_language_check(paper_dir),
+        _abstract_headline_check(paper_dir),
         _reproduction_chain_check(root),
         _code_paper_structure_check(root),
         _appendix_story_check(paper_dir / "sections" / "appendix.tex"),
@@ -182,8 +184,8 @@ def _clean_positive_mass_check(summary: dict[str, Any]) -> dict[str, str]:
     return _check(
         "clean_positive_mass",
         ok,
-        "Clean official anchors should provide a positive result block, not a one-off anecdote.",
-        f"{passes}/{trials} clean official passes.",
+        "Official boundary tasks should provide a positive reliability block, not a one-off anecdote.",
+        f"{passes}/{trials} current positive official passes.",
     )
 
 
@@ -283,7 +285,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, run-plan, proposal/effect, contract-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, run-plan, proposal/effect, boundary-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -341,11 +343,11 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         "Model-in-loop evidence should be reported separately from task-specific executor reliability.",
         (
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
-            f"{summary['matched_agent_controller_rows']} matched-controller, and "
+            f"{summary['matched_agent_controller_rows']} matched-boundary, and "
             f"{summary['faithful_baseline_rows']} faithful-baseline rows carry actor, boundary, "
             f"and official-result fields. Qwen faithful OCR baseline: "
             f"{summary['qwen_skillflow_faithful_baseline_passes']}/"
-            f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+controller: "
+            f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+boundary: "
             f"{summary['qwen_all_govkernel_passes']}/"
             f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
             f"executor-as-agent rows: "
@@ -498,8 +500,8 @@ def _story_language_check(paper_dir: Path) -> dict[str, str]:
         "proposal-to-effect gap",
         "frozen reasoner",
         "proposed effects",
-        "State Contract",
-        "commit controller",
+        "boundary rule",
+        "matched model-in-loop",
     ]
     missing = [anchor for anchor in anchors if anchor not in combined]
     return _check(
@@ -530,8 +532,8 @@ def _action_boundary_story_check(paper_dir: Path) -> dict[str, str]:
         "frozen reasoner",
         "external effects",
         "proposed effects",
-        "State Contract",
-        "commit controller",
+        "boundary rule",
+        "controller",
         "ready",
         "write scope",
         "preserve",
@@ -558,7 +560,7 @@ def _action_boundary_story_check(paper_dir: Path) -> dict[str, str]:
     )
     ok = not missing and not retired_hits and section_ok
     evidence = (
-        "Action boundary, proposal-to-effect gap, frozen reasoner, and State Contract implementation lead the front matter."
+        "Action boundary, proposal-to-effect gap, frozen reasoner, and boundary-rule implementation lead the front matter."
         if ok
         else f"missing={missing}; retired_front_matter={retired_hits}; section_ok={section_ok}"
     )
@@ -673,6 +675,103 @@ def _main_text_style_check(paper_dir: Path) -> dict[str, str]:
     )
 
 
+def _main_text_plain_language_check(paper_dir: Path) -> dict[str, str]:
+    body = _main_visible_text(paper_dir)
+    blocked = [
+        "License-to-Act",
+        "Action License",
+        "GovKernel",
+        "StateTx",
+        "OBLIGE",
+        "story-first",
+        "main spine",
+        "go signal",
+        "evidence portfolio",
+        "blueprint",
+        "clean anchor",
+        "clean executable anchor",
+    ]
+    hits = [phrase for phrase in blocked if phrase in body]
+    state_contract_count = body.count("State Contract")
+    commit_controller_count = body.count("commit controller")
+    action_boundary_count = body.count("action boundary")
+    core_sentence_present = "better ways to act on thought" in body
+    ok = (
+        not hits
+        and state_contract_count <= 3
+        and commit_controller_count <= 4
+        and action_boundary_count >= 12
+        and core_sentence_present
+    )
+    evidence = (
+        "Main text keeps implementation terms behind the action-boundary story."
+        if ok
+        else (
+            f"blocked={hits}; State Contract={state_contract_count}; "
+            f"commit controller={commit_controller_count}; action boundary={action_boundary_count}; "
+            f"core sentence present={core_sentence_present}"
+        )
+    )
+    return _check(
+        "main_text_keeps_terminology_light",
+        ok,
+        "The paper should be readable: action boundary is the main term, while implementation terms stay limited.",
+        evidence,
+    )
+
+
+def _main_visible_text(paper_dir: Path) -> str:
+    main = (paper_dir / "main.tex").read_text(encoding="utf-8")
+    sections = "\n".join(
+        (paper_dir / relative).read_text(encoding="utf-8")
+        for relative in [
+            "sections/01_introduction.tex",
+            "sections/02_formulation.tex",
+            "sections/03_method.tex",
+            "sections/04_experiments.tex",
+            "sections/05_results.tex",
+            "sections/06_related_work.tex",
+            "sections/07_discussion.tex",
+        ]
+    )
+    return "\n".join(
+        line
+        for line in (main + "\n" + sections).splitlines()
+        if not line.startswith("\\input{sections/generated_")
+        and not line.startswith("\\newcommand")
+        and not line.startswith("\\label")
+    )
+
+
+def _abstract_headline_check(paper_dir: Path) -> dict[str, str]:
+    main = (paper_dir / "main.tex").read_text(encoding="utf-8")
+    abstract = main.split("\\begin{abstract}", maxsplit=1)[1].split("\\end{abstract}", maxsplit=1)[0]
+    required = [
+        "proposal-to-effect gap",
+        "matched",
+        "Qwen3.8-27B-long32k+boundary",
+        "same frozen agents",
+    ]
+    blocked = [
+        "executable boundary runs reach",
+        "\\LTAStageTwoCleanTrials{}/\\LTAStageTwoCleanTrials{}",
+    ]
+    missing = [phrase for phrase in required if phrase not in abstract]
+    hits = [phrase for phrase in blocked if phrase in abstract]
+    ok = not missing and not hits
+    evidence = (
+        "Abstract leads with proposal/effect and matched action-boundary evidence, not runtime-only reliability."
+        if ok
+        else f"missing={missing}; blocked={hits}"
+    )
+    return _check(
+        "abstract_prioritizes_matched_action_boundary_evidence",
+        ok,
+        "The abstract should not use task-specific executor reliability as the headline causal evidence.",
+        evidence,
+    )
+
+
 def _reproduction_chain_check(root: Path) -> dict[str, str]:
     code_readme = (root / "License_code" / "README.md").read_text(encoding="utf-8")
     paper_readme = (root / "License_paper" / "README.md").read_text(encoding="utf-8")
@@ -703,7 +802,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include generated tables and the paper build path.",
-        "README files mention result exports, comparison exports, full-study plan exports, proposal/effect exports, contract-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
+        "README files mention result exports, comparison exports, full-study plan exports, proposal/effect exports, boundary-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 

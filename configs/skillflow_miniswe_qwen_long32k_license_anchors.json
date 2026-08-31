@@ -36,6 +36,6 @@
     "arm_type": "faithful_baseline",
     "model_key": "qwen_long32k",
     "task_count": 2,
-    "notes": "Matched long-context open-model agent baseline for the two SkillFlow artifact-obligation anchors used by the License-to-Act Stage-2 paper."
+    "notes": "Matched long-context open-model agent baseline for the two SkillFlow action-boundary finalization anchors used by the Stage-2 paper."
   }
 }

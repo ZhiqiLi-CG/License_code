@@ -1,4 +1,4 @@
-# StateTx Log Summary Commit Protocol
+# Action Boundary Log Summary Commit Protocol
 
 Required output:
 - Write `/app/summary.csv`.

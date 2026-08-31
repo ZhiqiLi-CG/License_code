@@ -190,7 +190,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P4_SKILLFLOW_COMPLETION_TRIGGER",
             "SkillFlow",
-            "Qwen3.8-27B + commit controller",
+            "Qwen3.8-27B + action boundary",
             "action-boundary completion trigger",
             "SF-INV-complete-evidence",
             "ready",
@@ -205,7 +205,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P4_SKILLFLOW_COMPLETION_TRIGGER",
             "SkillFlow",
-            "Qwen3.8-27B + commit controller",
+            "Qwen3.8-27B + action boundary",
             "action-boundary completion trigger",
             "SF-TRAVEL-complete-evidence",
             "ready",
@@ -220,7 +220,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P4_SKILLFLOW_COMPLETION_TRIGGER",
             "SkillFlow",
-            "Qwen3.8-27B + commit controller",
+            "Qwen3.8-27B + action boundary",
             "action-boundary completion trigger",
             "SF-incomplete-artifact-candidate",
             "premature",
