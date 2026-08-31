@@ -162,13 +162,11 @@ def write_stage2_paper_results(
         "n_clean_reliability_rows": len(clean_rows),
         "clean_reliability_trials": sum(int(row["n_trials"]) for row in clean_rows),
         "clean_reliability_errors": sum(int(row["n_errors"]) for row in clean_rows),
-        "clean_reliability_mean_reward": _mean(float(row["mean_reward"]) for row in clean_rows),
+        "clean_reliability_mean_reward": _weighted_mean_reward(clean_rows),
         "n_faithful_baseline_rows": len(faithful_baseline_rows),
         "faithful_baseline_trials": sum(int(row["n_trials"]) for row in faithful_baseline_rows),
         "faithful_baseline_errors": sum(int(row["n_errors"]) for row in faithful_baseline_rows),
-        "faithful_baseline_mean_reward": _mean(
-            float(row["mean_reward"]) for row in faithful_baseline_rows if row["mean_reward"] != ""
-        ),
+        "faithful_baseline_mean_reward": _weighted_mean_reward(faithful_baseline_rows),
         "tau2_cancel_decisions": tau2_report["summary"]["n_cancel_decisions"],
         "tau2_read_correct_write_wrong_proxy": tau2_report["summary"]["n_read_correct_write_wrong_proxy"],
         "tau2_infrastructure_error_simulations": tau2_report["summary"]["n_infrastructure_error_simulations"],
@@ -228,3 +226,17 @@ def _mean(values) -> float | None:
     if not concrete:
         return None
     return sum(concrete) / len(concrete)
+
+
+def _weighted_mean_reward(rows: list[dict[str, Any]]) -> float:
+    trials = 0
+    reward_mass = 0.0
+    for row in rows:
+        if row["mean_reward"] == "":
+            continue
+        n_trials = int(row["n_trials"])
+        trials += n_trials
+        reward_mass += float(row["mean_reward"]) * n_trials
+    if trials == 0:
+        return 0.0
+    return reward_mass / trials

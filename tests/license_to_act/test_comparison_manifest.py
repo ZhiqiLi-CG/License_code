@@ -15,8 +15,8 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     summary = manifest["summary"]
     assert summary["method_condition_rows"] == 1
     assert summary["faithful_baseline_rows"] == 1
-    assert summary["faithful_baseline_trials"] == 5
-    assert summary["faithful_baseline_passes"] == 0
+    assert summary["faithful_baseline_trials"] == 13
+    assert summary["faithful_baseline_passes"] == 1
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 5
     assert summary["integration_stress_rows"] == 1
@@ -43,6 +43,13 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     assert len(ablations) == 5
     assert all("baseline" not in row["paper_role"] for row in ablations)
     assert {row["evidence_status"] for row in ablations} == {"seed_evidence"}
+
+    integration = rows[-1]
+    assert integration["comparison_class"] == "integration_stress"
+    assert integration["current_result"] == "10/10 official passes"
+    assert "two SkillFlow OCR tasks" in integration["tests"]
+    assert integration["source_data"] == "model_in_loop_bridge.csv"
+    assert "long32k" in integration["condition"]
 
 
 def test_write_comparison_manifest_exports_csv_json_and_tex(tmp_path: Path) -> None:

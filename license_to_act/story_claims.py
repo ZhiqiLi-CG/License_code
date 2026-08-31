@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .model_in_loop_bridge import build_model_in_loop_bridge
+
 
 CLAIM_FIELDS = [
     "claim_id",
@@ -23,6 +25,7 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     stage2_summary = _read_json(root / "artifacts/stage2/lta_stage2_paper_results_20260830.json")
     stage2_rows = _read_csv(root / "License_paper/data/stage2_reliability.csv")
     tau2_rows = _read_csv(root / "License_paper/data/tau2_commit_mining.csv")
+    model_bridge = build_model_in_loop_bridge(root)
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
@@ -62,6 +65,14 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
         "transfer_failure_to_pass": transfer_ftp,
         "transfer_preserved_positive": transfer_positive,
         "transfer_pass_to_failure": transfer_ptf,
+        "qwen_skillflow_govkernel_passes": model_bridge["summary"]["qwen_skillflow_govkernel_passes"],
+        "qwen_skillflow_govkernel_trials": model_bridge["summary"]["qwen_skillflow_govkernel_trials"],
+        "qwen_skillflow_faithful_baseline_passes": model_bridge["summary"][
+            "qwen_skillflow_faithful_baseline_passes"
+        ],
+        "qwen_skillflow_faithful_baseline_trials": model_bridge["summary"][
+            "qwen_skillflow_faithful_baseline_trials"
+        ],
     }
 
     return {
@@ -154,13 +165,23 @@ def _claims(
                 "Runtime control is not only a veto: complete evidence can trigger a missing verifier-visible artifact."
             ),
             "positive_evidence": [
-                "SkillFlow invoice materializer reaches 5/5 clean official passes",
-                "SkillFlow travel-claim materializer reaches 5/5 clean official passes",
-                "Qwen3.8-27B-long32k mini-swe baseline scores 0/2 on the same SkillFlow anchors",
+                (
+                    "Qwen3.8-27B-long32k plus Commit Controller reaches "
+                    f"{metrics['qwen_skillflow_govkernel_passes']}/"
+                    f"{metrics['qwen_skillflow_govkernel_trials']} official passes "
+                    "on invoice and travel-claim OCR anchors"
+                ),
+                (
+                    "Qwen3.8-27B-long32k mini-swe baseline scores "
+                    f"{metrics['qwen_skillflow_faithful_baseline_passes']}/"
+                    f"{metrics['qwen_skillflow_faithful_baseline_trials']} "
+                    "on the same SkillFlow anchors"
+                ),
+                "Runtime completion-trigger reruns score 10/10 on the same two anchor tasks",
             ],
             "source_artifacts": [
                 "License_paper/data/stage2_reliability.csv",
-                "artifacts/method_slices/skillflow_invoice_qwen_lta_trace_materialized/result.json",
+                "License_paper/data/model_in_loop_bridge.csv",
             ],
         },
         "contract_refinements_transfer_across_state_substrates": {

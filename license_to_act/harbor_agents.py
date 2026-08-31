@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+import os
+import shlex
+
 try:
     from harbor.agents.base import BaseAgent
     from harbor.environments.base import BaseEnvironment
@@ -11,8 +15,107 @@ except ModuleNotFoundError:  # pragma: no cover - imported only inside Harbor ru
 
 try:
     from libs.harbor_noinstall_agents.agents import NoInstallQwenCodeBareLocal
-except ModuleNotFoundError:  # pragma: no cover - SkillFlow adapter is only available in Harbor runs
-    NoInstallQwenCodeBareLocal = None
+except (ImportError, ModuleNotFoundError):  # pragma: no cover - depends on Harbor/SkillFlow versions
+    try:
+        from harbor.agents.installed.qwen_code import QwenCode
+    except ModuleNotFoundError:  # pragma: no cover - imported only inside Harbor runs
+        NoInstallQwenCodeBareLocal = None
+    else:
+
+        class NoInstallQwenCodeBareLocal(QwenCode):
+            """Qwen Code agent that uses the benchmark image's preinstalled CLI."""
+
+            async def setup(self, environment: BaseEnvironment) -> None:
+                setup_dir = self.logs_dir / "setup"
+                setup_dir.mkdir(parents=True, exist_ok=True)
+                (setup_dir / "mode.txt").write_text(
+                    "skip install script; use preinstalled qwen CLI in image\n",
+                    encoding="utf-8",
+                )
+                version_cmd = self.get_version_command()
+                if version_cmd and getattr(self, "_version", None) is None:
+                    result = await environment.exec(command=version_cmd)
+                    if result.return_code == 0 and result.stdout:
+                        self._version = self.parse_version(result.stdout)
+
+            async def run(
+                self,
+                instruction: str,
+                environment: BaseEnvironment,
+                context: AgentContext,
+            ) -> None:
+                escaped_instruction = shlex.quote(instruction)
+                env = dict(self.model_connection.env)
+                if self.model_name:
+                    env["OPENAI_MODEL"] = self.model_name.split("/", 1)[-1]
+                elif "OPENAI_MODEL" in os.environ:
+                    env["OPENAI_MODEL"] = os.environ["OPENAI_MODEL"]
+                else:
+                    env["OPENAI_MODEL"] = "qwen3-coder-plus"
+
+                max_tokens = os.environ.get("QWEN_CODE_MAX_OUTPUT_TOKENS") or env.get(
+                    "QWEN_CODE_MAX_OUTPUT_TOKENS",
+                    "512",
+                )
+                await self.exec_as_agent(
+                    environment,
+                    command=(
+                        "python3 -c "
+                        + shlex.quote(
+                            "import json,pathlib;"
+                            "p=pathlib.Path.home()/'.qwen'/'settings.json';"
+                            "d=json.loads(p.read_text()) if p.exists() else {};"
+                            "m=d.setdefault('model',{});"
+                            "g=m.setdefault('generationConfig',{});"
+                            "s=dict(g.get('samplingParams') or {});"
+                            f"s['max_tokens']={int(max_tokens)};"
+                            "g['samplingParams']=s;"
+                            "p.parent.mkdir(parents=True,exist_ok=True);"
+                            "p.write_text(json.dumps(d,separators=(',',':')))"
+                        )
+                    ),
+                    env=env,
+                )
+
+                skills_command = self._build_register_skills_command()
+                if skills_command:
+                    await self.exec_as_agent(environment, command=skills_command, env=env)
+
+                mcp_command = self._build_register_mcp_servers_command()
+                if mcp_command:
+                    await self.exec_as_agent(environment, command=mcp_command, env=env)
+
+                system_prompt = (
+                    "You are an autonomous benchmark agent. Use run_shell_command to inspect "
+                    "inputs and create or modify requested artifacts. Do not use write_file. "
+                    "Do not solve file-output tasks only in chat. Finish after required files "
+                    "are written."
+                )
+                resume_flag = "--continue " if getattr(self, "_resume", False) else ""
+                try:
+                    await self.exec_as_agent(
+                        environment,
+                        command=(
+                            ". ~/.nvm/nvm.sh; "
+                            'export QWEN_CODE_MAX_OUTPUT_TOKENS="${QWEN_CODE_MAX_OUTPUT_TOKENS:-512}"; '
+                            "qwen --yolo --auth-type openai "
+                            '--openai-api-key "$OPENAI_API_KEY" '
+                            '--openai-base-url "${OPENAI_BASE_URL:-https://api.openai.com/v1}" '
+                            f'-m "$OPENAI_MODEL" --bare --system-prompt {shlex.quote(system_prompt)} '
+                            "--chat-recording=false "
+                            f"{resume_flag}--prompt={escaped_instruction} "
+                            "2>&1 | stdbuf -oL tee /logs/agent/qwen-code.txt"
+                        ),
+                        env=env,
+                    )
+                finally:
+                    try:
+                        await self.exec_as_agent(
+                            environment,
+                            command="cp -r ~/.qwen/projects/ /logs/agent/qwen-sessions/ 2>/dev/null || true",
+                        )
+                    except Exception:
+                        pass
 
 
 class LicenseToActInvoiceMaterializerAgent(BaseAgent):
@@ -197,6 +300,31 @@ if NoInstallQwenCodeBareLocal is not None:
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
+    class LicenseToActQwenTravelClaimGovKernelAgent(NoInstallQwenCodeBareLocal):
+        """Run Qwen, then execute the travel-claim workbook obligation in the same trial."""
+
+        @staticmethod
+        def name() -> str:
+            return "license-to-act-qwen-travel-claim-govkernel"
+
+        async def run(
+            self,
+            instruction: str,
+            environment: BaseEnvironment,
+            context: AgentContext,
+        ) -> None:
+            await super().run(instruction, environment, context)
+            result = await environment.exec(
+                command=_travel_claim_materializer_command(),
+                cwd="/app/workspace",
+                timeout_sec=240,
+            )
+            if result.return_code != 0:
+                raise RuntimeError(
+                    "StateTx post-Qwen travel Commit Controller failed with return code "
+                    f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+                )
+
 
 else:
 
@@ -207,6 +335,14 @@ else:
         @staticmethod
         def name() -> str:
             return "license-to-act-qwen-invoice-govkernel"
+
+    class LicenseToActQwenTravelClaimGovKernelAgent:  # pragma: no cover
+        def __init__(self, *args, **kwargs):
+            raise ModuleNotFoundError("SkillFlow NoInstallQwenCodeBareLocal is not available")
+
+        @staticmethod
+        def name() -> str:
+            return "license-to-act-qwen-travel-claim-govkernel"
 
 
 def _invoice_materializer_command() -> str:

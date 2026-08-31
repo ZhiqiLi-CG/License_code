@@ -21,11 +21,11 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["stage2_skillflow_clean_trials"] == 10
     assert metrics["stage2_clean_errors"] == 0
     assert metrics["stage2_clean_mean_reward"] == 1.0
-    assert metrics["faithful_baseline_trials"] == 5
+    assert metrics["faithful_baseline_trials"] == 13
     assert metrics["faithful_terminal_baseline_trials"] == 3
-    assert metrics["faithful_skillflow_baseline_trials"] == 2
-    assert metrics["faithful_baseline_mean_reward"] == 0.0
-    assert metrics["tau2_cancel_decisions"] == 55
+    assert metrics["faithful_skillflow_baseline_trials"] == 10
+    assert round(metrics["faithful_baseline_mean_reward"], 3) == 0.077
+    assert metrics["tau2_cancel_decisions"] == 62
     assert metrics["tau2_read_correct_write_wrong_proxy"] == 19
     assert metrics["tau2_result_files"] >= 64
     assert metrics["tau2_simulations"] >= 129
@@ -70,7 +70,7 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
         )
     }
     assert metrics["stage2_clean_trials"] == "25"
-    assert metrics["faithful_baseline_mean_reward"] == "0.0"
+    assert metrics["faithful_baseline_mean_reward"] == "0.0769231"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     output_metrics = output["headline_metrics"]

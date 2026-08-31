@@ -86,34 +86,37 @@ DEFAULT_RELIABILITY_CASES = [
         "interpretation": "The 32k open-model agent fails all three Terminal-Bench transaction anchors without runtime errors.",
     },
     {
-        "case_id": "SF-QWEN32K-MSWE-2",
+        "case_id": "SF-QWEN32K-MSWE-K10",
         "benchmark": "SkillFlow",
-        "task": "two SkillFlow artifact anchors",
+        "task": "two SkillFlow OCR anchors",
         "condition": "Qwen3.8-27B-long32k + mini-swe-agent",
-        "role": "faithful long-context baseline",
+        "role": "faithful long-context baseline, K=5 per OCR anchor",
         "result_path": artifact_path(
-            "stage2",
+            "stage3",
             "harbor",
-            "stage2-skillflow-miniswe-qwen-long32k-license-anchors-smoke",
+            "stage3-skillflow-miniswe-qwen-long32k-ocr-k5-real-20260831",
             "result.json",
         ),
         "paper_use": "faithful_baseline",
-        "interpretation": "The 32k open-model agent reads OCR evidence but fails both verifier-visible workbook finalizations.",
+        "interpretation": (
+            "The 32k open-model agent occasionally completes invoice extraction but remains unreliable "
+            "across OCR-to-workbook finalization."
+        ),
     },
     {
         "case_id": "SF-INV-QG-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
-        "condition": "Qwen + Commit Controller, out128",
+        "condition": "Qwen3.8-27B-long32k + Commit Controller",
         "role": "model integration stress",
         "result_path": artifact_path(
-            "stage2",
+            "stage3",
             "harbor",
-            "stage2-skillflow-lta-qwen-invoice-k5-18002-out128",
+            "stage3-skillflow-qwen-govkernel-invoice-k5-real3-20260831",
             "result.json",
         ),
         "paper_use": "integration_stress",
-        "interpretation": "Four of five trials pass; the failed trial is a Qwen context-window API error before controller evidence.",
+        "interpretation": "Qwen remains in the official Harbor trial and the Commit Controller finalizes the workbook in all five runs.",
     },
     {
         "case_id": "SF-TRAVEL-MAT-K5",

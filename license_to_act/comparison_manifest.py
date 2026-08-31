@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .model_in_loop_bridge import build_model_in_loop_bridge
+
 
 MANIFEST_FIELDS = [
     "comparison_id",
@@ -21,16 +23,15 @@ MANIFEST_FIELDS = [
 def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/License")) -> dict[str, Any]:
     root = Path(project_root)
     stage2_rows = _read_csv(root / "License_paper" / "data" / "stage2_reliability.csv")
+    model_bridge = build_model_in_loop_bridge(root)
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
-    stress_rows = [row for row in stage2_rows if row["paper_use"] == "integration_stress"]
 
     clean_trials = _sum_int(clean_rows, "n_trials")
     clean_passes = _weighted_passes(clean_rows)
     faithful_trials = _sum_int(faithful_rows, "n_trials")
     faithful_passes = _weighted_passes(faithful_rows)
-    stress_trials = _sum_int(stress_rows, "n_trials")
-    stress_passes = _weighted_passes(stress_rows)
+    bridge_summary = model_bridge["summary"]
 
     rows = [
         {
@@ -70,7 +71,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "condition": "StateTx without completion triggers for missing artifacts",
             "tests": "Does evidence alone materialize verifier-visible workflow outputs?",
             "evidence_status": "seed_evidence",
-            "current_result": "Open-model invoice and travel-claim traces observe OCR evidence but score 0/2",
+            "current_result": "Prompt-only invoice evidence remains uncommitted without a runtime completion trigger",
             "source_data": "stage2_reliability.csv | appendix evidence",
         },
         {
@@ -107,11 +108,17 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "S1_QWEN_COMMIT_CONTROLLER_INTEGRATION",
             "comparison_class": "integration_stress",
             "paper_role": "supporting_stress",
-            "condition": "Qwen3.8-27B plus Commit Controller under the 8192-token endpoint",
-            "tests": "Can a real model feed staged evidence into the transaction layer under endpoint pressure?",
+            "condition": "Qwen3.8-27B-long32k plus Commit Controller under the same official Harbor task",
+            "tests": (
+                "Can a real model feed staged evidence into the transaction layer across two SkillFlow "
+                "OCR tasks under endpoint pressure?"
+            ),
             "evidence_status": "completed",
-            "current_result": f"{stress_passes}/{stress_trials} official passes",
-            "source_data": "stage2_reliability.csv",
+            "current_result": (
+                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
+                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes"
+            ),
+            "source_data": "model_in_loop_bridge.csv",
         },
     ]
     summary = _summarize(rows, faithful_trials, faithful_passes)

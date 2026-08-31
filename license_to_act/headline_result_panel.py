@@ -8,6 +8,7 @@ from typing import Any
 from .comparison_manifest import build_comparison_manifest
 from .commit_pair_metrics import compute_commit_pair_metrics, build_commit_pair_member_rows
 from .evidence_portfolio import build_evidence_portfolio
+from .model_in_loop_bridge import build_model_in_loop_bridge
 from .story_claims import build_story_claims
 from .submission_scale_plan import build_submission_scale_plan
 
@@ -30,12 +31,14 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
     portfolio = build_evidence_portfolio(root)
     comparison = build_comparison_manifest(root)
     commit_pairs = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
+    model_bridge = build_model_in_loop_bridge(root)
     scale_plan = build_submission_scale_plan(root)
 
     metrics = claims["headline_metrics"]
     portfolio_summary = portfolio["summary"]
     comparison_summary = comparison["summary"]
     pair_summary = commit_pairs["summary"]
+    bridge_summary = model_bridge["summary"]
     scale_summary = scale_plan["summary"]
 
     rows = [
@@ -56,7 +59,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         },
         {
             "panel_id": "H2_CLEAN_POSITIVE_MASS",
-            "paper_role": "main_positive_evidence",
+            "paper_role": "runtime_reliability_evidence",
             "story_question": "Is the positive evidence a stable block rather than one lucky case?",
             "result_sentence": (
                 f"Commit-controller clean anchors achieve {portfolio_summary['clean_positive_passes']}/"
@@ -66,6 +69,25 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
                 "The paper can lead with verifier-backed positive mass around one transaction mechanism."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
+        },
+        {
+            "panel_id": "H8_MODEL_IN_LOOP_BRIDGE",
+            "paper_role": "main_positive_evidence",
+            "story_question": "Does the transaction boundary help when the same model stays in the official trial?",
+            "result_sentence": (
+                f"Qwen3.8-27B-long32k plus Commit Controller reaches "
+                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
+                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes on two SkillFlow OCR tasks "
+                f"with {bridge_summary['qwen_invoice_govkernel_errors'] + bridge_summary['qwen_travel_govkernel_errors']} "
+                f"errors, while the faithful Qwen3.8-27B-long32k mini-swe baseline reaches "
+                f"{bridge_summary['qwen_skillflow_faithful_baseline_passes']}/"
+                f"{bridge_summary['qwen_skillflow_faithful_baseline_trials']}."
+            ),
+            "why_it_matters": (
+                "This is the current matched-agent evidence: the actor remains Qwen, while the transaction "
+                "boundary controls the durable workbook commit."
+            ),
+            "source_data": "model_in_loop_bridge.csv",
         },
         {
             "panel_id": "H3_COMMIT_PAIR_ACCURACY",
@@ -148,6 +170,9 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
     summary = {
         "headline_rows": len(rows),
         "main_positive_rows": sum(1 for row in rows if row["paper_role"] == "main_positive_evidence"),
+        "runtime_reliability_rows": sum(
+            1 for row in rows if row["paper_role"] == "runtime_reliability_evidence"
+        ),
         "faithful_counterpoint_rows": sum(
             1 for row in rows if row["paper_role"] == "faithful_baseline_counterpoint"
         ),
@@ -159,6 +184,8 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "clean_positive_trials": portfolio_summary["clean_positive_trials"],
         "faithful_baseline_passes": comparison_summary["faithful_baseline_passes"],
         "faithful_baseline_trials": comparison_summary["faithful_baseline_trials"],
+        "model_loop_passes": bridge_summary["qwen_skillflow_govkernel_passes"],
+        "model_loop_trials": bridge_summary["qwen_skillflow_govkernel_trials"],
         "tau2_read_correct_write_wrong_proxy": metrics["tau2_read_correct_write_wrong_proxy"],
         "commit_pair_accuracy": pair_summary["commit_pair_accuracy"],
         "unauthorized_commit_rate": pair_summary["unauthorized_commit_rate"],
@@ -216,12 +243,15 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
     commands = {
         "LTAHeadlinePanelRows": summary["headline_rows"],
         "LTAHeadlineMainPositiveRows": summary["main_positive_rows"],
+        "LTAHeadlineRuntimeReliabilityRows": summary["runtime_reliability_rows"],
         "LTAHeadlineFaithfulCounterpointRows": summary["faithful_counterpoint_rows"],
         "LTAHeadlineScalePathRows": summary["scale_path_rows"],
         "LTAHeadlineCleanPositivePasses": summary["clean_positive_passes"],
         "LTAHeadlineCleanPositiveTrials": summary["clean_positive_trials"],
         "LTAHeadlineFaithfulBaselinePasses": summary["faithful_baseline_passes"],
         "LTAHeadlineFaithfulBaselineTrials": summary["faithful_baseline_trials"],
+        "LTAHeadlineModelLoopPasses": summary["model_loop_passes"],
+        "LTAHeadlineModelLoopTrials": summary["model_loop_trials"],
         "LTAHeadlineTauTwoRCWW": summary["tau2_read_correct_write_wrong_proxy"],
         "LTAHeadlineCommitPairAccuracy": f"{summary['commit_pair_accuracy']:.3f}",
         "LTAHeadlineUnauthorizedCommitRate": f"{summary['unauthorized_commit_rate']:.3f}",

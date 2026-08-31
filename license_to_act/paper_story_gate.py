@@ -11,6 +11,7 @@ from .commit_pair_metrics import build_commit_pair_member_rows, compute_commit_p
 from .evidence_portfolio import build_evidence_portfolio
 from .mechanism_ablation_panel import build_mechanism_ablation_panel
 from .model_in_loop_bridge import build_model_in_loop_bridge
+from .real_evidence_audit import build_real_evidence_audit
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
 
@@ -27,6 +28,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     comparison_manifest = build_comparison_manifest(root)
     ablation_panel = build_mechanism_ablation_panel(root)
     model_loop_bridge = build_model_in_loop_bridge(root)
+    real_evidence_audit = build_real_evidence_audit(root)
     commit_pair_metrics = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     recursive_lineage = build_recursive_amendment_lineage(root)
     claims = build_story_claims(root)
@@ -43,6 +45,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _comparison_manifest_check(comparison_summary),
         _mechanism_ablation_panel_check(ablation_panel["summary"]),
         _model_in_loop_bridge_check(model_loop_bridge),
+        _real_evidence_audit_check(real_evidence_audit["summary"]),
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
@@ -75,10 +78,18 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "mechanism_ablation_cut_passes": ablation_panel["summary"]["cut_passes"],
             "mechanism_ablation_cut_trials": ablation_panel["summary"]["cut_trials"],
             "model_in_loop_govkernel_passes": model_loop_bridge["summary"][
-                "qwen_invoice_govkernel_passes"
+                "qwen_skillflow_govkernel_passes"
             ],
             "model_in_loop_govkernel_trials": model_loop_bridge["summary"][
-                "qwen_invoice_govkernel_trials"
+                "qwen_skillflow_govkernel_trials"
+            ],
+            "real_evidence_harbor_rows": real_evidence_audit["summary"]["real_harbor_rows"],
+            "real_evidence_main_positive_planned_rows": real_evidence_audit["summary"][
+                "main_positive_planned_rows"
+            ],
+            "real_evidence_missing_artifacts": real_evidence_audit["summary"]["missing_artifact_rows"],
+            "real_evidence_unparseable_artifacts": real_evidence_audit["summary"][
+                "unparseable_artifact_rows"
             ],
             "commit_pair_accuracy": commit_pair_metrics["summary"]["commit_pair_accuracy"],
             "unauthorized_commit_rate": commit_pair_metrics["summary"]["unauthorized_commit_rate"],
@@ -240,6 +251,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_model_loop_numbers}",
         "\\input{sections/generated_commit_pair_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
+        "\\input{sections/generated_real_evidence_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
     ok = all(item in text for item in required)
@@ -247,7 +259,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, commit-pair metrics, scale plan, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, commit-pair metrics, scale plan, real-evidence audit, and consistency numbers.",
     )
 
 
@@ -286,10 +298,12 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and summary["prompt_control_rows"] >= 1
         and summary["matched_agent_controller_rows"] >= 2
         and summary["faithful_baseline_rows"] >= 1
-        and summary["qwen_invoice_baseline_passes"] == 0
-        and summary["qwen_invoice_baseline_trials"] >= 2
         and summary["qwen_invoice_govkernel_passes"] >= 4
         and summary["qwen_invoice_govkernel_trials"] >= 5
+        and summary["qwen_skillflow_govkernel_passes"] >= 10
+        and summary["qwen_skillflow_govkernel_trials"] >= 10
+        and summary["qwen_skillflow_faithful_baseline_trials"] >= 10
+        and summary["qwen_skillflow_faithful_baseline_passes"] < summary["qwen_skillflow_govkernel_passes"]
         and summary["materializer_rows_used_as_matched_agent"] == 0
         and row_fields_present
     )
@@ -301,11 +315,37 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
             f"{summary['matched_agent_controller_rows']} matched-controller, and "
             f"{summary['faithful_baseline_rows']} faithful-baseline rows carry actor, boundary, "
-            f"and official-result fields. Qwen invoice ordinary baselines: {summary['qwen_invoice_baseline_passes']}/"
-            f"{summary['qwen_invoice_baseline_trials']}; Qwen+CommitController: "
-            f"{summary['qwen_invoice_govkernel_passes']}/"
-            f"{summary['qwen_invoice_govkernel_trials']}; materializer-as-agent rows: "
+            f"and official-result fields. Qwen faithful OCR baseline: "
+            f"{summary['qwen_skillflow_faithful_baseline_passes']}/"
+            f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+CommitController: "
+            f"{summary['qwen_skillflow_govkernel_passes']}/"
+            f"{summary['qwen_skillflow_govkernel_trials']} across SkillFlow OCR bridge tasks; "
+            f"materializer-as-agent rows: "
             f"{summary['materializer_rows_used_as_matched_agent']}."
+        ),
+    )
+
+
+def _real_evidence_audit_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["real_harbor_rows"] >= 8
+        and summary["derived_real_rows"] >= 1
+        and summary["planned_rows"] >= 1
+        and summary["main_positive_planned_rows"] == 0
+        and summary["missing_artifact_rows"] == 0
+        and summary["unparseable_artifact_rows"] == 0
+    )
+    return _check(
+        "real_evidence_audit_blocks_planned_main_results",
+        ok,
+        "Main positive results must be backed by parseable real artifacts or derived real-artifact analyses, not planned matrices.",
+        (
+            f"{summary['real_harbor_rows']} parseable Harbor rows; "
+            f"{summary['derived_real_rows']} derived real-artifact rows; "
+            f"{summary['planned_rows']} planned rows isolated; "
+            f"planned main positives: {summary['main_positive_planned_rows']}; "
+            f"missing artifacts: {summary['missing_artifact_rows']}; "
+            f"unparseable artifacts: {summary['unparseable_artifact_rows']}."
         ),
     )
 
@@ -544,6 +584,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_model_in_loop_bridge.py",
         "export_commit_pair_metrics.py",
         "export_submission_scale_plan.py",
+        "export_real_evidence_audit.py",
         "export_state_contract_examples.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
@@ -555,7 +596,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, commit-pair metrics export, scale plan export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, commit-pair metrics export, scale plan export, real-evidence audit export, consistency export, figure generation, and LaTeX build.",
     )
 
 

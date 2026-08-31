@@ -41,16 +41,29 @@ env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
   --job-name stage2-skillflow-statetx-travel-claim-k5-py \
   --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
   --n-attempts 5 --n-concurrent 1 -y
+
+env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/SkillFlow harbor run \
+  -c configs/skillflow_lta_qwen_invoice_govkernel_official.yaml \
+  --job-name stage3-skillflow-qwen-govkernel-invoice-k5-real3-20260831 \
+  --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
+
+env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/SkillFlow harbor run \
+  -c configs/skillflow_lta_qwen_travel_claim_govkernel_official.yaml \
+  --job-name stage3-skillflow-qwen-govkernel-travel-k5-real-20260831 \
+  --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
 ```
 
 The sqlite-truncate anchor writes `/app/recover.json` from binary payload evidence in `/app/trunc.db`.
 The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
+The two Stage-3 Qwen commands keep `Qwen3.8-27B-long32k` inside the official SkillFlow trial while the Commit Controller owns the final workbook transaction; the current artifacts score 10/10 across invoice and travel-claim OCR anchors with zero exceptions.
 
 `configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
 
 ## Long-Context Faithful Baselines
 
-The Stage-2 paper also includes matched open-model baselines using the newly available `Qwen3.8-27B-long32k` endpoint:
+The paper includes matched open-model baselines using the newly available `Qwen3.8-27B-long32k` endpoint. These are the faithful baseline commands used by the current result tables:
 
 ```bash
 env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run \
@@ -59,14 +72,14 @@ env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run 
   --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
   --n-attempts 1 --n-concurrent 1 -y
 
-env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run \
+env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/SkillFlow OPENAI_API_KEY=dummy harbor run \
   -c configs/skillflow_miniswe_qwen_long32k_license_anchors.json \
-  --job-name stage2-skillflow-miniswe-qwen-long32k-statetx-anchors-smoke \
-  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
-  --n-attempts 1 --n-concurrent 1 -y
+  --job-name stage3-skillflow-miniswe-qwen-long32k-ocr-k5-real-20260831 \
+  --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
 ```
 
-Current artifacts record 0/3 Terminal-Bench passes and 0/2 SkillFlow passes with zero runtime exceptions. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same commit boundary without the Commit Controller.
+Current artifacts record 0/3 Terminal-Bench passes and 1/10 SkillFlow OCR passes with zero runtime exceptions, or 1/13 across the current matched faithful-baseline pool. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same commit boundary without the Commit Controller.
 
 ## Paper Result Exports
 
@@ -85,6 +98,7 @@ python scripts/export_mechanism_ablation_panel.py
 python scripts/export_model_in_loop_bridge.py
 python scripts/export_commit_pair_metrics.py
 python scripts/export_submission_scale_plan.py
+python scripts/export_real_evidence_audit.py
 python scripts/export_state_contract_examples.py
 python scripts/export_story_gate.py
 ```
@@ -95,11 +109,12 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_comparison_manifest.py`, `export_headline_result_panel.py`,
 `export_submission_experiment_blueprint.py`, `export_contract_refinement_lineage.py`,
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
-`export_commit_pair_metrics.py`, `export_submission_scale_plan.py`, and `export_story_gate.py` also write generated LaTeX number files under
+`export_commit_pair_metrics.py`, `export_submission_scale_plan.py`,
+`export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`, which the paper imports for headline result,
 evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint,
 contract-lineage, mechanism-ablation, model-in-loop bridge, submission-scale,
-commit-pair metrics, and paper-code consistency numbers.
+commit-pair metrics, real-evidence audit, and paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing State Contract JSON examples used in the appendix.
 
 ## Paper-Code Consistency
@@ -107,7 +122,7 @@ commit-pair metrics, and paper-code consistency numbers.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, contract-lineage, mechanism-ablation, model-in-loop bridge, commit-pair, submission-scale, State Contract examples, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, contract-lineage, mechanism-ablation, model-in-loop bridge, commit-pair, submission-scale, real-evidence audit, State Contract examples, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.

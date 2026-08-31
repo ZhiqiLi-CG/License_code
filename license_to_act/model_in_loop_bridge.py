@@ -119,26 +119,41 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images",
             "actor_backbone": "Qwen3.8-27B",
+            "actor_model": "Qwen3.8-27B-long32k",
             "harness": "StateTxQwenInvoiceCommitControllerAgent",
             "condition": "Qwen in loop plus Commit Controller completion trigger, K=5",
             "comparison_boundary": "model_in_loop_commit_controller",
             "uses_task_specific_materializer": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
-            / "stage2/harbor/stage2-skillflow-lta-qwen-invoice-k5-18002-out128/result.json",
+            / "stage3/harbor/stage3-skillflow-qwen-govkernel-invoice-k5-real3-20260831/result.json",
         },
         {
-            "bridge_id": "SF_INVOICE_QWEN32K_MINISWE_BASELINE",
+            "bridge_id": "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5",
             "benchmark": "SkillFlow",
-            "task": "task_family_invoice_images",
+            "task": "task_family_travel_claim_merge",
+            "actor_backbone": "Qwen3.8-27B-long32k",
+            "actor_model": "Qwen3.8-27B-long32k",
+            "harness": "StateTxQwenTravelClaimCommitControllerAgent",
+            "condition": "Qwen in loop plus Commit Controller completion trigger, K=5",
+            "comparison_boundary": "model_in_loop_commit_controller",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_positive",
+            "source_path": artifacts
+            / "stage3/harbor/stage3-skillflow-qwen-govkernel-travel-k5-real-20260831/result.json",
+        },
+        {
+            "bridge_id": "SF_OCR_QWEN32K_MINISWE_BASELINE_K5",
+            "benchmark": "SkillFlow",
+            "task": "task_family_invoice_images + task_family_travel_claim_merge",
             "actor_backbone": "Qwen3.8-27B-long32k",
             "harness": "mini-swe-agent",
-            "condition": "faithful long-context open-model baseline",
+            "condition": "faithful long-context open-model baseline, K=5 per OCR anchor",
             "comparison_boundary": "faithful_baseline",
             "uses_task_specific_materializer": "no",
             "paper_use": "model_in_loop_counterpoint",
             "source_path": artifacts
-            / "stage2/harbor/stage2-skillflow-miniswe-qwen-long32k-license-anchors-smoke/task_family_invoice_images__haan2Nx/result.json",
+            / "stage3/harbor/stage3-skillflow-miniswe-qwen-long32k-ocr-k5-real-20260831/result.json",
         },
         {
             "bridge_id": "TB_SANITIZE_MATERIALIZER_K5",
@@ -264,9 +279,15 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     baseline_rows = [
         row
         for row in rows
-        if row["bridge_id"] in {"SF_INVOICE_QWEN_TERMINUS_FULL", "SF_INVOICE_QWEN32K_MINISWE_BASELINE"}
+        if row["bridge_id"] == "SF_INVOICE_QWEN_TERMINUS_FULL"
+    ]
+    qwen_skillflow_faithful_baseline_rows = [
+        row
+        for row in rows
+        if row["bridge_id"] == "SF_OCR_QWEN32K_MINISWE_BASELINE_K5"
     ]
     commit_controller_k5 = _require_row(rows, "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5")
+    travel_controller_k5 = _require_row(rows, "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5")
     materializer_as_agent = [
         row
         for row in rows
@@ -277,6 +298,8 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     baseline_trials = _sum_int(baseline_rows, "n_trials")
     gov_passes = int(commit_controller_k5["passes"])
     gov_trials = int(commit_controller_k5["n_trials"])
+    travel_gov_passes = int(travel_controller_k5["passes"])
+    travel_gov_trials = int(travel_controller_k5["n_trials"])
     return {
         "model_in_loop_rows": len(model_rows),
         "ordinary_agent_rows": len(ordinary_rows),
@@ -289,6 +312,17 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "qwen_invoice_govkernel_trials": gov_trials,
         "qwen_invoice_govkernel_errors": int(commit_controller_k5["n_errors"]),
         "qwen_invoice_pass_delta": gov_passes - baseline_passes,
+        "qwen_travel_govkernel_passes": travel_gov_passes,
+        "qwen_travel_govkernel_trials": travel_gov_trials,
+        "qwen_travel_govkernel_errors": int(travel_controller_k5["n_errors"]),
+        "qwen_skillflow_govkernel_passes": gov_passes + travel_gov_passes,
+        "qwen_skillflow_govkernel_trials": gov_trials + travel_gov_trials,
+        "qwen_skillflow_faithful_baseline_passes": _sum_int(
+            qwen_skillflow_faithful_baseline_rows, "passes"
+        ),
+        "qwen_skillflow_faithful_baseline_trials": _sum_int(
+            qwen_skillflow_faithful_baseline_rows, "n_trials"
+        ),
         "runtime_reliability_rows": len(runtime_rows),
         "materializer_rows_used_as_matched_agent": len(materializer_as_agent),
     }
@@ -308,7 +342,7 @@ def _sum_int(rows: list[dict[str, str]], field: str) -> int:
 def _actor_model(case: dict[str, Any]) -> str:
     if case["uses_task_specific_materializer"] == "yes":
         return "none_runtime_only"
-    return str(case["actor_backbone"])
+    return str(case.get("actor_model") or case["actor_backbone"])
 
 
 def _controller_boundary(case: dict[str, Any]) -> str:
@@ -355,6 +389,17 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAModelLoopQwenInvoiceGovTrials": summary["qwen_invoice_govkernel_trials"],
         "LTAModelLoopQwenInvoiceGovErrors": summary["qwen_invoice_govkernel_errors"],
         "LTAModelLoopQwenInvoicePassDelta": summary["qwen_invoice_pass_delta"],
+        "LTAModelLoopQwenTravelGovPasses": summary["qwen_travel_govkernel_passes"],
+        "LTAModelLoopQwenTravelGovTrials": summary["qwen_travel_govkernel_trials"],
+        "LTAModelLoopQwenTravelGovErrors": summary["qwen_travel_govkernel_errors"],
+        "LTAModelLoopQwenSkillflowGovPasses": summary["qwen_skillflow_govkernel_passes"],
+        "LTAModelLoopQwenSkillflowGovTrials": summary["qwen_skillflow_govkernel_trials"],
+        "LTAModelLoopQwenSkillflowFaithfulBaselinePasses": summary[
+            "qwen_skillflow_faithful_baseline_passes"
+        ],
+        "LTAModelLoopQwenSkillflowFaithfulBaselineTrials": summary[
+            "qwen_skillflow_faithful_baseline_trials"
+        ],
         "LTAModelLoopRuntimeRows": summary["runtime_reliability_rows"],
         "LTAModelLoopMaterializerAsAgentRows": summary["materializer_rows_used_as_matched_agent"],
     }

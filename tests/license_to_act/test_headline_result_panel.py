@@ -13,19 +13,20 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     panel = build_headline_result_panel(Path("/data/zhiqi/License"))
 
     summary = panel["summary"]
-    assert summary["headline_rows"] == 7
+    assert summary["headline_rows"] == 8
     assert summary["main_positive_rows"] == 5
     assert summary["faithful_counterpoint_rows"] == 1
     assert summary["scale_path_rows"] == 1
+    assert summary["runtime_reliability_rows"] == 1
     assert summary["benchmarks"] == 3
     assert summary["state_substrates"] == 3
     assert summary["actor_backbones"] == 4
     assert summary["clean_positive_passes"] == 25
     assert summary["clean_positive_trials"] == 25
-    assert summary["faithful_baseline_passes"] == 0
-    assert summary["faithful_baseline_trials"] == 5
+    assert summary["faithful_baseline_passes"] == 1
+    assert summary["faithful_baseline_trials"] == 13
     assert summary["tau2_read_correct_write_wrong_proxy"] == 19
-    assert summary["submission_scale_rows"] == 7
+    assert summary["submission_scale_rows"] == 24
     assert summary["commit_pair_accuracy"] == 1.0
     assert summary["unauthorized_commit_rate"] == 0.0
     assert summary["authorized_commit_recall"] == 1.0
@@ -33,6 +34,7 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert [row["panel_id"] for row in panel["rows"]] == [
         "H1_BREADTH",
         "H2_CLEAN_POSITIVE_MASS",
+        "H8_MODEL_IN_LOOP_BRIDGE",
         "H3_COMMIT_PAIR_ACCURACY",
         "H4_FAITHFUL_BASELINE_COUNTERPOINT",
         "H5_TAU2_COMMIT_MINING",
@@ -41,10 +43,16 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     ]
     assert all(row["story_question"] for row in panel["rows"])
     assert all("RSI" not in " ".join(row.values()) for row in panel["rows"])
-    assert panel["rows"][2]["source_data"] == "commit_pair_metrics.csv | commit_pair_members.csv"
-    assert "unauthorized commit rate" in panel["rows"][2]["result_sentence"]
-    assert panel["rows"][3]["paper_role"] == "faithful_baseline_counterpoint"
-    assert "not an ablation" in panel["rows"][3]["result_sentence"]
+    rows = {row["panel_id"]: row for row in panel["rows"]}
+    assert rows["H3_COMMIT_PAIR_ACCURACY"]["source_data"] == "commit_pair_metrics.csv | commit_pair_members.csv"
+    assert rows["H2_CLEAN_POSITIVE_MASS"]["paper_role"] == "runtime_reliability_evidence"
+    assert rows["H8_MODEL_IN_LOOP_BRIDGE"]["paper_role"] == "main_positive_evidence"
+    assert rows["H8_MODEL_IN_LOOP_BRIDGE"]["source_data"] == "model_in_loop_bridge.csv"
+    assert "10/10 official passes" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
+    assert "two SkillFlow OCR tasks" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
+    assert "unauthorized commit rate" in rows["H3_COMMIT_PAIR_ACCURACY"]["result_sentence"]
+    assert rows["H4_FAITHFUL_BASELINE_COUNTERPOINT"]["paper_role"] == "faithful_baseline_counterpoint"
+    assert "not an ablation" in rows["H4_FAITHFUL_BASELINE_COUNTERPOINT"]["result_sentence"]
 
 
 def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -60,22 +68,26 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["panel_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 7
+    assert len(rows) == 8
     assert rows[0]["panel_id"] == "H1_BREADTH"
-    assert rows[1]["paper_role"] == "main_positive_evidence"
-    assert rows[6]["paper_role"] == "scale_path"
+    assert rows[1]["paper_role"] == "runtime_reliability_evidence"
+    assert rows[2]["panel_id"] == "H8_MODEL_IN_LOOP_BRIDGE"
+    assert rows[7]["paper_role"] == "scale_path"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAHeadlinePanelRows}{7}" in tex
+    assert "\\newcommand{\\LTAHeadlinePanelRows}{8}" in tex
     assert "\\newcommand{\\LTAHeadlineMainPositiveRows}{5}" in tex
-    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{5}" in tex
+    assert "\\newcommand{\\LTAHeadlineRuntimeReliabilityRows}{1}" in tex
+    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{13}" in tex
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{25}" in tex
+    assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{10}" in tex
+    assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{10}" in tex
     assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{19}" in tex
-    assert "\\newcommand{\\LTAHeadlineSubmissionScaleRows}{7}" in tex
+    assert "\\newcommand{\\LTAHeadlineSubmissionScaleRows}{24}" in tex
     assert "\\newcommand{\\LTAHeadlineCommitPairAccuracy}{1.000}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
-    assert summary["headline_rows"] == 7
+    assert summary["headline_rows"] == 8
 
 
 def test_export_headline_result_panel_cli_writes_requested_outputs(tmp_path: Path) -> None:

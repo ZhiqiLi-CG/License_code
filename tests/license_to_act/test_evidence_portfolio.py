@@ -24,8 +24,8 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["stage1_pass_to_failure"] == 0
     assert summary["clean_positive_trials"] == 25
     assert summary["clean_positive_passes"] == 25
-    assert summary["faithful_baseline_trials"] == 5
-    assert summary["faithful_baseline_passes"] == 0
+    assert summary["faithful_baseline_trials"] == 13
+    assert summary["faithful_baseline_passes"] == 1
     assert summary["tau2_read_correct_write_wrong_proxy"] == 19
 
     rows = portfolio["rows"]
@@ -40,6 +40,10 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert rows[4]["comparison_kind"] == "faithful_baseline"
     assert rows[4]["paper_use"] == "main_counterpoint"
     assert "ablation" not in rows[4]["comparison_kind"]
+    assert rows[5]["positive_result"] == "10/10 official passes"
+    assert "invoice and travel-claim" in rows[5]["story_role"]
+    assert rows[5]["source_data"] == "model_in_loop_bridge.csv"
+    assert rows[5]["comparison_kind"] == "matched_agent_commit_controller"
 
 
 def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -66,8 +70,8 @@ def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> No
     assert "\\newcommand{\\LTAEvidenceSubstrates}{3}" in tex
     assert "\\newcommand{\\LTAEvidenceBackbones}{4}" in tex
     assert "\\newcommand{\\LTAEvidenceCleanPositivePasses}{25}" in tex
-    assert "\\newcommand{\\LTAEvidenceFaithfulBaselinePasses}{0}" in tex
-    assert "\\newcommand{\\LTAEvidenceFaithfulBaselineTrials}{5}" in tex
+    assert "\\newcommand{\\LTAEvidenceFaithfulBaselinePasses}{1}" in tex
+    assert "\\newcommand{\\LTAEvidenceFaithfulBaselineTrials}{13}" in tex
     assert json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))[
         "summary"
     ]["benchmark_count"] == 3

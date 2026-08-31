@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .model_in_loop_bridge import build_model_in_loop_bridge
+
 
 PORTFOLIO_FIELDS = [
     "portfolio_id",
@@ -26,10 +28,10 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     transfer_rows = _read_csv(data_dir / "transfer_ledger.csv")
     tau2_rows = _read_csv(data_dir / "tau2_commit_mining.csv")
+    model_bridge = build_model_in_loop_bridge(root)
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
-    stress_rows = [row for row in stage2_rows if row["paper_use"] == "integration_stress"]
     tb_clean_rows = [row for row in clean_rows if row["benchmark"] == "Terminal-Bench 2.1"]
     sf_clean_rows = [row for row in clean_rows if row["benchmark"] == "SkillFlow"]
 
@@ -42,8 +44,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     clean_passes = _weighted_passes(clean_rows)
     faithful_trials = _sum_int(faithful_rows, "n_trials")
     faithful_passes = _weighted_passes(faithful_rows)
-    stress_trials = _sum_int(stress_rows, "n_trials")
-    stress_passes = _weighted_passes(stress_rows)
+    bridge_summary = model_bridge["summary"]
 
     rows = [
         {
@@ -106,14 +107,17 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P6_QWEN_COMMIT_CONTROLLER_BRIDGE",
-            "story_role": "model integration remains separate from clean transaction reliability",
+            "story_role": "invoice and travel-claim completion triggers preserve Qwen in the official loop",
             "benchmarks": "SkillFlow",
             "state_substrates": "workflow artifacts",
-            "actor_backbones": "Qwen3.8-27B",
-            "comparison_kind": "integration_stress",
-            "positive_result": f"{stress_passes}/{stress_trials} official passes",
+            "actor_backbones": "Qwen3.8-27B-long32k",
+            "comparison_kind": "matched_agent_commit_controller",
+            "positive_result": (
+                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
+                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes"
+            ),
             "paper_use": "supporting_stress",
-            "source_data": "stage2_reliability.csv",
+            "source_data": "model_in_loop_bridge.csv",
         },
     ]
 
@@ -131,6 +135,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         "faithful_baseline_trials": faithful_trials,
         "faithful_baseline_passes": faithful_passes,
         "tau2_read_correct_write_wrong_proxy": int(tau2_metrics["read_correct_write_wrong_proxy"]),
+        "qwen_skillflow_govkernel_passes": bridge_summary["qwen_skillflow_govkernel_passes"],
+        "qwen_skillflow_govkernel_trials": bridge_summary["qwen_skillflow_govkernel_trials"],
     }
     return {"summary": summary, "rows": rows}
 

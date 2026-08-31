@@ -9,9 +9,9 @@ environment:
 
 agents:
   - import_path: license_to_act.harbor_agents:LicenseToActQwenInvoiceGovKernelAgent
-    model_name: openai/Qwen3.8-27B
+    model_name: openai/Qwen3.8-27B-long32k
     env:
-      OPENAI_BASE_URL: http://172.17.0.1:18002/v1
+      OPENAI_BASE_URL: http://172.17.0.1:18010/v1
       OPENAI_API_KEY: dummy
       QWEN_CODE_MAX_OUTPUT_TOKENS: "256"
     kwargs: {}

@@ -20,7 +20,7 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
     assert summary["high_priority_rows"] == 3
     assert summary["baseline_overlap"] == 0
     assert summary["cut_passes"] == 0
-    assert summary["cut_trials"] == 8
+    assert summary["cut_trials"] == 6
     assert summary["full_passes"] == 23
     assert summary["full_trials"] == 23
 
@@ -36,7 +36,7 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
     assert rows["ABLATE_COMPLETION_TRIGGER"]["high_priority"] == "yes"
     assert rows["PROMPT_ONLY_TRANSACTION_TEXT"]["high_priority"] == "yes"
     assert "baseline" not in rows["PROMPT_ONLY_TRANSACTION_TEXT"]["comparison_class"]
-    assert rows["ABLATE_COMPLETION_TRIGGER"]["cut_evidence_cases"] == "SF-INV | SF-QWEN32K-MSWE-2"
+    assert rows["ABLATE_COMPLETION_TRIGGER"]["cut_evidence_cases"] == "SF-INV"
     assert rows["ABLATE_COMPLETION_TRIGGER"]["full_evidence_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5"
     assert rows["ABLATE_WRITE_SCOPE_AND_PRESERVE"]["paper_result"] == "0/1 cut pass versus 5/5 full StateTx pass"
     assert all(row["comparison_class"] == "mechanism_ablation" for row in rows.values())
@@ -63,7 +63,7 @@ def test_write_mechanism_ablation_panel_exports_csv_json_and_tex(tmp_path: Path)
     assert "\\newcommand{\\LTAMechanismAblationPanelRows}{5}" in tex
     assert "\\newcommand{\\LTAMechanismAblationPriorityRows}{3}" in tex
     assert "\\newcommand{\\LTAMechanismAblationCutPasses}{0}" in tex
-    assert "\\newcommand{\\LTAMechanismAblationCutTrials}{8}" in tex
+    assert "\\newcommand{\\LTAMechanismAblationCutTrials}{6}" in tex
     assert "\\newcommand{\\LTAMechanismAblationFullPasses}{23}" in tex
     assert "\\newcommand{\\LTAMechanismAblationFullTrials}{23}" in tex
 
