@@ -15,13 +15,13 @@ This repository contains the prototype authority layer, benchmark adapters, scri
 ## Quick Check
 
 ```bash
-python -m pytest tests/license_to_act -q
+PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_to_act
 ```
 
 Current local check:
 
 ```text
-42 passed
+2026-08-31: 44 passed in 0.35s
 ```
 
 ## Official Harbor Anchors
@@ -72,7 +72,26 @@ python scripts/build_lta_amendment_transfer_report.py
 python scripts/export_paper_results.py
 python scripts/mine_tau2_authority.py
 python scripts/export_stage2_results.py
+python scripts/export_story_claims.py
 ```
 
 The export scripts read large benchmark artifacts from `/data/zhiqi/License/artifacts`
 and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
+`export_story_claims.py` also writes
+`License_paper/sections/generated_story_numbers.tex`, which the paper imports for
+headline result numbers.
+
+## Paper-Code Consistency
+
+Before pushing paper-facing changes:
+
+1. Run the full `tests/license_to_act` suite.
+2. Regenerate stage-1, stage-2, and story-claim exports.
+3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
+4. Compile the paper.
+5. Scan touched files for placeholders.
+
+Faithful baselines and LTA ablations are different evidence categories. Baseline
+configs should reproduce the external agent condition as cleanly as possible;
+ablations isolate parts of our authority compiler and are allowed to be shaped
+around the paper mechanism.

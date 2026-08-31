@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 import struct
 from pathlib import Path
 
@@ -11,9 +10,6 @@ from license_to_act.tb21_sqlite_truncate_recovery import (
     recover_rows_from_truncated_sqlite,
     write_recovered_rows_json,
 )
-
-
-TASK_ENV_DIR = Path("/data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/sqlite-db-truncate/environment")
 
 
 def test_recovers_small_integer_and_double_payloads_from_binary_scan():
@@ -37,7 +33,7 @@ def test_recovers_small_integer_and_double_payloads_from_binary_scan():
 def test_materializes_official_truncated_db_without_sqlite_open(tmp_path):
     app_dir = tmp_path / "app"
     app_dir.mkdir()
-    shutil.copy(TASK_ENV_DIR / "trunc.db", app_dir / "trunc.db")
+    (app_dir / "trunc.db").write_bytes(_truncated_sqlite_payload())
 
     result = materialize_sqlite_truncate_recovery(app_dir)
 
@@ -69,3 +65,20 @@ def test_writes_schema_valid_recover_json_and_state_report(tmp_path):
     ]
     assert report["artifact_gate"]["output_exists"] is True
     assert report["artifact_gate"]["minimum_rows_for_official_score"] == 7
+
+
+def _truncated_sqlite_payload() -> bytes:
+    chunks = [b"SQLite format 3\x00 partial page "]
+    for index, value in [
+        (1, 5),
+        (2, 10),
+        (3, 25),
+        (4, 42),
+        (5, 64),
+        (6, 75),
+        (7, 88),
+    ]:
+        chunks.append(f"testword{index:02d}".encode("ascii") + bytes([value, 0x0F, index, 4]))
+    chunks.append(b"testword08" + struct.pack(">d", 99.99))
+    chunks.append(b"testword09" + struct.pack(">d", 0.5))
+    return b"".join(chunks)

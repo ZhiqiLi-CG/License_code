@@ -88,6 +88,7 @@ Resource request if available:
 
 - >=32k context Qwen-compatible endpoint for faithful Qwen Code, Recuris-style long-trace baselines, and larger SkillFlow prompts.
 - 32B-class VLM on GPUs 6/7 after the queue allows it; visual extraction itself is not the contribution, but stronger VLMs make the OCR evidence source paper-grade.
+- GPU scheduling follows `/data/zhiqi/project/排队.md`: GPU 0/1/2/3 are public services and must not be touched; GPU 4/5/6/7 are the requestable experiment pool. If License needs a long-context or VLM slot, add or update a queue row and request idle owners to drain rather than silently competing for memory. If License itself is holding GPU 4/5/6/7 idle and another project requests them, release the service or update the queue heartbeat with a concrete active run.
 
 ## Stage-2 Experiment Batches
 

@@ -1,0 +1,89 @@
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+
+from license_to_act.story_claims import build_story_claims, write_story_claims
+
+
+def test_build_story_claims_from_current_license_artifacts() -> None:
+    claims = build_story_claims(Path("/data/zhiqi/License"))
+
+    assert claims["thesis_slug"] == "proposal_is_not_authority"
+    metrics = claims["headline_metrics"]
+    assert metrics["stage1_cases"] == 6
+    assert metrics["stage1_failure_to_pass"] == 5
+    assert metrics["stage1_preserved_positive"] == 1
+    assert metrics["stage2_clean_anchor_count"] == 5
+    assert metrics["stage2_clean_trials"] == 25
+    assert metrics["stage2_terminal_clean_trials"] == 15
+    assert metrics["stage2_skillflow_clean_trials"] == 10
+    assert metrics["stage2_clean_errors"] == 0
+    assert metrics["stage2_clean_mean_reward"] == 1.0
+    assert metrics["faithful_baseline_trials"] == 5
+    assert metrics["faithful_terminal_baseline_trials"] == 3
+    assert metrics["faithful_skillflow_baseline_trials"] == 2
+    assert metrics["faithful_baseline_mean_reward"] == 0.0
+    assert metrics["tau2_cancel_decisions"] == 35
+    assert metrics["tau2_read_correct_write_wrong_proxy"] == 14
+    assert metrics["tau2_result_files"] >= 64
+    assert metrics["tau2_simulations"] >= 129
+    assert metrics["tau2_infrastructure_error_simulations"] >= 39
+
+    assert set(claims["claims"]) == {
+        "agency_gap_is_distinct_from_task_failure",
+        "proposal_evidence_is_not_commit_authority",
+        "licenses_are_not_operation_blacklists",
+        "govkernel_stabilizes_executable_authority",
+        "authority_can_compel_missing_commits",
+        "amendments_transfer_across_state_substrates",
+    }
+    for claim in claims["claims"].values():
+        assert claim["positive_evidence"]
+        assert claim["source_artifacts"]
+        assert claim["paper_section"]
+
+
+def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
+    output = write_story_claims(
+        Path("/data/zhiqi/License"),
+        paper_data_dir=tmp_path / "paper-data",
+        paper_sections_dir=tmp_path / "sections",
+        summary_path=tmp_path / "artifacts" / "story_claims.json",
+    )
+
+    assert Path(output["outputs"]["summary_json"]).exists()
+    assert Path(output["outputs"]["claims_csv"]).exists()
+    assert Path(output["outputs"]["headline_metrics_csv"]).exists()
+    assert Path(output["outputs"]["latex_numbers"]).exists()
+
+    with Path(output["outputs"]["claims_csv"]).open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 6
+    assert rows[0]["claim_id"] == "agency_gap_is_distinct_from_task_failure"
+
+    metrics = {
+        row["metric"]: row["value"]
+        for row in csv.DictReader(
+            Path(output["outputs"]["headline_metrics_csv"]).open(newline="", encoding="utf-8")
+        )
+    }
+    assert metrics["stage2_clean_trials"] == "25"
+    assert metrics["faithful_baseline_mean_reward"] == "0.0"
+
+    tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
+    output_metrics = output["headline_metrics"]
+    assert "\\newcommand{\\LTAStageTwoCleanTrials}{25}" in tex
+    assert "\\newcommand{\\LTAStageTwoTBCleanTrials}{15}" in tex
+    assert "\\newcommand{\\LTAStageTwoSFCleanTrials}{10}" in tex
+    assert f"\\newcommand{{\\LTATauTwoResultFiles}}{{{output_metrics['tau2_result_files']}}}" in tex
+    assert f"\\newcommand{{\\LTATauTwoSimulations}}{{{output_metrics['tau2_simulations']}}}" in tex
+    assert (
+        f"\\newcommand{{\\LTATauTwoInfraErrors}}{{{output_metrics['tau2_infrastructure_error_simulations']}}}"
+        in tex
+    )
+    assert "\\newcommand{\\LTATauTwoRCWW}{14}" in tex
+    assert json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))[
+        "headline_metrics"
+    ]["stage2_clean_anchor_count"] == 5
