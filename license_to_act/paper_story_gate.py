@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .comparison_manifest import build_comparison_manifest
 from .evidence_portfolio import build_evidence_portfolio
 from .story_claims import build_story_claims
 
@@ -18,16 +19,19 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     data_dir = paper_dir / "data"
 
     portfolio = build_evidence_portfolio(root)
+    comparison_manifest = build_comparison_manifest(root)
     claims = build_story_claims(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     portfolio_rows = portfolio["rows"]
     portfolio_summary = portfolio["summary"]
+    comparison_summary = comparison_manifest["summary"]
     claim_metrics = claims["headline_metrics"]
 
     checks = [
         _portfolio_breadth_check(portfolio_summary),
         _clean_positive_mass_check(portfolio_summary),
         _faithful_baseline_check(portfolio_rows, stage2_rows),
+        _comparison_manifest_check(comparison_summary),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _story_language_check(paper_dir),
@@ -151,6 +155,25 @@ def _faithful_baseline_check(
     )
 
 
+def _comparison_manifest_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["faithful_baseline_rows"] >= 1
+        and summary["mechanism_ablation_rows"] >= 5
+        and summary["completed_mechanism_ablation_rows"] >= 3
+        and summary["baseline_ablation_overlap"] == 0
+    )
+    return _check(
+        "comparison_manifest_separates_roles",
+        ok,
+        "The paper should keep faithful external-agent baselines distinct from mechanism cuts.",
+        (
+            f"{summary['faithful_baseline_rows']} faithful-baseline row; "
+            f"{summary['mechanism_ablation_rows']} mechanism-ablation rows; "
+            f"{summary['baseline_ablation_overlap']} baseline/ablation overlap."
+        ),
+    )
+
+
 def _workspace_only_check(
     portfolio_rows: list[dict[str, Any]],
     claims: list[dict[str, Any]],
@@ -180,6 +203,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
     required = [
         "\\input{sections/generated_story_numbers}",
         "\\input{sections/generated_portfolio_numbers}",
+        "\\input{sections/generated_comparison_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
     ok = all(item in text for item in required)
@@ -187,7 +211,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, and story gate numbers.",
+        "main.tex imports generated story, portfolio, comparison, and story gate numbers.",
     )
 
 
@@ -218,6 +242,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
     required = [
         "export_story_claims.py",
         "export_evidence_portfolio.py",
+        "export_comparison_manifest.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
         "latexmk -pdf",
@@ -228,7 +253,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, story gate export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, story gate export, figure generation, and LaTeX build.",
     )
 
 
