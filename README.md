@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 46 passed in 0.44s
+2026-08-31: 49 passed in 0.45s
 ```
 
 ## Official Harbor Anchors
@@ -74,20 +74,22 @@ python scripts/mine_tau2_authority.py
 python scripts/export_stage2_results.py
 python scripts/export_story_claims.py
 python scripts/export_evidence_portfolio.py
+python scripts/export_story_gate.py
 ```
 
 The export scripts read large benchmark artifacts from `/data/zhiqi/License/artifacts`
 and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
-`export_story_claims.py` and `export_evidence_portfolio.py` also write generated
-LaTeX number files under `License_paper/sections`, which the paper imports for
-headline result and evidence-portfolio numbers.
+`export_story_claims.py`, `export_evidence_portfolio.py`, and
+`export_story_gate.py` also write generated LaTeX number files under
+`License_paper/sections`, which the paper imports for headline result,
+evidence-portfolio, and paper-code consistency numbers.
 
 ## Paper-Code Consistency
 
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, story-claim, and evidence-portfolio exports.
+2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, and story-gate exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.

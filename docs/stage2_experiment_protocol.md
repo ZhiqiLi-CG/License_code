@@ -124,3 +124,15 @@ The main paper should contain positive, story-serving results:
 - reduction in false authority, overbroad side effects, missing commit obligations, and evidence-consuming reads.
 
 Infrastructure errors, weak context-window failures, and noisy failed probes may be stored in artifacts but should only enter the paper when they clarify resource needs or boundary conditions.
+
+Before any paper-facing push, run the story gate:
+
+```bash
+python scripts/export_story_gate.py
+```
+
+The gate must report zero failed checks. It verifies that the paper keeps the
+evidence spine broad enough for a top-conference claim, separates faithful
+external-agent baselines from our mechanism cuts, imports generated numbers,
+uses License-only paper-facing evidence sources, documents the reproduction
+chain, and keeps the appendix aligned with the main story.
