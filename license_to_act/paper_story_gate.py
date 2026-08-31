@@ -42,7 +42,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _faithful_baseline_check(portfolio_rows, stage2_rows),
         _comparison_manifest_check(comparison_summary),
         _mechanism_ablation_panel_check(ablation_panel["summary"]),
-        _model_in_loop_bridge_check(model_loop_bridge["summary"]),
+        _model_in_loop_bridge_check(model_loop_bridge),
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
@@ -271,21 +271,37 @@ def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
     )
 
 
-def _model_in_loop_bridge_check(summary: dict[str, Any]) -> dict[str, str]:
+def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
+    summary = bridge["summary"]
+    rows = bridge["rows"]
+    row_fields_present = all(
+        row.get("actor_model")
+        and row.get("controller_boundary")
+        and row.get("official_verifier_result") in {"pass", "fail", "mixed", "error"}
+        for row in rows
+    )
     ok = (
         summary["model_in_loop_rows"] >= 4
+        and summary["ordinary_agent_rows"] >= 1
+        and summary["prompt_control_rows"] >= 1
+        and summary["matched_agent_controller_rows"] >= 2
+        and summary["faithful_baseline_rows"] >= 1
         and summary["qwen_invoice_baseline_passes"] == 0
         and summary["qwen_invoice_baseline_trials"] >= 2
         and summary["qwen_invoice_govkernel_passes"] >= 4
         and summary["qwen_invoice_govkernel_trials"] >= 5
         and summary["materializer_rows_used_as_matched_agent"] == 0
+        and row_fields_present
     )
     return _check(
         "model_in_loop_bridge_separates_materializers",
         ok,
         "Model-in-loop evidence should be reported separately from task-specific materializer reliability.",
         (
-            f"Qwen invoice ordinary baselines: {summary['qwen_invoice_baseline_passes']}/"
+            f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
+            f"{summary['matched_agent_controller_rows']} matched-controller, and "
+            f"{summary['faithful_baseline_rows']} faithful-baseline rows carry actor, boundary, "
+            f"and official-result fields. Qwen invoice ordinary baselines: {summary['qwen_invoice_baseline_passes']}/"
             f"{summary['qwen_invoice_baseline_trials']}; Qwen+CommitController: "
             f"{summary['qwen_invoice_govkernel_passes']}/"
             f"{summary['qwen_invoice_govkernel_trials']}; materializer-as-agent rows: "

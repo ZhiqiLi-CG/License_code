@@ -42,6 +42,32 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     )
 
 
+def test_bridge_rows_name_actor_controller_boundary_and_official_result() -> None:
+    bridge = build_model_in_loop_bridge(Path("/data/zhiqi/License"))
+
+    for row in bridge["rows"]:
+        assert row["actor_model"]
+        assert row["controller_boundary"]
+        assert row["official_verifier_result"] in {"pass", "fail", "mixed", "error"}
+
+    rows = {row["bridge_id"]: row for row in bridge["rows"]}
+    assert rows["SF_INVOICE_QWEN_TERMINUS_FULL"]["actor_model"] == "Qwen3.8-27B"
+    assert rows["SF_INVOICE_QWEN_TERMINUS_FULL"]["controller_boundary"] == "none"
+    assert rows["SF_INVOICE_QWEN_TERMINUS_FULL"]["official_verifier_result"] == "fail"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["actor_model"] == "Qwen3.8-27B"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["controller_boundary"] == "completion_trigger"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "mixed"
+    assert rows["TB_WAL_MATERIALIZER_K5"]["actor_model"] == "none_runtime_only"
+    assert rows["TB_WAL_MATERIALIZER_K5"]["controller_boundary"] == "runtime_transaction"
+    assert rows["TB_WAL_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
+
+    summary = bridge["summary"]
+    assert summary["ordinary_agent_rows"] == 1
+    assert summary["prompt_control_rows"] == 1
+    assert summary["matched_agent_controller_rows"] == 2
+    assert summary["faithful_baseline_rows"] == 1
+
+
 def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> None:
     output = write_model_in_loop_bridge(
         Path("/data/zhiqi/License"),
@@ -61,6 +87,10 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAModelLoopRows}{4}" in tex
+    assert "\\newcommand{\\LTAModelLoopOrdinaryRows}{1}" in tex
+    assert "\\newcommand{\\LTAModelLoopPromptControlRows}{1}" in tex
+    assert "\\newcommand{\\LTAModelLoopMatchedControllerRows}{2}" in tex
+    assert "\\newcommand{\\LTAModelLoopFaithfulBaselineRows}{1}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceBaselinePasses}{0}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceBaselineTrials}{2}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceGovPasses}{4}" in tex
@@ -70,6 +100,7 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
     assert summary["materializer_rows_used_as_matched_agent"] == 0
+    assert set(rows[0]) >= {"actor_model", "controller_boundary", "official_verifier_result"}
 
 
 def test_export_model_in_loop_bridge_cli_writes_requested_outputs(tmp_path: Path) -> None:

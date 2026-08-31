@@ -11,13 +11,16 @@ BRIDGE_FIELDS = [
     "benchmark",
     "task",
     "actor_backbone",
+    "actor_model",
     "harness",
     "condition",
     "comparison_boundary",
+    "controller_boundary",
     "n_trials",
     "n_errors",
     "passes",
     "pass_at_5",
+    "official_verifier_result",
     "uses_task_specific_materializer",
     "paper_use",
     "source_path",
@@ -208,13 +211,16 @@ def _row_from_case(case: dict[str, Any]) -> dict[str, str]:
         "benchmark": case["benchmark"],
         "task": case["task"],
         "actor_backbone": case["actor_backbone"],
+        "actor_model": _actor_model(case),
         "harness": case["harness"],
         "condition": case["condition"],
         "comparison_boundary": case["comparison_boundary"],
+        "controller_boundary": _controller_boundary(case),
         "n_trials": str(stats["n_trials"]),
         "n_errors": str(stats["n_errors"]),
         "passes": str(stats["passes"]),
         "pass_at_5": _format_optional(stats["pass_at_5"]),
+        "official_verifier_result": _official_verifier_result(stats),
         "uses_task_specific_materializer": case["uses_task_specific_materializer"],
         "paper_use": case["paper_use"],
         "source_path": str(case["source_path"]),
@@ -251,6 +257,10 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         in {"ordinary_agent", "prompt_only_control", "model_in_loop_commit_controller"}
     ]
     runtime_rows = [row for row in rows if row["comparison_boundary"] == "runtime_reliability"]
+    ordinary_rows = [row for row in rows if row["comparison_boundary"] == "ordinary_agent"]
+    prompt_rows = [row for row in rows if row["comparison_boundary"] == "prompt_only_control"]
+    controller_rows = [row for row in rows if row["comparison_boundary"] == "model_in_loop_commit_controller"]
+    faithful_baseline_rows = [row for row in rows if row["comparison_boundary"] == "faithful_baseline"]
     baseline_rows = [
         row
         for row in rows
@@ -269,6 +279,10 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     gov_trials = int(commit_controller_k5["n_trials"])
     return {
         "model_in_loop_rows": len(model_rows),
+        "ordinary_agent_rows": len(ordinary_rows),
+        "prompt_control_rows": len(prompt_rows),
+        "matched_agent_controller_rows": len(controller_rows),
+        "faithful_baseline_rows": len(faithful_baseline_rows),
         "qwen_invoice_baseline_passes": baseline_passes,
         "qwen_invoice_baseline_trials": baseline_trials,
         "qwen_invoice_govkernel_passes": gov_passes,
@@ -291,6 +305,36 @@ def _sum_int(rows: list[dict[str, str]], field: str) -> int:
     return sum(int(row[field]) for row in rows)
 
 
+def _actor_model(case: dict[str, Any]) -> str:
+    if case["uses_task_specific_materializer"] == "yes":
+        return "none_runtime_only"
+    return str(case["actor_backbone"])
+
+
+def _controller_boundary(case: dict[str, Any]) -> str:
+    boundary = case["comparison_boundary"]
+    if boundary == "model_in_loop_commit_controller":
+        return "completion_trigger"
+    if boundary == "runtime_reliability":
+        return "runtime_transaction"
+    return "none"
+
+
+def _official_verifier_result(stats: dict[str, int | float | None]) -> str:
+    trials = int(stats["n_trials"] or 0)
+    errors = int(stats["n_errors"] or 0)
+    passes = int(stats["passes"] or 0)
+    if trials == 0:
+        return "error"
+    if passes == trials and errors == 0:
+        return "pass"
+    if passes == 0 and errors == trials:
+        return "error"
+    if passes == 0:
+        return "fail"
+    return "mixed"
+
+
 def _write_bridge_csv(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=BRIDGE_FIELDS, lineterminator="\n")
@@ -301,6 +345,10 @@ def _write_bridge_csv(path: Path, rows: list[dict[str, str]]) -> None:
 def _latex_numbers(summary: dict[str, Any]) -> str:
     commands = {
         "LTAModelLoopRows": summary["model_in_loop_rows"],
+        "LTAModelLoopOrdinaryRows": summary["ordinary_agent_rows"],
+        "LTAModelLoopPromptControlRows": summary["prompt_control_rows"],
+        "LTAModelLoopMatchedControllerRows": summary["matched_agent_controller_rows"],
+        "LTAModelLoopFaithfulBaselineRows": summary["faithful_baseline_rows"],
         "LTAModelLoopQwenInvoiceBaselinePasses": summary["qwen_invoice_baseline_passes"],
         "LTAModelLoopQwenInvoiceBaselineTrials": summary["qwen_invoice_baseline_trials"],
         "LTAModelLoopQwenInvoiceGovPasses": summary["qwen_invoice_govkernel_passes"],
