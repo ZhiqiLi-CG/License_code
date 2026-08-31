@@ -20,7 +20,7 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     assert summary["current_faithful_baseline_trials"] == 5
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 3
-    assert summary["story_gate_checks"] == 11
+    assert summary["story_gate_checks"] == 12
 
     rows = plan["rows"]
     assert [row["target_id"] for row in rows] == [

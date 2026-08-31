@@ -35,6 +35,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _story_language_check(paper_dir),
+        _main_text_style_check(paper_dir),
         _reproduction_chain_check(root),
         _code_paper_structure_check(root),
         _appendix_story_check(paper_dir / "sections" / "appendix.tex"),
@@ -207,6 +208,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_portfolio_numbers}",
         "\\input{sections/generated_comparison_numbers}",
         "\\input{sections/generated_headline_panel_numbers}",
+        "\\input{sections/generated_experiment_blueprint_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
@@ -215,7 +217,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, scale plan, and story gate numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, scale plan, and consistency numbers.",
     )
 
 
@@ -240,6 +242,40 @@ def _story_language_check(paper_dir: Path) -> dict[str, str]:
     )
 
 
+def _main_text_style_check(paper_dir: Path) -> dict[str, str]:
+    combined = "\n".join(
+        (paper_dir / relative).read_text(encoding="utf-8")
+        for relative in [
+            "main.tex",
+            "sections/01_introduction.tex",
+            "sections/02_formulation.tex",
+            "sections/03_method.tex",
+            "sections/04_experiments.tex",
+            "sections/05_results.tex",
+            "sections/06_related_work.tex",
+            "sections/07_discussion.tex",
+        ]
+    )
+    blocked = [
+        "story-first",
+        "Story-first",
+        "main spine",
+        "Main spine",
+        "go signal",
+        "story gate",
+        "Story gate",
+        "story-gate",
+        "Story-gate",
+    ]
+    hits = [phrase for phrase in blocked if phrase in combined]
+    return _check(
+        "main_text_avoids_meta_curation_language",
+        not hits,
+        "The main paper should use hypothesis/evaluation language rather than internal curation labels.",
+        "Main text avoids internal curation wording.",
+    )
+
+
 def _reproduction_chain_check(root: Path) -> dict[str, str]:
     code_readme = (root / "License_code" / "README.md").read_text(encoding="utf-8")
     paper_readme = (root / "License_paper" / "README.md").read_text(encoding="utf-8")
@@ -248,6 +284,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_evidence_portfolio.py",
         "export_comparison_manifest.py",
         "export_headline_result_panel.py",
+        "export_submission_experiment_blueprint.py",
         "export_submission_scale_plan.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
@@ -259,7 +296,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, scale plan export, story gate export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, scale plan export, consistency export, figure generation, and LaTeX build.",
     )
 
 
