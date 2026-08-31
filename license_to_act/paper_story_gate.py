@@ -14,6 +14,7 @@ from .model_in_loop_bridge import build_model_in_loop_bridge
 from .real_evidence_audit import build_real_evidence_audit
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
+from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
 
 
 CHECK_FIELDS = ["check_id", "status", "criterion", "evidence"]
@@ -32,6 +33,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     commit_pair_metrics = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     recursive_lineage = build_recursive_amendment_lineage(root)
     claims = build_story_claims(root)
+    tau2_matched = build_tau2_matched_boundary_export(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     portfolio_rows = portfolio["rows"]
     portfolio_summary = portfolio["summary"]
@@ -47,6 +49,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _model_in_loop_bridge_check(model_loop_bridge),
         _real_evidence_audit_check(real_evidence_audit["summary"]),
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
+        _tau2_matched_boundary_check(tau2_matched["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
@@ -94,6 +97,8 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "commit_pair_accuracy": commit_pair_metrics["summary"]["commit_pair_accuracy"],
             "unauthorized_commit_rate": commit_pair_metrics["summary"]["unauthorized_commit_rate"],
             "authorized_commit_recall": commit_pair_metrics["summary"]["authorized_commit_recall"],
+            "tau2_matched_pairs": tau2_matched["summary"]["complete_pairs"],
+            "tau2_matched_reward_delta": tau2_matched["summary"]["reward_delta"],
         },
         "checks": checks,
     }
@@ -249,6 +254,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_recursive_numbers}",
         "\\input{sections/generated_ablation_numbers}",
         "\\input{sections/generated_model_loop_numbers}",
+        "\\input{sections/generated_tau2_matched_boundary_numbers}",
         "\\input{sections/generated_commit_pair_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_real_evidence_numbers}",
@@ -259,7 +265,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, run-plan, contract-update, ablation, model-in-loop, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, run-plan, contract-update, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -372,6 +378,30 @@ def _commit_pair_metric_check(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['commit_pair_accuracy']:.3f}; unauthorized commit rate "
             f"{summary['unauthorized_commit_rate']:.3f}; authorized commit recall "
             f"{summary['authorized_commit_recall']:.3f}."
+        ),
+    )
+
+
+def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["complete_pairs"] >= 1
+        and summary["baseline_mean_reward"] == 0.0
+        and summary["boundary_mean_reward"] == 1.0
+        and summary["baseline_read_correct_write_wrong"] >= 1
+        and summary["boundary_read_correct_write_wrong"] == 0
+        and summary["boundary_vetoes"] >= 1
+        and summary["boundary_regressions"] == 0
+    )
+    return _check(
+        "tau2_matched_boundary_pair_present",
+        ok,
+        "The paper should include real matched tau2 actor pairs, not only retrospective mining.",
+        (
+            f"{summary['complete_pairs']} matched pairs; reward "
+            f"{summary['baseline_mean_reward']:.1f}->{summary['boundary_mean_reward']:.1f}; "
+            f"read-correct/write-wrong "
+            f"{summary['baseline_read_correct_write_wrong']}->{summary['boundary_read_correct_write_wrong']}; "
+            f"boundary vetoes {summary['boundary_vetoes']}; regressions {summary['boundary_regressions']}."
         ),
     )
 
@@ -594,6 +624,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_contract_refinement_lineage.py",
         "export_mechanism_ablation_panel.py",
         "export_model_in_loop_bridge.py",
+        "export_tau2_matched_boundary.py",
         "export_commit_pair_metrics.py",
         "export_submission_scale_plan.py",
         "export_real_evidence_audit.py",
@@ -608,7 +639,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include generated tables and the paper build path.",
-        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, ablation exports, model-in-loop exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
+        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 

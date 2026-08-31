@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 90 passed.
+2026-08-31: 99 passed.
 ```
 
 ## Official Harbor Anchors
@@ -74,6 +74,34 @@ The three Stage-3 Qwen+controller commands keep `Qwen3.8-27B-long32k` inside the
 
 `configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
 
+## tau2 Matched Boundary Block
+
+The current live matched tau2 seed uses the same Mistral actor and the same
+scripted user in both conditions; the only changed component is the action
+boundary around `cancel_reservation`.
+
+```bash
+/data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
+  --domain airline \
+  --task-ids 48 \
+  --user-mode scripted \
+  --num-trials 5 \
+  --seed 312 \
+  --max-steps 20 \
+  --timeout 180 \
+  --llm-agent openai/Mistral-Small-3.2-24B-Instruct-2506 \
+  --llm-user openai/Mistral-Small-3.2-24B-Instruct-2506 \
+  --agent-max-tokens 256 \
+  --user-max-tokens 128 \
+  --api-base http://127.0.0.1:8001/v1 \
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_scripted_k5_20260831.json
+```
+
+The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
+paper table: across five matched seeds, the baseline has mean reward 0.0 with
+five read-correct/write-wrong cancellations, while the action boundary has mean
+reward 1.0 with five vetoes and zero regressions.
+
 ## Long-Context Faithful Baselines
 
 The paper includes matched open-model baselines using the newly available `Qwen3.8-27B-long32k` endpoint. These are the faithful baseline commands used by the current result tables:
@@ -115,6 +143,7 @@ python scripts/export_submission_experiment_blueprint.py
 python scripts/export_contract_refinement_lineage.py
 python scripts/export_mechanism_ablation_panel.py
 python scripts/export_model_in_loop_bridge.py
+python scripts/export_tau2_matched_boundary.py
 python scripts/export_commit_pair_metrics.py
 python scripts/export_submission_scale_plan.py
 python scripts/export_real_evidence_audit.py
@@ -128,12 +157,13 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_comparison_manifest.py`, `export_headline_result_panel.py`,
 `export_submission_experiment_blueprint.py`, `export_contract_refinement_lineage.py`,
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
-`export_commit_pair_metrics.py`, `export_submission_scale_plan.py`,
+`export_tau2_matched_boundary.py`, `export_commit_pair_metrics.py`,
+`export_submission_scale_plan.py`,
 `export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`. The paper imports those files for result counts,
 baseline and ablation separation, full-study targets, contract updates,
-model-in-loop comparisons, commit-pair metrics, real-evidence auditing, and
-paper-code consistency numbers.
+model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
+real-evidence auditing, and paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing State Contract JSON examples used in the appendix.
 
 ## Paper-Code Consistency
@@ -141,7 +171,7 @@ paper-code consistency numbers.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, contract-update, mechanism-ablation, model-in-loop, commit-pair, real-evidence audit, State Contract example, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, contract-update, mechanism-ablation, model-in-loop, matched-tau2, commit-pair, real-evidence audit, State Contract example, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.
