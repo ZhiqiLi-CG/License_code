@@ -13,8 +13,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 9
-    assert summary["passed_checks"] == 9
+    assert summary["total_checks"] == 11
+    assert summary["passed_checks"] == 11
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 25
     assert summary["clean_positive_trials"] == 25
@@ -36,6 +36,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
     assert "story gate" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert checks["appendix_serves_story"]["status"] == "pass"
+    assert checks["appendix_uses_submission_scale_language"]["status"] == "pass"
+    assert checks["code_paper_submodules_declared"]["status"] == "pass"
 
     assert "ablation" not in checks["faithful_baseline_not_ablation"]["evidence"].lower()
     assert "RSI" not in checks["license_workspace_only"]["evidence"]
@@ -54,12 +56,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 9
+    assert len(rows) == 11
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{9}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{9}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{11}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{11}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

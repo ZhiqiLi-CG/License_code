@@ -36,7 +36,9 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _generated_import_check(paper_dir / "main.tex"),
         _story_language_check(paper_dir),
         _reproduction_chain_check(root),
+        _code_paper_structure_check(root),
         _appendix_story_check(paper_dir / "sections" / "appendix.tex"),
+        _appendix_scale_language_check(paper_dir / "sections" / "appendix.tex"),
     ]
     passed = sum(1 for check in checks if check["status"] == "pass")
     failed = len(checks) - passed
@@ -257,6 +259,35 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
     )
 
 
+def _code_paper_structure_check(root: Path) -> dict[str, str]:
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    gitmodules = (root / ".gitmodules").read_text(encoding="utf-8")
+    required_readme = [
+        "License_code/",
+        "code folder",
+        "License_paper/",
+        "paper folder",
+        "regenerated from `License_code/` into `License_paper/`",
+    ]
+    required_modules = [
+        "path = License_code",
+        "path = License_paper",
+        "ZhiqiLi-CG/License_code.git",
+        "ZhiqiLi-CG/License_paper.git",
+    ]
+    ok = (
+        all(item in readme for item in required_readme)
+        and all(item in gitmodules for item in required_modules)
+        and "intentionally empty" not in readme
+    )
+    return _check(
+        "code_paper_submodules_declared",
+        ok,
+        "The root repository should explicitly expose the open-source code folder and paper folder.",
+        "Root README and .gitmodules declare License_code and License_paper as separate pushed submodules.",
+    )
+
+
 def _appendix_story_check(appendix_path: Path) -> dict[str, str]:
     text = appendix_path.read_text(encoding="utf-8")
     anchors = [
@@ -270,6 +301,28 @@ def _appendix_story_check(appendix_path: Path) -> dict[str, str]:
         not missing,
         "The appendix should support the story rather than archive weak exploratory logs.",
         "Appendix opens detailed evidence with portfolio construction and inclusion criteria.",
+    )
+
+
+def _appendix_scale_language_check(appendix_path: Path) -> dict[str, str]:
+    text = appendix_path.read_text(encoding="utf-8")
+    defensive_phrases = [
+        "Claims not yet supported",
+        "not yet supported",
+        "does not by itself prove",
+    ]
+    scale_anchors = [
+        "Submission-scale targets",
+        "Current positive spine",
+        "Scale evidence to add",
+    ]
+    blocked = [phrase for phrase in defensive_phrases if phrase in text]
+    missing = [anchor for anchor in scale_anchors if anchor not in text]
+    return _check(
+        "appendix_uses_submission_scale_language",
+        not blocked and not missing,
+        "The appendix should frame remaining work as submission-scale evidence, not defensive unsupported-claim caveats.",
+        "Appendix uses current-positive-spine and scale-target language without unsupported-claim headings.",
     )
 
 
