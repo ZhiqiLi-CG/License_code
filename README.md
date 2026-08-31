@@ -45,6 +45,26 @@ The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evid
 
 `configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
 
+## Long-Context Faithful Baselines
+
+The Stage-2 paper also includes matched open-model baselines using the newly available `Qwen3.8-27B-long32k` endpoint:
+
+```bash
+env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run \
+  -c configs/tb21_miniswe_qwen_long32k_license_anchors.json \
+  --job-name stage2-tb21-miniswe-qwen-long32k-license-anchors-smoke \
+  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
+  --n-attempts 1 --n-concurrent 1 -y
+
+env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run \
+  -c configs/skillflow_miniswe_qwen_long32k_license_anchors.json \
+  --job-name stage2-skillflow-miniswe-qwen-long32k-license-anchors-smoke \
+  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
+  --n-attempts 1 --n-concurrent 1 -y
+```
+
+Current artifacts record 0/3 Terminal-Bench passes and 0/2 SkillFlow passes with zero runtime exceptions. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same authority and obligation boundary without GovKernel.
+
 ## Paper Result Exports
 
 ```bash

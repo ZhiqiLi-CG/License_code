@@ -155,6 +155,7 @@ def write_stage2_paper_results(
     _write_csv(paper_data_dir / "tau2_authority_by_group.csv", TAU2_BY_GROUP_FIELDS, tau2_by_group_rows)
 
     clean_rows = [row for row in reliability_rows if row["paper_use"] == "clean_reliability_anchor"]
+    faithful_baseline_rows = [row for row in reliability_rows if row["paper_use"] == "faithful_baseline"]
     summary = {
         "tau2_mining_path": str(tau2_mining_path),
         "paper_data_dir": str(paper_data_dir),
@@ -163,6 +164,12 @@ def write_stage2_paper_results(
         "clean_reliability_trials": sum(int(row["n_trials"]) for row in clean_rows),
         "clean_reliability_errors": sum(int(row["n_errors"]) for row in clean_rows),
         "clean_reliability_mean_reward": _mean(float(row["mean_reward"]) for row in clean_rows),
+        "n_faithful_baseline_rows": len(faithful_baseline_rows),
+        "faithful_baseline_trials": sum(int(row["n_trials"]) for row in faithful_baseline_rows),
+        "faithful_baseline_errors": sum(int(row["n_errors"]) for row in faithful_baseline_rows),
+        "faithful_baseline_mean_reward": _mean(
+            float(row["mean_reward"]) for row in faithful_baseline_rows if row["mean_reward"] != ""
+        ),
         "tau2_cancel_decisions": tau2_report["summary"]["n_cancel_decisions"],
         "tau2_read_correct_write_wrong_proxy": tau2_report["summary"]["n_read_correct_write_wrong_proxy"],
         "tau2_infrastructure_error_simulations": tau2_report["summary"]["n_infrastructure_error_simulations"],

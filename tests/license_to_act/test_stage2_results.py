@@ -72,6 +72,16 @@ def test_exports_stage2_reliability_and_tau2_mining(tmp_path):
                 "result_path": harbor_path,
                 "paper_use": "clean_reliability_anchor",
                 "interpretation": "interpretation",
+            },
+            {
+                "case_id": "TB-QWEN32K",
+                "benchmark": "Terminal-Bench 2.1",
+                "task": "task",
+                "condition": "baseline condition",
+                "role": "faithful long-context baseline",
+                "result_path": harbor_path,
+                "paper_use": "faithful_baseline",
+                "interpretation": "baseline interpretation",
             }
         ],
         paper_data_dir=paper_data_dir,
@@ -80,6 +90,8 @@ def test_exports_stage2_reliability_and_tau2_mining(tmp_path):
 
     assert summary["clean_reliability_trials"] == 5
     assert summary["clean_reliability_errors"] == 0
+    assert summary["faithful_baseline_trials"] == 5
+    assert summary["faithful_baseline_errors"] == 0
     assert summary["tau2_read_correct_write_wrong_proxy"] == 1
     assert (paper_data_dir / "stage2_reliability.csv").read_text(encoding="utf-8").splitlines()[1].startswith(
         "TB-K5,"

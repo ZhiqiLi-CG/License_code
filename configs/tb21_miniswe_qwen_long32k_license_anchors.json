@@ -1,0 +1,41 @@
+{
+  "job_name": "stage2-tb21-miniswe-qwen-long32k-license-anchors",
+  "jobs_dir": "/data/zhiqi/License/artifacts/stage2/harbor",
+  "n_concurrent_trials": 1,
+  "agents": [
+    {
+      "name": "mini-swe-agent",
+      "model_name": "openai/Qwen3.8-27B-long32k",
+      "n_concurrent": 1,
+      "extra_allowed_hosts": [
+        "172.17.0.1"
+      ],
+      "kwargs": {
+        "max_tokens": 1024
+      },
+      "env": {
+        "OPENAI_API_KEY": "dummy",
+        "OPENAI_BASE_URL": "http://172.17.0.1:18010/v1"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "path": "/data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/sanitize-git-repo"
+    },
+    {
+      "path": "/data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/db-wal-recovery"
+    },
+    {
+      "path": "/data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/sqlite-db-truncate"
+    }
+  ],
+  "license_to_act_metadata": {
+    "benchmark": "Terminal-Bench 2.1",
+    "arm": "qwen_long32k_miniswe_baseline",
+    "arm_type": "faithful_baseline",
+    "model_key": "qwen_long32k",
+    "task_count": 3,
+    "notes": "Matched long-context open-model agent baseline for the three Terminal-Bench anchors used by the License-to-Act Stage-2 paper."
+  }
+}

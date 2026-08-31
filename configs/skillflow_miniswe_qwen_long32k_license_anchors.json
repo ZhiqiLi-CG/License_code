@@ -1,0 +1,41 @@
+{
+  "job_name": "stage2-skillflow-miniswe-qwen-long32k-license-anchors",
+  "jobs_dir": "/data/zhiqi/License/artifacts/stage2/harbor",
+  "n_concurrent_trials": 1,
+  "environment": {
+    "force_build": true
+  },
+  "agents": [
+    {
+      "name": "mini-swe-agent",
+      "model_name": "openai/Qwen3.8-27B-long32k",
+      "n_concurrent": 1,
+      "extra_allowed_hosts": [
+        "172.17.0.1"
+      ],
+      "kwargs": {
+        "max_tokens": 1024
+      },
+      "env": {
+        "OPENAI_API_KEY": "dummy",
+        "OPENAI_BASE_URL": "http://172.17.0.1:18010/v1"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "path": "/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images"
+    },
+    {
+      "path": "/data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_travel_claim_merge"
+    }
+  ],
+  "license_to_act_metadata": {
+    "benchmark": "SkillFlow",
+    "arm": "qwen_long32k_miniswe_baseline",
+    "arm_type": "faithful_baseline",
+    "model_key": "qwen_long32k",
+    "task_count": 2,
+    "notes": "Matched long-context open-model agent baseline for the two SkillFlow artifact-obligation anchors used by the License-to-Act Stage-2 paper."
+  }
+}
