@@ -56,8 +56,8 @@ def test_story_gate_exports_transaction_consistency_check() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
     checks = {check["check_id"]: check for check in report["checks"]}
 
-    assert report["summary"]["total_checks"] == 17
-    assert report["summary"]["passed_checks"] == 17
+    assert report["summary"]["total_checks"] == 18
+    assert report["summary"]["passed_checks"] == 18
     assert checks["transaction_story_framing"]["status"] == "pass"
     assert checks["public_surface_uses_transaction_terms"]["status"] == "pass"
     assert "commit gap" in checks["transaction_story_framing"]["evidence"].lower()

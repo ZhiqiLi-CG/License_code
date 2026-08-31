@@ -7,6 +7,7 @@ import subprocess
 from typing import Any
 
 from .comparison_manifest import build_comparison_manifest
+from .commit_pair_metrics import build_commit_pair_member_rows, compute_commit_pair_metrics
 from .evidence_portfolio import build_evidence_portfolio
 from .mechanism_ablation_panel import build_mechanism_ablation_panel
 from .model_in_loop_bridge import build_model_in_loop_bridge
@@ -26,6 +27,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     comparison_manifest = build_comparison_manifest(root)
     ablation_panel = build_mechanism_ablation_panel(root)
     model_loop_bridge = build_model_in_loop_bridge(root)
+    commit_pair_metrics = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     recursive_lineage = build_recursive_amendment_lineage(root)
     claims = build_story_claims(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
@@ -41,6 +43,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _comparison_manifest_check(comparison_summary),
         _mechanism_ablation_panel_check(ablation_panel["summary"]),
         _model_in_loop_bridge_check(model_loop_bridge["summary"]),
+        _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
@@ -77,6 +80,9 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "model_in_loop_govkernel_trials": model_loop_bridge["summary"][
                 "qwen_invoice_govkernel_trials"
             ],
+            "commit_pair_accuracy": commit_pair_metrics["summary"]["commit_pair_accuracy"],
+            "unauthorized_commit_rate": commit_pair_metrics["summary"]["unauthorized_commit_rate"],
+            "authorized_commit_recall": commit_pair_metrics["summary"]["authorized_commit_recall"],
         },
         "checks": checks,
     }
@@ -232,6 +238,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_recursive_numbers}",
         "\\input{sections/generated_ablation_numbers}",
         "\\input{sections/generated_model_loop_numbers}",
+        "\\input{sections/generated_commit_pair_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
@@ -240,7 +247,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, scale plan, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, commit-pair metrics, scale plan, and consistency numbers.",
     )
 
 
@@ -283,6 +290,28 @@ def _model_in_loop_bridge_check(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['qwen_invoice_govkernel_passes']}/"
             f"{summary['qwen_invoice_govkernel_trials']}; materializer-as-agent rows: "
             f"{summary['materializer_rows_used_as_matched_agent']}."
+        ),
+    )
+
+
+def _commit_pair_metric_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["pair_count"] >= 4
+        and summary["ready_opportunities"] >= 4
+        and summary["premature_opportunities"] >= 4
+        and summary["commit_pair_accuracy"] >= 1.0
+        and summary["unauthorized_commit_rate"] == 0.0
+        and summary["authorized_commit_recall"] >= 1.0
+    )
+    return _check(
+        "commit_pair_metrics_support_bidirectional_correctness",
+        ok,
+        "The main evidence should report a bidirectional commit metric after task reward.",
+        (
+            f"{summary['pair_count']} commit-pair groups; accuracy "
+            f"{summary['commit_pair_accuracy']:.3f}; unauthorized commit rate "
+            f"{summary['unauthorized_commit_rate']:.3f}; authorized commit recall "
+            f"{summary['authorized_commit_recall']:.3f}."
         ),
     )
 
@@ -497,6 +526,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_contract_refinement_lineage.py",
         "export_mechanism_ablation_panel.py",
         "export_model_in_loop_bridge.py",
+        "export_commit_pair_metrics.py",
         "export_submission_scale_plan.py",
         "export_state_contract_examples.py",
         "export_story_gate.py",
@@ -509,7 +539,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, scale plan export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, commit-pair metrics export, scale plan export, consistency export, figure generation, and LaTeX build.",
     )
 
 

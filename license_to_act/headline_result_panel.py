@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .comparison_manifest import build_comparison_manifest
+from .commit_pair_metrics import compute_commit_pair_metrics, build_commit_pair_member_rows
 from .evidence_portfolio import build_evidence_portfolio
 from .story_claims import build_story_claims
 from .submission_scale_plan import build_submission_scale_plan
@@ -28,11 +29,13 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
     claims = build_story_claims(root)
     portfolio = build_evidence_portfolio(root)
     comparison = build_comparison_manifest(root)
+    commit_pairs = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     scale_plan = build_submission_scale_plan(root)
 
     metrics = claims["headline_metrics"]
     portfolio_summary = portfolio["summary"]
     comparison_summary = comparison["summary"]
+    pair_summary = commit_pairs["summary"]
     scale_summary = scale_plan["summary"]
 
     rows = [
@@ -65,7 +68,23 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
         },
         {
-            "panel_id": "H3_FAITHFUL_BASELINE_COUNTERPOINT",
+            "panel_id": "H3_COMMIT_PAIR_ACCURACY",
+            "paper_role": "main_positive_evidence",
+            "story_question": "Does StateTx distinguish ready commits from premature commits?",
+            "result_sentence": (
+                f"Across {pair_summary['pair_count']} current commit-pair groups, StateTx reaches "
+                f"{pair_summary['commit_pair_accuracy']:.3f} pair accuracy, "
+                f"{pair_summary['unauthorized_commit_rate']:.3f} unauthorized commit rate, and "
+                f"{pair_summary['authorized_commit_recall']:.3f} authorized commit recall."
+            ),
+            "why_it_matters": (
+                "The mechanism metric tests both sides of the transaction story: block premature effects "
+                "and still commit when the evidence is ready."
+            ),
+            "source_data": "commit_pair_metrics.csv | commit_pair_members.csv",
+        },
+        {
+            "panel_id": "H4_FAITHFUL_BASELINE_COUNTERPOINT",
             "paper_role": "faithful_baseline_counterpoint",
             "story_question": "Does a stronger ordinary task agent solve the same commit boundary?",
             "result_sentence": (
@@ -81,7 +100,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "comparison_manifest.csv | stage2_reliability.csv",
         },
         {
-            "panel_id": "H4_TAU2_COMMIT_MINING",
+            "panel_id": "H5_TAU2_COMMIT_MINING",
             "paper_role": "main_positive_evidence",
             "story_question": "Are premature commits visible beyond hand-picked examples?",
             "result_sentence": (
@@ -96,7 +115,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "tau2_commit_mining.csv",
         },
         {
-            "panel_id": "H5_CONTRACT_REFINEMENT_TRANSFER",
+            "panel_id": "H6_CONTRACT_REFINEMENT_TRANSFER",
             "paper_role": "main_positive_evidence",
             "story_question": "Does a failure-derived contract refinement transfer across benchmarks?",
             "result_sentence": (
@@ -111,7 +130,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "transfer_ledger.csv | stage1_cases.csv",
         },
         {
-            "panel_id": "H6_SUBMISSION_SCALE_PATH",
+            "panel_id": "H7_SUBMISSION_SCALE_PATH",
             "paper_role": "scale_path",
             "story_question": "What must be scaled before final top-conference claim freeze?",
             "result_sentence": (
@@ -141,6 +160,9 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "faithful_baseline_passes": comparison_summary["faithful_baseline_passes"],
         "faithful_baseline_trials": comparison_summary["faithful_baseline_trials"],
         "tau2_read_correct_write_wrong_proxy": metrics["tau2_read_correct_write_wrong_proxy"],
+        "commit_pair_accuracy": pair_summary["commit_pair_accuracy"],
+        "unauthorized_commit_rate": pair_summary["unauthorized_commit_rate"],
+        "authorized_commit_recall": pair_summary["authorized_commit_recall"],
         "submission_scale_rows": scale_summary["scale_target_rows"],
     }
     return {"summary": summary, "rows": rows}
@@ -201,6 +223,9 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAHeadlineFaithfulBaselinePasses": summary["faithful_baseline_passes"],
         "LTAHeadlineFaithfulBaselineTrials": summary["faithful_baseline_trials"],
         "LTAHeadlineTauTwoRCWW": summary["tau2_read_correct_write_wrong_proxy"],
+        "LTAHeadlineCommitPairAccuracy": f"{summary['commit_pair_accuracy']:.3f}",
+        "LTAHeadlineUnauthorizedCommitRate": f"{summary['unauthorized_commit_rate']:.3f}",
+        "LTAHeadlineAuthorizedCommitRecall": f"{summary['authorized_commit_recall']:.3f}",
         "LTAHeadlineSubmissionScaleRows": summary["submission_scale_rows"],
     }
     lines = [

@@ -83,6 +83,7 @@ python scripts/export_submission_experiment_blueprint.py
 python scripts/export_contract_refinement_lineage.py
 python scripts/export_mechanism_ablation_panel.py
 python scripts/export_model_in_loop_bridge.py
+python scripts/export_commit_pair_metrics.py
 python scripts/export_submission_scale_plan.py
 python scripts/export_state_contract_examples.py
 python scripts/export_story_gate.py
@@ -94,11 +95,11 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_comparison_manifest.py`, `export_headline_result_panel.py`,
 `export_submission_experiment_blueprint.py`, `export_contract_refinement_lineage.py`,
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
-`export_submission_scale_plan.py`, and `export_story_gate.py` also write generated LaTeX number files under
+`export_commit_pair_metrics.py`, `export_submission_scale_plan.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`, which the paper imports for headline result,
 evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint,
 contract-lineage, mechanism-ablation, model-in-loop bridge, submission-scale,
-and paper-code consistency numbers.
+commit-pair metrics, and paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing State Contract JSON examples used in the appendix.
 
 ## Paper-Code Consistency
@@ -106,7 +107,7 @@ and paper-code consistency numbers.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, contract-lineage, mechanism-ablation, model-in-loop bridge, submission-scale, State Contract examples, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, contract-lineage, mechanism-ablation, model-in-loop bridge, commit-pair, submission-scale, State Contract examples, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.
