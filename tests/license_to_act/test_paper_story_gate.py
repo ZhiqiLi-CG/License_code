@@ -20,8 +20,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["total_checks"] == 19
     assert summary["passed_checks"] == 19
     assert summary["failed_checks"] == 0
-    assert summary["clean_positive_passes"] == 25
-    assert summary["clean_positive_trials"] == 25
+    assert summary["clean_positive_passes"] == 30
+    assert summary["clean_positive_trials"] == 30
     assert summary["faithful_baseline_passes"] == 4
     assert summary["faithful_baseline_trials"] == 25
     assert summary["benchmark_count"] == 3

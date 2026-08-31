@@ -192,6 +192,19 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-sqlite-truncate-k5-py/result.json",
         },
         {
+            "bridge_id": "TB_LOG_MATERIALIZER_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "log-summary-date-ranges",
+            "actor_backbone": "Commit Controller runtime",
+            "harness": "log-summary CSV transaction executor",
+            "condition": "runtime transaction anchor, K=5",
+            "comparison_boundary": "runtime_reliability",
+            "uses_task_specific_materializer": "yes",
+            "paper_use": "runtime_reliability",
+            "source_path": artifacts
+            / "stage3/harbor/stage3-tb21-lta-log-summary-k5-real-20260831/result.json",
+        },
+        {
             "bridge_id": "SF_INVOICE_MATERIALIZER_K5",
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images",

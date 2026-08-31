@@ -129,7 +129,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "story_axis": "Shell proposals need scoped write sets and preservation checks.",
             "current_positive_evidence": (
                 f"{metrics['stage2_terminal_clean_trials']}/{metrics['stage2_terminal_clean_trials']} "
-                "official Terminal-Bench passes across Git, WAL, and truncated-SQLite anchors."
+                "official Terminal-Bench passes across Git, WAL, truncated-SQLite, and log-summary anchors."
             ),
             "scale_target": "Expand Git/history tasks from sanitize and leak recovery into a scoped-write pilot.",
             "inclusion_rule": inclusion_rule,

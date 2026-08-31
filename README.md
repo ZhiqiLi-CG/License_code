@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 78 passed.
+2026-08-31: 90 passed.
 ```
 
 ## Official Harbor Anchors
@@ -34,6 +34,12 @@ env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
   -c configs/tb21_lta_sqlite_truncate_recovery_official.yaml \
   --job-name stage2-tb21-statetx-sqlite-truncate-k5-py \
   --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
+
+env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
+  -c configs/tb21_lta_log_summary_materializer_official.yaml \
+  --job-name stage3-tb21-lta-log-summary-k5-real-20260831 \
+  --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
   --n-attempts 5 --n-concurrent 1 -y
 
 env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
@@ -56,6 +62,7 @@ env PYTHONPATH=/data/zhiqi/License/License_code:/data/zhiqi/License/datasets/Ski
 ```
 
 The sqlite-truncate anchor writes `/app/recover.json` from binary payload evidence in `/app/trunc.db`.
+The log-summary anchor writes `/app/summary.csv` from bracketed severity tokens and filename dates in `/app/logs`.
 The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
 The two Stage-3 Qwen commands keep `Qwen3.8-27B-long32k` inside the official SkillFlow trial while the Commit Controller owns the final workbook transaction; the current artifacts score 10/10 across invoice and travel-claim OCR anchors with zero exceptions.
 

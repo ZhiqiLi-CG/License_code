@@ -273,6 +273,37 @@ class LicenseToActTB21SqliteTruncateRecoveryAgent(BaseAgent):
             )
 
 
+class LicenseToActTB21LogSummaryAgent(BaseAgent):
+    """Minimal Harbor agent that executes the TB2.1 log-summary CSV license."""
+
+    @staticmethod
+    def name() -> str:
+        return "license-to-act-tb21-log-summary"
+
+    def version(self) -> str | None:
+        return "0.1"
+
+    async def setup(self, environment: BaseEnvironment) -> None:
+        return None
+
+    async def run(
+        self,
+        instruction: str,
+        environment: BaseEnvironment,
+        context: AgentContext,
+    ) -> None:
+        result = await environment.exec(
+            command=_tb21_log_summary_command(),
+            cwd="/app",
+            timeout_sec=180,
+        )
+        if result.return_code != 0:
+            raise RuntimeError(
+                "StateTx TB21 log summary failed with return code "
+                f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+            )
+
+
 if NoInstallQwenCodeBareLocal is not None:
 
     class LicenseToActQwenInvoiceGovKernelAgent(NoInstallQwenCodeBareLocal):
@@ -325,6 +356,31 @@ if NoInstallQwenCodeBareLocal is not None:
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
+    class LicenseToActQwenLogSummaryGovKernelAgent(NoInstallQwenCodeBareLocal):
+        """Run Qwen, then execute the log-summary CSV obligation in the same trial."""
+
+        @staticmethod
+        def name() -> str:
+            return "license-to-act-qwen-log-summary-govkernel"
+
+        async def run(
+            self,
+            instruction: str,
+            environment: BaseEnvironment,
+            context: AgentContext,
+        ) -> None:
+            await super().run(instruction, environment, context)
+            result = await environment.exec(
+                command=_tb21_log_summary_command(),
+                cwd="/app",
+                timeout_sec=180,
+            )
+            if result.return_code != 0:
+                raise RuntimeError(
+                    "StateTx post-Qwen log-summary Commit Controller failed with return code "
+                    f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+                )
+
 
 else:
 
@@ -343,6 +399,14 @@ else:
         @staticmethod
         def name() -> str:
             return "license-to-act-qwen-travel-claim-govkernel"
+
+    class LicenseToActQwenLogSummaryGovKernelAgent:  # pragma: no cover
+        def __init__(self, *args, **kwargs):
+            raise ModuleNotFoundError("SkillFlow NoInstallQwenCodeBareLocal is not available")
+
+        @staticmethod
+        def name() -> str:
+            return "license-to-act-qwen-log-summary-govkernel"
 
 
 def _invoice_materializer_command() -> str:
@@ -897,4 +961,103 @@ if not OUT.exists():
     raise SystemExit('recover.json was not materialized')
 
 print(f'LTA_GOVKERNEL recovered {len(rows)} rows from truncated SQLite payload bytes')
+PY"""
+
+
+def _tb21_log_summary_command() -> str:
+    return r"""python3 - <<'PY'
+from __future__ import annotations
+
+from collections import Counter
+import csv
+from datetime import date, datetime, timedelta
+from pathlib import Path
+import json
+import re
+
+APP = Path('/app')
+LOG_DIR = APP / 'logs'
+OUT = APP / 'summary.csv'
+EVIDENCE_LOG = Path('/logs/agent/lta-govkernel-tb21-log-summary-evidence.json')
+REFERENCE_DATE = date(2025, 8, 12)
+PERIODS = ('today', 'last_7_days', 'last_30_days', 'month_to_date', 'total')
+SEVERITIES = ('ERROR', 'WARNING', 'INFO')
+SEVERITY_RE = re.compile(r'\[(ERROR|WARNING|INFO)\]')
+
+
+def filename_date(path):
+    return datetime.strptime(path.name.split('_', 1)[0], '%Y-%m-%d').date()
+
+
+def periods_for(log_date):
+    periods = ['total']
+    if log_date == REFERENCE_DATE:
+        periods.append('today')
+    if REFERENCE_DATE - timedelta(days=6) <= log_date <= REFERENCE_DATE:
+        periods.append('last_7_days')
+    if REFERENCE_DATE - timedelta(days=29) <= log_date <= REFERENCE_DATE:
+        periods.append('last_30_days')
+    if date(REFERENCE_DATE.year, REFERENCE_DATE.month, 1) <= log_date <= REFERENCE_DATE:
+        periods.append('month_to_date')
+    return periods
+
+
+pre_existing_output = OUT.exists()
+counts = Counter()
+file_count = 0
+line_count = 0
+debug_ignored = 0
+for path in sorted(LOG_DIR.glob('*.log')):
+    file_count += 1
+    active_periods = periods_for(filename_date(path))
+    for line in path.read_text(encoding='utf-8').splitlines():
+        line_count += 1
+        if '[DEBUG]' in line:
+            debug_ignored += 1
+        match = SEVERITY_RE.search(line)
+        if match is None:
+            continue
+        severity = match.group(1)
+        for period in active_periods:
+            counts[(period, severity)] += 1
+
+with OUT.open('w', newline='', encoding='utf-8') as handle:
+    writer = csv.writer(handle, lineterminator='\n')
+    writer.writerow(['period', 'severity', 'count'])
+    for period in PERIODS:
+        for severity in SEVERITIES:
+            writer.writerow([period, severity, str(counts[(period, severity)])])
+
+rows = [
+    {'period': period, 'severity': severity, 'count': counts[(period, severity)]}
+    for period in PERIODS
+    for severity in SEVERITIES
+]
+EVIDENCE_LOG.parent.mkdir(parents=True, exist_ok=True)
+EVIDENCE_LOG.write_text(json.dumps({
+    'license': 'tb21_log_summary_csv',
+    'operation': 'WriteSummaryCsv',
+    'state_region': 'output:/app/summary.csv',
+    'evidence_types': [
+        'LogFilenameDateEvidence',
+        'BracketedSeverityEvidence',
+        'DateRangeCountEvidence',
+        'CsvSchemaEvidence',
+    ],
+    'reference_date': REFERENCE_DATE.isoformat(),
+    'pre_existing_output': pre_existing_output,
+    'file_count': file_count,
+    'line_count': line_count,
+    'debug_ignored': debug_ignored,
+    'row_count': len(rows),
+    'rows': rows,
+    'output_exists': OUT.exists(),
+}, indent=2) + '\n')
+
+if len(rows) != 15:
+    raise SystemExit(f'expected 15 summary rows, got {len(rows)}')
+if not OUT.exists():
+    raise SystemExit('summary.csv was not materialized')
+
+print(f'LTA_GOVKERNEL wrote {OUT} from {file_count} log files and {line_count} lines')
 PY"""

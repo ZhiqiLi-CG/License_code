@@ -56,6 +56,23 @@ DEFAULT_RELIABILITY_CASES = [
         "interpretation": "Binary payload witnesses recover rows and commit the verifier-visible JSON artifact.",
     },
     {
+        "case_id": "TB-LOG-K5",
+        "benchmark": "Terminal-Bench 2.1",
+        "task": "log-summary-date-ranges",
+        "condition": "StateTx log-summary CSV transaction",
+        "role": "log evidence to CSV artifact",
+        "result_path": artifact_path(
+            "stage3",
+            "harbor",
+            "stage3-tb21-lta-log-summary-k5-real-20260831",
+            "result.json",
+        ),
+        "paper_use": "clean_reliability_anchor",
+        "interpretation": (
+            "Bracketed severity evidence and filename dates are committed as the exact verifier-visible CSV."
+        ),
+    },
+    {
         "case_id": "SF-INV-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",

@@ -24,8 +24,8 @@ def test_build_submission_experiment_blueprint_separates_story_scale_baselines_a
     assert summary["faithful_baseline_blocks"] == 2
     assert summary["mechanism_ablation_blocks"] == 1
     assert summary["baseline_ablation_overlap"] == 0
-    assert summary["current_clean_positive_passes"] == 25
-    assert summary["current_clean_positive_trials"] == 25
+    assert summary["current_clean_positive_passes"] == 30
+    assert summary["current_clean_positive_trials"] == 30
 
     rows = blueprint["rows"]
     assert [row["blueprint_id"] for row in rows] == [

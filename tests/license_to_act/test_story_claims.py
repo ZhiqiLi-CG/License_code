@@ -15,9 +15,9 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["stage1_cases"] == 6
     assert metrics["stage1_failure_to_pass"] == 5
     assert metrics["stage1_preserved_positive"] == 1
-    assert metrics["stage2_clean_anchor_count"] == 5
-    assert metrics["stage2_clean_trials"] == 25
-    assert metrics["stage2_terminal_clean_trials"] == 15
+    assert metrics["stage2_clean_anchor_count"] == 6
+    assert metrics["stage2_clean_trials"] == 30
+    assert metrics["stage2_terminal_clean_trials"] == 20
     assert metrics["stage2_skillflow_clean_trials"] == 10
     assert metrics["stage2_clean_errors"] == 0
     assert metrics["stage2_clean_mean_reward"] == 1.0
@@ -75,13 +75,13 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
             Path(output["outputs"]["headline_metrics_csv"]).open(newline="", encoding="utf-8")
         )
     }
-    assert metrics["stage2_clean_trials"] == "25"
+    assert metrics["stage2_clean_trials"] == "30"
     assert metrics["faithful_baseline_mean_reward"] == "0.16"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     output_metrics = output["headline_metrics"]
-    assert "\\newcommand{\\LTAStageTwoCleanTrials}{25}" in tex
-    assert "\\newcommand{\\LTAStageTwoTBCleanTrials}{15}" in tex
+    assert "\\newcommand{\\LTAStageTwoCleanTrials}{30}" in tex
+    assert "\\newcommand{\\LTAStageTwoTBCleanTrials}{20}" in tex
     assert "\\newcommand{\\LTAStageTwoSFCleanTrials}{10}" in tex
     assert "\\newcommand{\\LTAFaithfulBaselinePasses}{4}" in tex
     assert "\\newcommand{\\LTAFaithfulBaselineErrors}{1}" in tex
@@ -98,4 +98,4 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
     assert "\\newcommand{\\LTATauTwoRCWW}{19}" in tex
     assert json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))[
         "headline_metrics"
-    ]["stage2_clean_anchor_count"] == 5
+    ]["stage2_clean_anchor_count"] == 6
