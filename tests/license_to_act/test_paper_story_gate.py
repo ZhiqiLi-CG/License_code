@@ -32,9 +32,11 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["license_workspace_only"]["status"] == "pass"
     assert checks["paper_imports_generated_numbers"]["status"] == "pass"
     assert "story gate" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "scale plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert checks["story_language_anchors"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
     assert "story gate" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "scale plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert checks["appendix_serves_story"]["status"] == "pass"
     assert checks["appendix_uses_submission_scale_language"]["status"] == "pass"
     assert checks["code_paper_submodules_declared"]["status"] == "pass"
