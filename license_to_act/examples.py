@@ -87,6 +87,38 @@ def tb21_db_wal_recovery_required_commit() -> StateChangeEvent:
     )
 
 
+def tb21_sqlite_truncate_recovery_license() -> ActionLicense:
+    return ActionLicense(
+        name="tb21_sqlite_truncate_recover_json",
+        actor_role="terminal_agent",
+        state_region="output:/app/recover.json",
+        operation="WriteRecoveredJson",
+        required_evidence={
+            "TruncatedSqliteBytesEvidence",
+            "RecoveredPayloadOffsetEvidence",
+            "RecoveredRowsEvidence",
+            "JsonSchemaEvidence",
+        },
+    )
+
+
+def tb21_sqlite_truncate_recovery_required_commit() -> StateChangeEvent:
+    return StateChangeEvent(
+        actor_role="terminal_agent",
+        state_region="output:/app/recover.json",
+        operation="WriteRecoveredJson",
+        evidence=EvidenceBundle(
+            types={
+                "TruncatedSqliteBytesEvidence",
+                "RecoveredPayloadOffsetEvidence",
+                "RecoveredRowsEvidence",
+                "JsonSchemaEvidence",
+            },
+            refs={"/app/trunc.db", "/app/recover.json"},
+        ),
+    )
+
+
 def skillflow_clinic_shift_license() -> ActionLicense:
     return ActionLicense(
         name="skillflow_clinic_shift_claim_flags",

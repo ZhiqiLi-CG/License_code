@@ -21,12 +21,18 @@ python -m pytest tests/license_to_act -q
 Current local check:
 
 ```text
-38 passed
+42 passed
 ```
 
 ## Official Harbor Anchors
 
 ```bash
+env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
+  -c configs/tb21_lta_sqlite_truncate_recovery_official.yaml \
+  --job-name stage2-tb21-lta-sqlite-truncate-k5-py \
+  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
+
 env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
   -c configs/skillflow_lta_travel_claim_materializer_official.yaml \
   --job-name stage2-skillflow-lta-travel-claim-k5-py \
@@ -34,6 +40,7 @@ env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
   --n-attempts 5 --n-concurrent 1 -y
 ```
 
+The sqlite-truncate anchor writes `/app/recover.json` from binary payload evidence in `/app/trunc.db`.
 The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
 
 ## Paper Result Exports

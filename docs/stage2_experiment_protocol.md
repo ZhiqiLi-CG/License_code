@@ -93,7 +93,7 @@ Resource request if available:
 
 Batch A: Reproducibility K-5 anchors.
 
-- Run official Harbor K=5 repeats for `sanitize-git-repo`, `db-wal-recovery`, SkillFlow invoice materialization, and SkillFlow travel-claim OCR merge.
+- Run official Harbor K=5 repeats for `sanitize-git-repo`, `db-wal-recovery`, `sqlite-db-truncate`, SkillFlow invoice materialization, and SkillFlow travel-claim OCR merge.
 - Purpose: turn single official wins into reliability bars.
 
 Batch B: tau2 authority mining.
@@ -106,7 +106,7 @@ Batch B: tau2 authority mining.
 Batch C: held-out task expansion.
 
 - Add at least one non-airline tau2 write family.
-- Add 3-5 Terminal-Bench tasks beyond the current two, selected for state-region diversity.
+- Add 3-5 Terminal-Bench tasks beyond the current recovery/sanitization anchors, selected for state-region diversity.
 - Add 2-3 SkillFlow families beyond the current OCR workbook anchors, including one ceiling/control family.
 
 Batch D: ablations and transfer.

@@ -1,0 +1,13 @@
+job_name: tb21-lta-sqlite-truncate-recovery-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_lta_sqlite_truncate_recovery_official
+quiet: true
+agent_timeout_multiplier: 0.5
+environment:
+  type: docker
+  force_build: false
+agents:
+  - import_path: license_to_act.harbor_agents:LicenseToActTB21SqliteTruncateRecoveryAgent
+    model_name: null
+    kwargs: {}
+tasks:
+  - path: /data/zhiqi/RSI1/external/terminal-bench-2-1/tasks/sqlite-db-truncate

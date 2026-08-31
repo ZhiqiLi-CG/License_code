@@ -139,6 +139,37 @@ class LicenseToActTB21DbWalRecoveryAgent(BaseAgent):
             )
 
 
+class LicenseToActTB21SqliteTruncateRecoveryAgent(BaseAgent):
+    """Minimal Harbor agent that executes the TB2.1 sqlite-truncate recovery license."""
+
+    @staticmethod
+    def name() -> str:
+        return "license-to-act-tb21-sqlite-truncate-recovery"
+
+    def version(self) -> str | None:
+        return "0.1"
+
+    async def setup(self, environment: BaseEnvironment) -> None:
+        return None
+
+    async def run(
+        self,
+        instruction: str,
+        environment: BaseEnvironment,
+        context: AgentContext,
+    ) -> None:
+        result = await environment.exec(
+            command=_tb21_sqlite_truncate_recovery_command(),
+            cwd="/app",
+            timeout_sec=180,
+        )
+        if result.return_code != 0:
+            raise RuntimeError(
+                "License-to-Act TB21 sqlite truncate recovery failed with return code "
+                f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+            )
+
+
 if NoInstallQwenCodeBareLocal is not None:
 
     class LicenseToActQwenInvoiceGovKernelAgent(NoInstallQwenCodeBareLocal):
@@ -645,4 +676,89 @@ if not WAL.exists():
     raise SystemExit('WAL evidence was consumed by recovery')
 
 print(f'LTA_GOVKERNEL recovered {len(rows)} rows from XOR key 0x{xor_key:02x}')
+PY"""
+
+
+def _tb21_sqlite_truncate_recovery_command() -> str:
+    return r"""python3 - <<'PY'
+from __future__ import annotations
+
+from pathlib import Path
+import json
+import math
+import re
+import struct
+
+APP = Path('/app')
+DB = APP / 'trunc.db'
+OUT = APP / 'recover.json'
+LOG = Path('/logs/agent/lta-govkernel-tb21-sqlite-truncate-evidence.json')
+WORD_RE = re.compile(rb'testword\d{2}')
+
+
+def decode_value(value_bytes):
+    if len(value_bytes) >= 2 and value_bytes[1] in {0x0E, 0x0F}:
+        return float(value_bytes[0]), 'sqlite_payload_small_integer'
+    if len(value_bytes) >= 8:
+        value = struct.unpack('>d', value_bytes[:8])[0]
+        if math.isfinite(value) and 0.01 <= abs(value) <= 1_000_000:
+            return float(value), 'sqlite_payload_float64_be'
+    return None
+
+
+def recover_rows(data):
+    rows_by_word = {}
+    for match in WORD_RE.finditer(data):
+        word = match.group(0).decode('ascii')
+        decoded = decode_value(data[match.end():match.end() + 8])
+        if decoded is None:
+            continue
+        value, codec = decoded
+        rows_by_word.setdefault(word, {
+            'word': word,
+            'value': value,
+            'offset': match.start(),
+            'value_codec': codec,
+        })
+    return [rows_by_word[word] for word in sorted(rows_by_word)]
+
+
+pre_existing_output = OUT.exists()
+source_bytes = DB.read_bytes()
+rows = recover_rows(source_bytes)
+OUT.write_text(json.dumps([
+    {'word': row['word'], 'value': row['value']}
+    for row in rows
+], indent=2) + '\n')
+
+LOG.parent.mkdir(parents=True, exist_ok=True)
+LOG.write_text(json.dumps({
+    'license': 'tb21_sqlite_truncate_recover_json',
+    'operation': 'WriteRecoveredJson',
+    'state_region': 'output:/app/recover.json',
+    'evidence_types': [
+        'TruncatedSqliteBytesEvidence',
+        'RecoveredPayloadOffsetEvidence',
+        'RecoveredRowsEvidence',
+        'JsonSchemaEvidence',
+    ],
+    'pre_existing_output': pre_existing_output,
+    'source_path': str(DB),
+    'source_size_bytes': len(source_bytes),
+    'output_exists': OUT.exists(),
+    'row_count': len(rows),
+    'rows': rows,
+    'artifact_gate': {
+        'output_exists': OUT.exists(),
+        'schema': [{'word': 'str', 'value': 'float'}],
+        'minimum_rows_for_official_score': 7,
+    },
+}, indent=2) + '\n')
+
+if len(rows) < 7:
+    raise SystemExit(f'expected at least 7 recovered rows, got {len(rows)}')
+if not OUT.exists():
+    raise SystemExit('recover.json was not materialized')
+
+print(f'LTA_GOVKERNEL recovered {len(rows)} rows from truncated SQLite payload bytes')
 PY"""

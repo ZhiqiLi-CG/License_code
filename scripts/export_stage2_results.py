@@ -40,6 +40,21 @@ DEFAULT_RELIABILITY_CASES = [
         "interpretation": "Recovery captures evidence before reads and preserves the WAL across official checks.",
     },
     {
+        "case_id": "TB-SQLITE-K5",
+        "benchmark": "Terminal-Bench 2.1",
+        "task": "sqlite-db-truncate",
+        "condition": "LTA truncated SQLite recovery",
+        "role": "binary evidence recovery",
+        "result_path": artifact_path(
+            "stage2",
+            "harbor",
+            "stage2-tb21-lta-sqlite-truncate-k5-py",
+            "result.json",
+        ),
+        "paper_use": "clean_reliability_anchor",
+        "interpretation": "Binary payload witnesses recover rows and commit the verifier-visible JSON artifact.",
+    },
+    {
         "case_id": "SF-INV-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",

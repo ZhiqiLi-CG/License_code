@@ -10,6 +10,8 @@ from license_to_act.examples import (
     tb21_db_wal_recovery_license,
     tb21_db_wal_recovery_required_commit,
     tb21_db_wal_read_license,
+    tb21_sqlite_truncate_recovery_license,
+    tb21_sqlite_truncate_recovery_required_commit,
     tb21_sanitize_license,
 )
 
@@ -143,3 +145,28 @@ def test_skillflow_travel_claim_example_requires_roster_join_before_workbook_com
     assert decision.allowed is False
     assert decision.reason == "missing_required_evidence"
     assert decision.missing_evidence == {"RosterJoinEvidence"}
+
+
+def test_tb21_sqlite_truncate_example_requires_payload_offset_evidence():
+    event = StateChangeEvent(
+        actor_role="terminal_agent",
+        state_region="output:/app/recover.json",
+        operation="WriteRecoveredJson",
+        evidence=EvidenceBundle(
+            types={"TruncatedSqliteBytesEvidence", "RecoveredRowsEvidence", "JsonSchemaEvidence"},
+            refs={"/app/trunc.db", "/app/recover.json"},
+        ),
+    )
+
+    decision = evaluate_event(event, [tb21_sqlite_truncate_recovery_license()])
+
+    assert decision.allowed is False
+    assert decision.reason == "missing_required_evidence"
+    assert decision.missing_evidence == {"RecoveredPayloadOffsetEvidence"}
+
+    fulfilled = evaluate_commit_obligation(
+        tb21_sqlite_truncate_recovery_required_commit(),
+        [tb21_sqlite_truncate_recovery_required_commit()],
+        [tb21_sqlite_truncate_recovery_license()],
+    )
+    assert fulfilled.allowed is True
