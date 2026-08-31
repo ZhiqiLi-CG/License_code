@@ -341,7 +341,10 @@ def _tau2_notes(task_id: str, is_positive: bool) -> str:
     if is_positive:
         return "Legal cancellation remained allowed after additional flight-status evidence."
     if task_id == "48":
-        return "Unsupported compensation was replaced with transfer to a human agent."
+        return (
+            "User-claimed recency could not override the verified reservation timestamp; "
+            "the boundary revised the stale cancellation instead of committing it."
+        )
     return (
         "User intent and reservation state were present, but the cancellation was not ready to commit; "
         "the boundary transferred to a human agent."

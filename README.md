@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 110 passed.
+2026-08-31: 114 passed.
 ```
 
 ## Official Harbor Anchors
@@ -85,7 +85,7 @@ boundary around `cancel_reservation`.
   --domain airline \
   --task-ids 48 \
   --user-mode scripted \
-  --num-trials 5 \
+  --num-trials 20 \
   --seed 312 \
   --max-steps 20 \
   --timeout 180 \
@@ -94,13 +94,13 @@ boundary around `cancel_reservation`.
   --agent-max-tokens 256 \
   --user-max-tokens 128 \
   --api-base http://127.0.0.1:8001/v1 \
-  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_scripted_k5_20260831.json
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_scripted_k20b_20260831.json
 ```
 
 The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
-paper table: across five matched seeds, the baseline has mean reward 0.0 with
-five read-correct/write-wrong cancellations, while the action boundary has mean
-reward 1.0 with five vetoes and zero regressions.
+paper table: across 20 matched seeds, the baseline has mean reward 0.0 with
+20 read-correct/write-wrong cancellations, while the action boundary has mean
+reward 1.0 with 26 vetoes and zero regressions.
 
 ## Long-Context Faithful Baselines
 

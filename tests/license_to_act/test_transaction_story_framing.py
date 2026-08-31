@@ -107,6 +107,36 @@ def test_main_paper_keeps_runtime_reliability_out_of_abstract_headline() -> None
     assert "\\LTAStageTwoCleanTrials{}/\\LTAStageTwoCleanTrials{}" not in abstract
 
 
+def test_runtime_reruns_are_not_described_as_primary_matched_evidence() -> None:
+    experiments = (PAPER / "sections" / "04_experiments.tex").read_text(encoding="utf-8")
+    results = (PAPER / "sections" / "05_results.tex").read_text(encoding="utf-8")
+
+    assert "Terminal-Bench reruns" in experiments
+    assert "Runtime support" in experiments
+    assert "SkillFlow reruns" in experiments
+    assert "Runtime support" in experiments
+    assert "Terminal-Bench reruns &" in experiments
+    assert "SkillFlow reruns &" in experiments
+    assert "Terminal-Bench reruns & \\LTAStageTwoTBCleanTrials{}/\\LTAStageTwoTBCleanTrials{} official passes" in experiments
+    assert "SkillFlow reruns & \\LTAStageTwoSFCleanTrials{}/\\LTAStageTwoSFCleanTrials{} official passes" in experiments
+    assert "Terminal-Bench reruns & \\LTAStageTwoTBCleanTrials{}/\\LTAStageTwoTBCleanTrials{} official passes over four \\(K=5\\) boundary-run tasks. & Runtime support" in experiments
+    assert "SkillFlow reruns & \\LTAStageTwoSFCleanTrials{}/\\LTAStageTwoSFCleanTrials{} official passes over invoice and travel-claim completion triggers. & Runtime support" in experiments
+    assert "runtime-only rows validate executable boundary obligations, but we do not count them as matched-agent evidence" in results
+    assert "Primary evidence: scoped commits are stable in terminal state" not in experiments
+    assert "Primary evidence: ready evidence can trigger artifact finalization" not in experiments
+
+
+def test_tau2_matched_block_uses_k20_in_public_paper_text() -> None:
+    main = (PAPER / "main.tex").read_text(encoding="utf-8")
+    results = (PAPER / "sections" / "05_results.tex").read_text(encoding="utf-8")
+    public_text = "\n".join([main, results])
+
+    assert "live matched \\(K=20\\) \\(\\tau^2\\) block" in public_text
+    assert "\\(\\tau^2\\) matched A48, \\(K=20\\)" in results
+    assert "live matched \\(K=5\\) \\(\\tau^2\\) block" not in public_text
+    assert "\\(\\tau^2\\) matched A48, \\(K=5\\)" not in results
+
+
 def test_story_gate_exports_action_boundary_consistency_check() -> None:
     from license_to_act.paper_story_gate import build_story_gate_report
 

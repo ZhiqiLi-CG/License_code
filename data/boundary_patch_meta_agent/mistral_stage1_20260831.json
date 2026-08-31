@@ -1,46 +1,73 @@
 {
-  "schema": "boundary_patch_meta_agent_fixture_v1",
+  "schema": "boundary_patch_meta_agent_raw_v1",
   "model": "Mistral-Small-3.2-24B-Instruct-2506",
-  "source_case_ids": ["T2-A1", "T2-A48", "TB-SAN", "TB-WAL", "SF-INV"],
+  "api_base": "http://127.0.0.1:8001/v1",
+  "temperature": 0.0,
+  "max_tokens": 700,
+  "source_case_ids": [
+    "T2-A1",
+    "T2-A48",
+    "TB-SAN",
+    "TB-WAL",
+    "SF-INV"
+  ],
+  "prompts": {
+    "T2-A1": "You are proposing one reusable action-boundary patch for a frozen state-changing agent.\nDo not solve the task. Do not write a task-id guard. Do not mention private chain of thought.\nReturn only JSON with these keys:\npatch_id, boundary_field, failure_summary, proposed_change, applicability_condition, expected_effect, source_test, positive_controls, regression_tests, task_local_terms\nAllowed boundary_field values: ready, scope, preserve, done.\n\ncase_id: T2-A1\nbenchmark: tau2-Bench\ntask: Airline task 1\nobserved_failure_type: Premature commit\nbaseline_agent: Qwen\nbaseline_variant: Vanilla\nbaseline_reward: 0\nboundary_variant: action-boundary pre-commit\nboundary_reward: 1\nevidence_note: User intent and reservation state were present, but the cancellation was not ready to commit; the boundary transferred to a human agent.\n\nWrite the proposed_change as a general action pattern, not a benchmark-specific script.",
+    "T2-A48": "You are proposing one reusable action-boundary patch for a frozen state-changing agent.\nDo not solve the task. Do not write a task-id guard. Do not mention private chain of thought.\nReturn only JSON with these keys:\npatch_id, boundary_field, failure_summary, proposed_change, applicability_condition, expected_effect, source_test, positive_controls, regression_tests, task_local_terms\nAllowed boundary_field values: ready, scope, preserve, done.\n\ncase_id: T2-A48\nbenchmark: tau2-Bench\ntask: Airline task 48\nobserved_failure_type: Premature commit\nbaseline_agent: Mistral\nbaseline_variant: Vanilla\nbaseline_reward: 0\nboundary_variant: action-boundary pre-commit\nboundary_reward: 1\nevidence_note: User-claimed recency could not override the verified reservation timestamp; the boundary revised the stale cancellation instead of committing it.\n\nWrite the proposed_change as a general action pattern, not a benchmark-specific script.",
+    "TB-SAN": "You are proposing one reusable action-boundary patch for a frozen state-changing agent.\nDo not solve the task. Do not write a task-id guard. Do not mention private chain of thought.\nReturn only JSON with these keys:\npatch_id, boundary_field, failure_summary, proposed_change, applicability_condition, expected_effect, source_test, positive_controls, regression_tests, task_local_terms\nAllowed boundary_field values: ready, scope, preserve, done.\n\ncase_id: TB-SAN\nbenchmark: Terminal-Bench 2.1\ntask: sanitize-git-repo\nobserved_failure_type: Overbroad commit\nbaseline_agent: Codex GPT-5.5\nbaseline_variant: Vanilla\nbaseline_reward: 0\nboundary_variant: boundary executor\nboundary_reward: 1\nevidence_note: Baseline removed secrets but rewrote history and removed the remote; the boundary changed exactly the contaminated working-tree paths and preserved HEAD/remote.\n\nWrite the proposed_change as a general action pattern, not a benchmark-specific script.",
+    "TB-WAL": "You are proposing one reusable action-boundary patch for a frozen state-changing agent.\nDo not solve the task. Do not write a task-id guard. Do not mention private chain of thought.\nReturn only JSON with these keys:\npatch_id, boundary_field, failure_summary, proposed_change, applicability_condition, expected_effect, source_test, positive_controls, regression_tests, task_local_terms\nAllowed boundary_field values: ready, scope, preserve, done.\n\ncase_id: TB-WAL\nbenchmark: Terminal-Bench 2.1\ntask: db-wal-recovery\nobserved_failure_type: Destructive observation\nbaseline_agent: Qwen3.8-27B + Terminus-2\nbaseline_variant: Vanilla\nbaseline_reward: 0\nboundary_variant: boundary executor\nboundary_reward: 1\nevidence_note: Baseline timed out without recovered.json and the WAL disappeared after direct reads; the preserving-read boundary passed 7/7 checks.\n\nWrite the proposed_change as a general action pattern, not a benchmark-specific script.",
+    "SF-INV": "You are proposing one reusable action-boundary patch for a frozen state-changing agent.\nDo not solve the task. Do not write a task-id guard. Do not mention private chain of thought.\nReturn only JSON with these keys:\npatch_id, boundary_field, failure_summary, proposed_change, applicability_condition, expected_effect, source_test, positive_controls, regression_tests, task_local_terms\nAllowed boundary_field values: ready, scope, preserve, done.\n\ncase_id: SF-INV\nbenchmark: SkillFlow\ntask: invoice image extraction\nobserved_failure_type: Missing finalization\nbaseline_agent: Qwen3.8-27B + Terminus-2\nbaseline_variant: Prompt-only boundary instructions\nbaseline_reward: 0\nboundary_variant: completion trigger\nboundary_reward: 1\nevidence_note: Prompt-only boundary instructions exposed OCR evidence but never wrote the workbook; the action boundary wrote 15 invoice rows from a non-existing output state.\n\nWrite the proposed_change as a general action pattern, not a benchmark-specific script."
+  },
+  "raw_responses": {
+    "T2-A1": "```json\n{\n  \"patch_id\": \"T2-A1-action-boundary-pre-commit\",\n  \"boundary_field\": \"ready\",\n  \"failure_summary\": \"Premature commit of cancellation action before user intent and reservation state were fully verified.\",\n  \"proposed_change\": \"Introduce a pre-commit boundary check to verify user intent and reservation state before allowing the commit action.\",\n  \"applicability_condition\": \"The agent is in a state where a commit action is being considered, but user intent and reservation state have not been fully verified.\",\n  \"expected_effect\": \"The commit action will be delayed until user intent and reservation state are fully verified, reducing the likelihood of premature commits.\",\n  \"source_test\": \"tau2-Bench Airline task 1 with Qwen Vanilla agent.\",\n  \"positive_controls\": \"Boundary transfer to a human agent when cancellation is not ready to commit.\",\n  \"regression_tests\": \"Verify that the agent correctly handles cases where user intent and reservation state are fully verified before commit.\",\n  \"task_local_terms\": {\n    \"user_intent\": \"The user's expressed desire to cancel the reservation.\",\n    \"reservation_state\": \"The current status of the reservation, including any pending changes or verifications.\"\n  }\n}\n```",
+    "T2-A48": "```json\n{\n  \"patch_id\": \"T2-A48-action-boundary-pre-commit\",\n  \"boundary_field\": \"ready\",\n  \"failure_summary\": \"Premature commit due to user-claimed recency overriding verified reservation timestamp\",\n  \"proposed_change\": \"Reject actions that commit changes based on user-claimed recency when verified timestamps indicate staleness; instead, revise the stale data.\",\n  \"applicability_condition\": \"When the agent is about to commit a change based on user input that contradicts verified timestamps.\",\n  \"expected_effect\": \"Prevents premature commits and ensures changes are only made based on verified, up-to-date information.\",\n  \"source_test\": \"tau2-Bench, Airline task 48\",\n  \"positive_controls\": [\n    \"User-claimed recency does not override verified reservation timestamp.\"\n  ],\n  \"regression_tests\": [\n    \"Verify that the agent correctly handles cases where user input aligns with verified timestamps.\"\n  ],\n  \"task_local_terms\": {\n    \"premature commit\": \"Committing a change before verifying the recency of the data.\",\n    \"verified reservation timestamp\": \"The official and accurate timestamp of a reservation.\"\n  }\n}\n```",
+    "TB-SAN": "```json\n{\n  \"patch_id\": \"TB-SAN-001\",\n  \"boundary_field\": \"preserve\",\n  \"failure_summary\": \"Overbroad commit: Baseline removed secrets but rewrote history and removed the remote.\",\n  \"proposed_change\": \"Instead of rewriting the entire commit history, only modify the contaminated working-tree paths and preserve the HEAD and remote references.\",\n  \"applicability_condition\": \"When the task involves sanitizing a git repository and the baseline agent performs overbroad changes that affect more than the contaminated paths.\",\n  \"expected_effect\": \"The agent will only change the contaminated working-tree paths, preserving the HEAD and remote references, thus avoiding overbroad commits.\",\n  \"source_test\": \"Terminal-Bench 2.1, task: sanitize-git-repo\",\n  \"positive_controls\": [\n    \"Contaminated paths are correctly identified and modified.\",\n    \"HEAD and remote references remain unchanged.\"\n  ],\n  \"regression_tests\": [\n    \"Ensure that no additional paths are inadvertently modified.\",\n    \"Verify that the commit history remains intact except for the contaminated paths.\"\n  ],\n  \"task_local_terms\": {\n    \"contaminated_paths\": \"Paths in the working tree that contain sensitive or secret information.\",\n    \"HEAD\": \"The current snapshot of changes in the git repository.\",\n    \"remote\": \"The reference to the remote repository.\"\n  }\n}\n```",
+    "TB-WAL": "```json\n{\n  \"patch_id\": \"TB-WAL-001\",\n  \"boundary_field\": \"preserve\",\n  \"failure_summary\": \"Baseline agent timed out without recovering the WAL file, leading to data loss.\",\n  \"proposed_change\": \"Implement a preserving-read action that ensures critical data is read and stored before any state-changing operations.\",\n  \"applicability_condition\": \"When the agent encounters a state-changing operation that involves critical data, such as a WAL file.\",\n  \"expected_effect\": \"The agent will successfully recover and preserve the WAL file, preventing data loss and ensuring the operation completes successfully.\",\n  \"source_test\": \"Terminal-Bench 2.1, task: db-wal-recovery\",\n  \"positive_controls\": \"7/7 checks passed with the preserving-read boundary.\",\n  \"regression_tests\": \"Verify that the agent does not time out and that the WAL file is preserved and recovered correctly.\",\n  \"task_local_terms\": {\n    \"WAL\": \"Write-Ahead Log\",\n    \"preserving-read\": \"An action that reads and stores critical data before any state-changing operations.\"\n  }\n}\n```",
+    "SF-INV": "```json\n{\n  \"patch_id\": \"SF-INV-001\",\n  \"boundary_field\": \"done\",\n  \"failure_summary\": \"Agent fails to finalize the task, leaving the output state incomplete.\",\n  \"proposed_change\": \"Implement a completion trigger that verifies the output state and ensures all necessary actions are taken before marking the task as done.\",\n  \"applicability_condition\": \"The agent is in a state where it has gathered all necessary information but has not yet finalized the output.\",\n  \"expected_effect\": \"The agent will complete the task by finalizing the output state, ensuring all necessary actions are taken.\",\n  \"source_test\": \"Test case where the agent gathers OCR evidence but does not write the workbook.\",\n  \"positive_controls\": \"Agent successfully writes the workbook after implementing the completion trigger.\",\n  \"regression_tests\": \"Test cases where the agent correctly finalizes the task without missing any steps.\",\n  \"task_local_terms\": {\n    \"OCR\": \"Optical Character Recognition\",\n    \"workbook\": \"Output file where invoice data is stored\"\n  }\n}\n```"
+  },
   "responses": {
     "T2-A1": {
       "patch_id": "T2-A1-action-boundary-pre-commit",
       "boundary_field": "ready",
-      "failure_summary": "Premature commit: the agent committed a cancellation before user intent and reservation state were fully verified.",
+      "failure_summary": "Premature commit of cancellation action before user intent and reservation state were fully verified.",
       "proposed_change": "Introduce a pre-commit boundary check to verify user intent and reservation state before allowing the commit action.",
-      "applicability_condition": "The agent is considering a durable customer-service commit, but user intent and source state have not both been verified.",
-      "expected_effect": "The boundary asks for revision or escalation instead of committing an unready business write.",
-      "source_test": "Replay the source failure with the same actor and state.",
-      "positive_controls": ["Boundary transfer to a human agent when cancellation is not ready to commit."],
-      "regression_tests": ["Verify that the agent correctly handles cases where user intent and reservation state are fully verified before commit."],
-      "task_local_terms": ["user_intent", "reservation_state"]
+      "applicability_condition": "The agent is in a state where a commit action is being considered, but user intent and reservation state have not been fully verified.",
+      "expected_effect": "The commit action will be delayed until user intent and reservation state are fully verified, reducing the likelihood of premature commits.",
+      "source_test": "tau2-Bench Airline task 1 with Qwen Vanilla agent.",
+      "positive_controls": "Boundary transfer to a human agent when cancellation is not ready to commit.",
+      "regression_tests": "Verify that the agent correctly handles cases where user intent and reservation state are fully verified before commit.",
+      "task_local_terms": {
+        "user_intent": "The user's expressed desire to cancel the reservation.",
+        "reservation_state": "The current status of the reservation, including any pending changes or verifications."
+      }
     },
     "T2-A48": {
       "patch_id": "T2-A48-action-boundary-pre-commit",
       "boundary_field": "ready",
-      "failure_summary": "Premature commit: the agent accepted a user-side claim over source state before committing a business action.",
-      "proposed_change": "Replace unsupported compensation actions with a transfer to a human agent",
-      "applicability_condition": "When the agent is about to commit an action that involves unsupported compensation",
-      "expected_effect": "The boundary prevents premature commitment when the requested business action lacks source-state support.",
-      "source_test": "Replay the source failure with the same actor and state.",
+      "failure_summary": "Premature commit due to user-claimed recency overriding verified reservation timestamp",
+      "proposed_change": "Reject actions that commit changes based on user-claimed recency when verified timestamps indicate staleness; instead, revise the stale data.",
+      "applicability_condition": "When the agent is about to commit a change based on user input that contradicts verified timestamps.",
+      "expected_effect": "Prevents premature commits and ensures changes are only made based on verified, up-to-date information.",
+      "source_test": "tau2-Bench, Airline task 48",
       "positive_controls": [
-        "Agent correctly identifies unsupported compensation scenarios.",
-        "Agent transfers control to a human agent for compensation handling."
+        "User-claimed recency does not override verified reservation timestamp."
       ],
       "regression_tests": [
-        "Verify that the agent does not prematurely commit in other scenarios.",
-        "Ensure that the agent's overall performance is not degraded by the patch."
+        "Verify that the agent correctly handles cases where user input aligns with verified timestamps."
       ],
-      "task_local_terms": ["unsupported compensation", "transfer to a human agent"]
+      "task_local_terms": {
+        "premature commit": "Committing a change before verifying the recency of the data.",
+        "verified reservation timestamp": "The official and accurate timestamp of a reservation."
+      }
     },
     "TB-SAN": {
       "patch_id": "TB-SAN-001",
       "boundary_field": "preserve",
-      "failure_summary": "Overbroad commit: local secret removal was correct, but the final repository state changed too much.",
+      "failure_summary": "Overbroad commit: Baseline removed secrets but rewrote history and removed the remote.",
       "proposed_change": "Instead of rewriting the entire commit history, only modify the contaminated working-tree paths and preserve the HEAD and remote references.",
-      "applicability_condition": "When a repository task has a local target change and the candidate effect mutates more than the contaminated paths.",
-      "expected_effect": "The agent keeps the useful local edit while avoiding collateral repository mutation.",
-      "source_test": "Replay the source failure with the same repository state.",
+      "applicability_condition": "When the task involves sanitizing a git repository and the baseline agent performs overbroad changes that affect more than the contaminated paths.",
+      "expected_effect": "The agent will only change the contaminated working-tree paths, preserving the HEAD and remote references, thus avoiding overbroad commits.",
+      "source_test": "Terminal-Bench 2.1, task: sanitize-git-repo",
       "positive_controls": [
         "Contaminated paths are correctly identified and modified.",
         "HEAD and remote references remain unchanged."
@@ -49,31 +76,41 @@
         "Ensure that no additional paths are inadvertently modified.",
         "Verify that the commit history remains intact except for the contaminated paths."
       ],
-      "task_local_terms": ["contaminated_paths", "HEAD", "remote"]
+      "task_local_terms": {
+        "contaminated_paths": "Paths in the working tree that contain sensitive or secret information.",
+        "HEAD": "The current snapshot of changes in the git repository.",
+        "remote": "The reference to the remote repository."
+      }
     },
     "TB-WAL": {
       "patch_id": "TB-WAL-001",
       "boundary_field": "preserve",
-      "failure_summary": "Destructive observation: reading the database can consume the recovery substrate before the final artifact is written.",
+      "failure_summary": "Baseline agent timed out without recovering the WAL file, leading to data loss.",
       "proposed_change": "Implement a preserving-read action that ensures critical data is read and stored before any state-changing operations.",
-      "applicability_condition": "When the agent encounters a read or recovery operation over fragile evidence that can be consumed by ordinary inspection.",
-      "expected_effect": "The recovery path preserves source evidence before producing the verifier-visible output.",
-      "source_test": "Replay the source failure with the same database files.",
-      "positive_controls": ["7/7 checks passed with the preserving-read boundary."],
-      "regression_tests": ["Verify that the agent does not time out and that the source evidence is preserved and recovered correctly."],
-      "task_local_terms": ["WAL", "preserving-read"]
+      "applicability_condition": "When the agent encounters a state-changing operation that involves critical data, such as a WAL file.",
+      "expected_effect": "The agent will successfully recover and preserve the WAL file, preventing data loss and ensuring the operation completes successfully.",
+      "source_test": "Terminal-Bench 2.1, task: db-wal-recovery",
+      "positive_controls": "7/7 checks passed with the preserving-read boundary.",
+      "regression_tests": "Verify that the agent does not time out and that the WAL file is preserved and recovered correctly.",
+      "task_local_terms": {
+        "WAL": "Write-Ahead Log",
+        "preserving-read": "An action that reads and stores critical data before any state-changing operations."
+      }
     },
     "SF-INV": {
       "patch_id": "SF-INV-001",
       "boundary_field": "done",
-      "failure_summary": "Missing finalization: source evidence was present, but the required output artifact was never written.",
+      "failure_summary": "Agent fails to finalize the task, leaving the output state incomplete.",
       "proposed_change": "Implement a completion trigger that verifies the output state and ensures all necessary actions are taken before marking the task as done.",
-      "applicability_condition": "The agent has gathered the required source evidence but has not yet finalized the verifier-visible output.",
-      "expected_effect": "The boundary converts complete source evidence into the required artifact instead of allowing a false stop.",
-      "source_test": "Replay the source case where OCR evidence is gathered but the workbook is absent.",
-      "positive_controls": ["Agent successfully writes the workbook after implementing the completion trigger."],
-      "regression_tests": ["Test cases where the agent correctly finalizes the task without missing any steps."],
-      "task_local_terms": ["OCR", "workbook"]
+      "applicability_condition": "The agent is in a state where it has gathered all necessary information but has not yet finalized the output.",
+      "expected_effect": "The agent will complete the task by finalizing the output state, ensuring all necessary actions are taken.",
+      "source_test": "Test case where the agent gathers OCR evidence but does not write the workbook.",
+      "positive_controls": "Agent successfully writes the workbook after implementing the completion trigger.",
+      "regression_tests": "Test cases where the agent correctly finalizes the task without missing any steps.",
+      "task_local_terms": {
+        "OCR": "Optical Character Recognition",
+        "workbook": "Output file where invoice data is stored"
+      }
     }
   }
 }

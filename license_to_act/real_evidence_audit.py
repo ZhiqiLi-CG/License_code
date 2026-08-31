@@ -110,7 +110,12 @@ def _stage2_rows(path: Path) -> list[dict[str, str]]:
     for row in _read_csv(path):
         artifact_status = _artifact_status(Path(row["result_path"]))
         kind = "real_official_harbor" if artifact_status == "parseable" else f"{artifact_status}_artifact"
-        counts = "yes" if artifact_status == "parseable" else "no"
+        counts = (
+            "yes"
+            if artifact_status == "parseable"
+            and row["paper_use"] in {"faithful_baseline", "integration_stress"}
+            else "no"
+        )
         rows.append(
             _row(
                 evidence_id=f"stage2:{row['case_id']}",

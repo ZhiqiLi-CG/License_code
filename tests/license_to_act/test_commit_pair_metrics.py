@@ -118,6 +118,11 @@ def test_write_commit_pair_metrics_exports_csv_json_and_tex(tmp_path: Path) -> N
     member_rows = list(csv.DictReader(Path(output["outputs"]["pairs_csv"]).open(newline="", encoding="utf-8")))
     assert {row["expected_commit"] for row in member_rows} == {"yes", "no"}
     assert {row["observed_commit"] for row in member_rows} == {"yes", "no"}
+    task48 = next(row for row in member_rows if row["member_id"] == "T2-A48-premature")
+    task48_interpretation = task48["interpretation"].lower()
+    assert "user-claimed recency" in task48_interpretation
+    assert "reservation timestamp" in task48_interpretation
+    assert "compensation" not in task48_interpretation
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTACommitPairAccuracy}{1.000}" in tex

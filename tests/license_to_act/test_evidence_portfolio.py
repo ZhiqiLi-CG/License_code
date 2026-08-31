@@ -45,6 +45,11 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert "boundary" in rows[5]["story_role"]
     assert rows[5]["source_data"] == "model_in_loop_bridge.csv"
     assert rows[5]["comparison_kind"] == "matched_agent_commit_controller"
+    assert rows[5]["paper_use"] == "main_argument"
+    assert rows[2]["portfolio_id"] == "P3_TB_OFFICIAL_RERUNS"
+    assert rows[2]["paper_use"] == "runtime_reliability"
+    assert rows[3]["portfolio_id"] == "P4_SKILLFLOW_OFFICIAL_RERUNS"
+    assert rows[3]["paper_use"] == "runtime_reliability"
 
 
 def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> None:

@@ -24,6 +24,11 @@ def test_exports_paper_csvs_from_transfer_report(tmp_path):
     stage1_rows = _read_csv(data_dir / "stage1_cases.csv")
     assert stage1_rows[0]["case_id"] == "T2-A1"
     assert stage1_rows[0]["comparison_type"] == "paired intervention"
+    task48 = next(row for row in stage1_rows if row["case_id"] == "T2-A48")
+    task48_notes = task48["notes"].lower()
+    assert "user-claimed recency" in task48_notes
+    assert "reservation timestamp" in task48_notes
+    assert "compensation" not in task48_notes
     assert stage1_rows[2]["case_id"] == "T2-A19"
     assert stage1_rows[2]["positive_control"] == "yes"
     transfer_rows = _read_csv(data_dir / "transfer_ledger.csv")

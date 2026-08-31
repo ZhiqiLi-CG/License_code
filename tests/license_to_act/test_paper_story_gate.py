@@ -27,13 +27,13 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["benchmark_count"] == 3
     assert summary["state_substrate_count"] == 3
     assert summary["actor_backbone_count"] == 4
-    assert summary["tau2_matched_pairs"] == 5
+    assert summary["tau2_matched_pairs"] == 20
     assert summary["tau2_matched_reward_delta"] == 1.0
     assert summary["meta_agent_candidates"] == 5
     assert summary["meta_agent_accepted"] == 5
     assert summary["meta_agent_source_f_to_p"] == 5
-    assert summary["proposal_effect_gap_observations"] == 29
-    assert summary["proposal_effect_boundary_source_successes"] == 9
+    assert summary["proposal_effect_gap_observations"] == 44
+    assert summary["proposal_effect_boundary_source_successes"] == 24
 
     checks = {check["check_id"]: check for check in report["checks"]}
     assert checks["portfolio_breadth"]["status"] == "pass"

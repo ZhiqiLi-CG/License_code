@@ -166,10 +166,10 @@ def _tau2_matched_row(report: dict[str, Any]) -> dict[str, str]:
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
     boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
     return {
-        "decomposition_id": "TAU2_A48_MISTRAL_MATCHED_K5",
+        "decomposition_id": "TAU2_A48_MISTRAL_MATCHED_K20",
         "benchmark": "tau2-Bench",
         "task_family": "airline task 48",
-        "evidence_type": "matched_actor_k5",
+        "evidence_type": "matched_actor_k20",
         "actor_backbone": "Mistral-Small-3.2-24B-Instruct-2506",
         "comparison_kind": "same actor, same scripted user, boundary changed",
         "n_trials": str(summary["baseline_trials"]),

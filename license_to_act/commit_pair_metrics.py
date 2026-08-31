@@ -125,7 +125,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
             "business-record write",
             "stage1_cases.csv | tau2_commit_mining.csv",
             "current_positive_spine",
-            "Unsupported compensation is revised rather than committed.",
+            "User-claimed recency is revised when the verified reservation timestamp makes cancellation unready.",
         ),
         _member(
             "P2_TERMINAL_WRITE_SCOPE",

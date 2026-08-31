@@ -151,6 +151,19 @@ def test_default_tracked_fixture_supports_paper_meta_agent_numbers() -> None:
     assert report["summary"]["heldout_clean_trials"] == 35
     assert report["summary"]["pass_to_failure_regressions"] == 0
 
+    rows = {row["case_id"]: row for row in report["rows"]}
+    task48_patch_text = " ".join(
+        [
+            rows["T2-A48"]["proposed_change"],
+            rows["T2-A48"]["applicability_condition"],
+            rows["T2-A48"]["positive_controls"],
+            rows["T2-A48"]["regression_tests"],
+        ]
+    ).lower()
+    assert "reservation timestamp" in task48_patch_text
+    assert "user-claimed recency" in task48_patch_text
+    assert "compensation" not in task48_patch_text
+
 
 def test_export_meta_agent_patch_cli_writes_requested_outputs(tmp_path: Path) -> None:
     responses = {

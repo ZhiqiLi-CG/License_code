@@ -19,19 +19,19 @@ def test_build_proposal_effect_decomposition_uses_real_rows_not_plans() -> None:
     assert summary["rows"] == 6
     assert summary["benchmark_count"] == 3
     assert summary["planned_rows"] == 0
-    assert summary["gap_observations"] == 29
-    assert summary["gap_source_observations"] == 9
+    assert summary["gap_observations"] == 44
+    assert summary["gap_source_observations"] == 24
     assert summary["gap_distributional_observations"] == 20
     assert summary["baseline_effect_successes_on_gap_rows"] == 0
-    assert summary["boundary_effect_successes_on_source_gap_rows"] == 9
+    assert summary["boundary_effect_successes_on_source_gap_rows"] == 24
 
     rows = {row["decomposition_id"]: row for row in report["rows"]}
     assert rows["TAU2_MINED_CANCEL_RCWW"]["evidence_type"] == "distributional_mining"
     assert rows["TAU2_MINED_CANCEL_RCWW"]["proposal_successes"] == "20"
     assert rows["TAU2_MINED_CANCEL_RCWW"]["effect_successes_without_boundary"] == "0"
-    assert rows["TAU2_A48_MISTRAL_MATCHED_K5"]["evidence_type"] == "matched_actor_k5"
-    assert rows["TAU2_A48_MISTRAL_MATCHED_K5"]["proposal_successes"] == "5"
-    assert rows["TAU2_A48_MISTRAL_MATCHED_K5"]["effect_successes_with_boundary"] == "5"
+    assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["evidence_type"] == "matched_actor_k20"
+    assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["proposal_successes"] == "20"
+    assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
     assert rows["SF_INVOICE_QWEN_PROMPT"]["benchmark"] == "SkillFlow"
     assert all(row["counts_as_planned"] == "no" for row in report["rows"])
 
@@ -54,8 +54,8 @@ def test_write_proposal_effect_decomposition_exports_csv_json_and_tex(tmp_path: 
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAProposalEffectRows}{6}" in tex
-    assert "\\newcommand{\\LTAProposalEffectGapObservations}{29}" in tex
-    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{9}" in tex
+    assert "\\newcommand{\\LTAProposalEffectGapObservations}{44}" in tex
+    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{24}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
     assert summary["gap_rate_on_gap_rows"] == 1.0

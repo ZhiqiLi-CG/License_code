@@ -56,6 +56,46 @@ def build_tau2_matched_boundary_export(
     return {"summary": summary, "rows": rows}
 
 
+def compact_tau2_matched_report(
+    source_path: str | Path,
+    *,
+    domain: str,
+    actor_model: str,
+    user_mode: str,
+    paper_use: str,
+    expected_complete_pairs: int | None = None,
+) -> dict[str, Any]:
+    """Convert a full tau2 live report into a small paper-facing fixture."""
+
+    path = Path(source_path)
+    payload = _read_json(path)
+    runs = [
+        _compact_run(
+            run,
+            domain=domain,
+            actor_model=actor_model,
+            user_mode=user_mode,
+            paper_use=paper_use,
+        )
+        for run in payload["runs"]
+    ]
+    summary = summarize_tau2_matched_runs(runs)
+    if expected_complete_pairs is not None and summary["complete_pairs"] != expected_complete_pairs:
+        raise ValueError(
+            f"expected {expected_complete_pairs} complete pairs, found {summary['complete_pairs']}"
+        )
+    return {
+        "source_full_report": str(path),
+        "notes": (
+            "Compact export of a real matched tau2 run. The full local report "
+            "contains official tau2 messages and reward_info; this file keeps "
+            "only fields needed to regenerate the paper table and generated numbers."
+        ),
+        "summary": summary,
+        "runs": runs,
+    }
+
+
 def write_tau2_matched_boundary_export(
     project_root: str | Path = Path("/data/zhiqi/License"),
     *,
@@ -112,6 +152,37 @@ def _row_from_run(run: dict[str, Any], source_path: Path) -> dict[str, str]:
         "paper_use": str(run.get("paper_use", "")),
         "source_path": str(source_path),
     }
+
+
+def _compact_run(
+    run: dict[str, Any],
+    *,
+    domain: str,
+    actor_model: str,
+    user_mode: str,
+    paper_use: str,
+) -> dict[str, Any]:
+    return {
+        "pair_id": str(run["pair_id"]),
+        "domain": domain,
+        "task_id": str(run.get("task_id", "")),
+        "seed": _seed_from_pair_id(str(run["pair_id"])),
+        "actor_model": actor_model,
+        "user_mode": user_mode,
+        "condition": str(run["condition"]),
+        "reward": float(run.get("reward") or 0.0),
+        "cancel_tool_calls": int(run.get("cancel_tool_calls") or 0),
+        "read_correct_write_wrong": bool(run.get("read_correct_write_wrong")),
+        "boundary_records": run.get("boundary_records") or [],
+        "paper_use": paper_use,
+    }
+
+
+def _seed_from_pair_id(pair_id: str) -> int:
+    prefix = "seed-"
+    if prefix not in pair_id:
+        raise ValueError(f"pair_id does not contain seed: {pair_id}")
+    return int(pair_id.rsplit(prefix, maxsplit=1)[1])
 
 
 def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]]) -> None:

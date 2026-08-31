@@ -80,7 +80,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "actor_backbones": "commit-controller runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(tb_clean_rows)}/{_sum_int(tb_clean_rows, 'n_trials')} official passes",
-            "paper_use": "main_argument",
+            "paper_use": "runtime_reliability",
             "source_data": "stage2_reliability.csv",
         },
         {
@@ -91,7 +91,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "actor_backbones": "commit-controller runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(sf_clean_rows)}/{_sum_int(sf_clean_rows, 'n_trials')} official passes",
-            "paper_use": "main_argument",
+            "paper_use": "runtime_reliability",
             "source_data": "stage2_reliability.csv",
         },
         {
@@ -116,7 +116,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
                 f"{bridge_summary['qwen_all_govkernel_passes']}/"
                 f"{bridge_summary['qwen_all_govkernel_trials']} official passes"
             ),
-            "paper_use": "supporting_stress",
+            "paper_use": "main_argument",
             "source_data": "model_in_loop_bridge.csv",
         },
     ]
