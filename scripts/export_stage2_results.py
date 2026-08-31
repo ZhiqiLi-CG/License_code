@@ -106,6 +106,24 @@ DEFAULT_RELIABILITY_CASES = [
         ),
     },
     {
+        "case_id": "TB-QWEN32K-MSWE-LOG-K5",
+        "benchmark": "Terminal-Bench 2.1",
+        "task": "log-summary-date-ranges",
+        "condition": "Qwen3.8-27B-long32k + mini-swe-agent",
+        "role": "faithful long-context baseline, K=5 on log-summary anchor",
+        "result_path": artifact_path(
+            "stage3",
+            "harbor",
+            "stage3-tb21-miniswe-qwen-long32k-log-summary-k5-real-20260831",
+            "result.json",
+        ),
+        "paper_use": "faithful_baseline",
+        "interpretation": (
+            "The 32k open-model agent solves most log-summary attempts, so this anchor is "
+            "reported as a real baseline rather than a failure-only foil."
+        ),
+    },
+    {
         "case_id": "SF-QWEN32K-MSWE-K10",
         "benchmark": "SkillFlow",
         "task": "two SkillFlow OCR anchors",
@@ -137,6 +155,42 @@ DEFAULT_RELIABILITY_CASES = [
         ),
         "paper_use": "integration_stress",
         "interpretation": "Qwen remains in the official Harbor trial and the Commit Controller finalizes the workbook in all five runs.",
+    },
+    {
+        "case_id": "TB-LOG-QG-K5",
+        "benchmark": "Terminal-Bench 2.1",
+        "task": "log-summary-date-ranges",
+        "condition": "Qwen3.8-27B-long32k + Commit Controller",
+        "role": "model integration stress",
+        "result_path": artifact_path(
+            "stage3",
+            "harbor",
+            "stage3-tb21-miniswe-govkernel-log-summary-k5-real3-20260831",
+            "result.json",
+        ),
+        "paper_use": "integration_stress",
+        "interpretation": (
+            "Qwen remains in the official Terminal-Bench trial and the Commit Controller "
+            "finalizes the log-summary CSV in all five runs."
+        ),
+    },
+    {
+        "case_id": "SF-TRAVEL-QG-K5",
+        "benchmark": "SkillFlow",
+        "task": "travel claim OCR merge",
+        "condition": "Qwen3.8-27B-long32k + Commit Controller",
+        "role": "model integration stress",
+        "result_path": artifact_path(
+            "stage3",
+            "harbor",
+            "stage3-skillflow-qwen-govkernel-travel-k5-real-20260831",
+            "result.json",
+        ),
+        "paper_use": "integration_stress",
+        "interpretation": (
+            "Qwen remains in the official SkillFlow trial and the Commit Controller "
+            "finalizes the travel-claim workbook in all five runs."
+        ),
     },
     {
         "case_id": "SF-TRAVEL-MAT-K5",

@@ -259,7 +259,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop bridge, commit-pair metrics, scale plan, real-evidence audit, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop comparison, commit-pair metrics, scale plan, real-evidence audit, and consistency numbers.",
     )
 
 
@@ -300,6 +300,10 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and summary["faithful_baseline_rows"] >= 1
         and summary["qwen_invoice_govkernel_passes"] >= 4
         and summary["qwen_invoice_govkernel_trials"] >= 5
+        and summary["qwen_terminal_log_govkernel_passes"] >= 5
+        and summary["qwen_terminal_log_govkernel_trials"] >= 5
+        and summary["qwen_all_govkernel_passes"] >= 15
+        and summary["qwen_all_govkernel_trials"] >= 15
         and summary["qwen_skillflow_govkernel_passes"] >= 10
         and summary["qwen_skillflow_govkernel_trials"] >= 10
         and summary["qwen_skillflow_faithful_baseline_trials"] >= 10
@@ -318,8 +322,8 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
             f"and official-result fields. Qwen faithful OCR baseline: "
             f"{summary['qwen_skillflow_faithful_baseline_passes']}/"
             f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+CommitController: "
-            f"{summary['qwen_skillflow_govkernel_passes']}/"
-            f"{summary['qwen_skillflow_govkernel_trials']} across SkillFlow OCR bridge tasks; "
+            f"{summary['qwen_all_govkernel_passes']}/"
+            f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
             f"materializer-as-agent rows: "
             f"{summary['materializer_rows_used_as_matched_agent']}."
         ),
@@ -596,7 +600,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop bridge export, commit-pair metrics export, scale plan export, real-evidence audit export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop comparison export, commit-pair metrics export, scale plan export, real-evidence audit export, consistency export, figure generation, and LaTeX build.",
     )
 
 

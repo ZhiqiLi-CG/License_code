@@ -188,7 +188,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "target_n": "18",
             "paper_use": "main_positive",
             "story_axis": "Observed evidence must become the exact judged file.",
-            "current_positive_evidence": "The clean evidence set already contains missing-artifact and completion-trigger wins.",
+            "current_positive_evidence": "Current clean results already contain missing-artifact and completion-trigger wins.",
             "scale_target": "Add log/data, document, and image-output tasks to the 12-task pilot.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Use public task specs to bind output schemas before running agents.",

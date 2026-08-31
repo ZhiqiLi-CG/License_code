@@ -76,16 +76,17 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "story_question": "Does the transaction boundary help when the same model stays in the official trial?",
             "result_sentence": (
                 f"Qwen3.8-27B-long32k plus Commit Controller reaches "
-                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
-                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes on two SkillFlow OCR tasks "
-                f"with {bridge_summary['qwen_invoice_govkernel_errors'] + bridge_summary['qwen_travel_govkernel_errors']} "
-                f"errors, while the faithful Qwen3.8-27B-long32k mini-swe baseline reaches "
+                f"{bridge_summary['qwen_all_govkernel_passes']}/"
+                f"{bridge_summary['qwen_all_govkernel_trials']} official passes on Terminal-Bench log-summary "
+                "and two SkillFlow OCR tasks with zero errors. The same faithful mini-swe actor without "
+                f"the controller reaches {bridge_summary['qwen_terminal_log_faithful_baseline_passes']}/"
+                f"{bridge_summary['qwen_terminal_log_faithful_baseline_trials']} on log-summary and "
                 f"{bridge_summary['qwen_skillflow_faithful_baseline_passes']}/"
-                f"{bridge_summary['qwen_skillflow_faithful_baseline_trials']}."
+                f"{bridge_summary['qwen_skillflow_faithful_baseline_trials']} on the OCR tasks."
             ),
             "why_it_matters": (
                 "This is the current matched-agent evidence: the actor remains Qwen, while the transaction "
-                "boundary controls the durable workbook commit."
+                "boundary controls the durable artifact commit."
             ),
             "source_data": "model_in_loop_bridge.csv",
         },
@@ -184,8 +185,8 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "clean_positive_trials": portfolio_summary["clean_positive_trials"],
         "faithful_baseline_passes": comparison_summary["faithful_baseline_passes"],
         "faithful_baseline_trials": comparison_summary["faithful_baseline_trials"],
-        "model_loop_passes": bridge_summary["qwen_skillflow_govkernel_passes"],
-        "model_loop_trials": bridge_summary["qwen_skillflow_govkernel_trials"],
+        "model_loop_passes": bridge_summary["qwen_all_govkernel_passes"],
+        "model_loop_trials": bridge_summary["qwen_all_govkernel_trials"],
         "tau2_read_correct_write_wrong_proxy": metrics["tau2_read_correct_write_wrong_proxy"],
         "commit_pair_accuracy": pair_summary["commit_pair_accuracy"],
         "unauthorized_commit_rate": pair_summary["unauthorized_commit_rate"],

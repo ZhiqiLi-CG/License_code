@@ -107,14 +107,14 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P6_QWEN_COMMIT_CONTROLLER_BRIDGE",
-            "story_role": "invoice and travel-claim completion triggers preserve Qwen in the official loop",
-            "benchmarks": "SkillFlow",
-            "state_substrates": "workflow artifacts",
+            "story_role": "finalization triggers preserve Qwen in the official loop",
+            "benchmarks": "Terminal-Bench 2.1 | SkillFlow",
+            "state_substrates": "terminal artifacts | workflow artifacts",
             "actor_backbones": "Qwen3.8-27B-long32k",
             "comparison_kind": "matched_agent_commit_controller",
             "positive_result": (
-                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
-                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes"
+                f"{bridge_summary['qwen_all_govkernel_passes']}/"
+                f"{bridge_summary['qwen_all_govkernel_trials']} official passes"
             ),
             "paper_use": "supporting_stress",
             "source_data": "model_in_loop_bridge.csv",
@@ -137,6 +137,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         "tau2_read_correct_write_wrong_proxy": int(tau2_metrics["read_correct_write_wrong_proxy"]),
         "qwen_skillflow_govkernel_passes": bridge_summary["qwen_skillflow_govkernel_passes"],
         "qwen_skillflow_govkernel_trials": bridge_summary["qwen_skillflow_govkernel_trials"],
+        "qwen_all_govkernel_passes": bridge_summary["qwen_all_govkernel_passes"],
+        "qwen_all_govkernel_trials": bridge_summary["qwen_all_govkernel_trials"],
     }
     return {"summary": summary, "rows": rows}
 

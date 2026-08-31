@@ -143,6 +143,34 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             / "stage3/harbor/stage3-skillflow-qwen-govkernel-travel-k5-real-20260831/result.json",
         },
         {
+            "bridge_id": "TB_LOG_QWEN32K_MINISWE_BASELINE_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "log-summary-date-ranges",
+            "actor_backbone": "Qwen3.8-27B-long32k",
+            "actor_model": "Qwen3.8-27B-long32k",
+            "harness": "mini-swe-agent",
+            "condition": "faithful long-context open-model baseline, K=5",
+            "comparison_boundary": "faithful_baseline",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_counterpoint",
+            "source_path": artifacts
+            / "stage3/harbor/stage3-tb21-miniswe-qwen-long32k-log-summary-k5-real-20260831/result.json",
+        },
+        {
+            "bridge_id": "TB_LOG_QWEN_COMMIT_CONTROLLER_K5",
+            "benchmark": "Terminal-Bench 2.1",
+            "task": "log-summary-date-ranges",
+            "actor_backbone": "Qwen3.8-27B-long32k",
+            "actor_model": "Qwen3.8-27B-long32k",
+            "harness": "mini-swe-agent + Commit Controller",
+            "condition": "Qwen in loop plus Commit Controller log-summary finalization, K=5",
+            "comparison_boundary": "model_in_loop_commit_controller",
+            "uses_task_specific_materializer": "no",
+            "paper_use": "model_in_loop_positive",
+            "source_path": artifacts
+            / "stage3/harbor/stage3-tb21-miniswe-govkernel-log-summary-k5-real3-20260831/result.json",
+        },
+        {
             "bridge_id": "SF_OCR_QWEN32K_MINISWE_BASELINE_K5",
             "benchmark": "SkillFlow",
             "task": "task_family_invoice_images + task_family_travel_claim_merge",
@@ -299,8 +327,10 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         for row in rows
         if row["bridge_id"] == "SF_OCR_QWEN32K_MINISWE_BASELINE_K5"
     ]
+    qwen_tb_log_faithful_baseline = _require_row(rows, "TB_LOG_QWEN32K_MINISWE_BASELINE_K5")
     commit_controller_k5 = _require_row(rows, "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5")
     travel_controller_k5 = _require_row(rows, "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5")
+    terminal_log_controller_k5 = _require_row(rows, "TB_LOG_QWEN_COMMIT_CONTROLLER_K5")
     materializer_as_agent = [
         row
         for row in rows
@@ -313,6 +343,10 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     gov_trials = int(commit_controller_k5["n_trials"])
     travel_gov_passes = int(travel_controller_k5["passes"])
     travel_gov_trials = int(travel_controller_k5["n_trials"])
+    terminal_log_gov_passes = int(terminal_log_controller_k5["passes"])
+    terminal_log_gov_trials = int(terminal_log_controller_k5["n_trials"])
+    skillflow_gov_passes = gov_passes + travel_gov_passes
+    skillflow_gov_trials = gov_trials + travel_gov_trials
     return {
         "model_in_loop_rows": len(model_rows),
         "ordinary_agent_rows": len(ordinary_rows),
@@ -328,14 +362,21 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "qwen_travel_govkernel_passes": travel_gov_passes,
         "qwen_travel_govkernel_trials": travel_gov_trials,
         "qwen_travel_govkernel_errors": int(travel_controller_k5["n_errors"]),
-        "qwen_skillflow_govkernel_passes": gov_passes + travel_gov_passes,
-        "qwen_skillflow_govkernel_trials": gov_trials + travel_gov_trials,
+        "qwen_skillflow_govkernel_passes": skillflow_gov_passes,
+        "qwen_skillflow_govkernel_trials": skillflow_gov_trials,
         "qwen_skillflow_faithful_baseline_passes": _sum_int(
             qwen_skillflow_faithful_baseline_rows, "passes"
         ),
         "qwen_skillflow_faithful_baseline_trials": _sum_int(
             qwen_skillflow_faithful_baseline_rows, "n_trials"
         ),
+        "qwen_terminal_log_faithful_baseline_passes": int(qwen_tb_log_faithful_baseline["passes"]),
+        "qwen_terminal_log_faithful_baseline_trials": int(qwen_tb_log_faithful_baseline["n_trials"]),
+        "qwen_terminal_log_govkernel_passes": terminal_log_gov_passes,
+        "qwen_terminal_log_govkernel_trials": terminal_log_gov_trials,
+        "qwen_terminal_log_govkernel_errors": int(terminal_log_controller_k5["n_errors"]),
+        "qwen_all_govkernel_passes": skillflow_gov_passes + terminal_log_gov_passes,
+        "qwen_all_govkernel_trials": skillflow_gov_trials + terminal_log_gov_trials,
         "runtime_reliability_rows": len(runtime_rows),
         "materializer_rows_used_as_matched_agent": len(materializer_as_agent),
     }
@@ -413,6 +454,17 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAModelLoopQwenSkillflowFaithfulBaselineTrials": summary[
             "qwen_skillflow_faithful_baseline_trials"
         ],
+        "LTAModelLoopQwenTBLogBaselinePasses": summary[
+            "qwen_terminal_log_faithful_baseline_passes"
+        ],
+        "LTAModelLoopQwenTBLogBaselineTrials": summary[
+            "qwen_terminal_log_faithful_baseline_trials"
+        ],
+        "LTAModelLoopQwenTBLogGovPasses": summary["qwen_terminal_log_govkernel_passes"],
+        "LTAModelLoopQwenTBLogGovTrials": summary["qwen_terminal_log_govkernel_trials"],
+        "LTAModelLoopQwenTBLogGovErrors": summary["qwen_terminal_log_govkernel_errors"],
+        "LTAModelLoopQwenAllGovPasses": summary["qwen_all_govkernel_passes"],
+        "LTAModelLoopQwenAllGovTrials": summary["qwen_all_govkernel_trials"],
         "LTAModelLoopRuntimeRows": summary["runtime_reliability_rows"],
         "LTAModelLoopMaterializerAsAgentRows": summary["materializer_rows_used_as_matched_agent"],
     }

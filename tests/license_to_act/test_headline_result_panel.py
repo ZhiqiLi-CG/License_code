@@ -23,8 +23,10 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["actor_backbones"] == 4
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
-    assert summary["faithful_baseline_passes"] == 4
-    assert summary["faithful_baseline_trials"] == 25
+    assert summary["faithful_baseline_passes"] == 8
+    assert summary["faithful_baseline_trials"] == 30
+    assert summary["model_loop_passes"] == 15
+    assert summary["model_loop_trials"] == 15
     assert summary["tau2_read_correct_write_wrong_proxy"] == 19
     assert summary["submission_scale_rows"] == 24
     assert summary["commit_pair_accuracy"] == 1.0
@@ -48,7 +50,8 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert rows["H2_CLEAN_POSITIVE_MASS"]["paper_role"] == "runtime_reliability_evidence"
     assert rows["H8_MODEL_IN_LOOP_BRIDGE"]["paper_role"] == "main_positive_evidence"
     assert rows["H8_MODEL_IN_LOOP_BRIDGE"]["source_data"] == "model_in_loop_bridge.csv"
-    assert "10/10 official passes" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
+    assert "15/15 official passes" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
+    assert "Terminal-Bench log-summary" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
     assert "two SkillFlow OCR tasks" in rows["H8_MODEL_IN_LOOP_BRIDGE"]["result_sentence"]
     assert "unauthorized commit rate" in rows["H3_COMMIT_PAIR_ACCURACY"]["result_sentence"]
     assert rows["H4_FAITHFUL_BASELINE_COUNTERPOINT"]["paper_role"] == "faithful_baseline_counterpoint"
@@ -78,10 +81,10 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTAHeadlinePanelRows}{8}" in tex
     assert "\\newcommand{\\LTAHeadlineMainPositiveRows}{5}" in tex
     assert "\\newcommand{\\LTAHeadlineRuntimeReliabilityRows}{1}" in tex
-    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{25}" in tex
+    assert "\\newcommand{\\LTAHeadlineFaithfulBaselineTrials}{30}" in tex
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{30}" in tex
-    assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{10}" in tex
-    assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{10}" in tex
+    assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{15}" in tex
+    assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{15}" in tex
     assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{19}" in tex
     assert "\\newcommand{\\LTAHeadlineSubmissionScaleRows}{24}" in tex
     assert "\\newcommand{\\LTAHeadlineCommitPairAccuracy}{1.000}" in tex

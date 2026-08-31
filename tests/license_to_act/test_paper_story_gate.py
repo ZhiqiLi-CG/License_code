@@ -22,8 +22,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
-    assert summary["faithful_baseline_passes"] == 4
-    assert summary["faithful_baseline_trials"] == 25
+    assert summary["faithful_baseline_passes"] == 8
+    assert summary["faithful_baseline_trials"] == 30
     assert summary["benchmark_count"] == 3
     assert summary["state_substrate_count"] == 3
     assert summary["actor_backbone_count"] == 4
@@ -35,7 +35,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["comparison_manifest_separates_roles"]["status"] == "pass"
     assert checks["mechanism_ablation_panel_has_requested_cuts"]["status"] == "pass"
     assert checks["model_in_loop_bridge_separates_materializers"]["status"] == "pass"
-    assert "10/10" in checks["model_in_loop_bridge_separates_materializers"]["evidence"]
+    assert "15/15" in checks["model_in_loop_bridge_separates_materializers"]["evidence"]
     assert checks["real_evidence_audit_blocks_planned_main_results"]["status"] == "pass"
     assert "planned main positives: 0" in checks["real_evidence_audit_blocks_planned_main_results"]["evidence"]
     assert checks["license_workspace_only"]["status"] == "pass"
@@ -43,7 +43,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "consistency numbers" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "headline panel" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "experiment blueprint" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "model-in-loop bridge" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "model-in-loop comparison" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "contract lineage" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "ablation" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "scale plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
@@ -58,7 +58,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "consistency export" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "headline panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "experiment blueprint" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "model-in-loop bridge" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "model-in-loop comparison" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "contract lineage" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "ablation panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "scale plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()

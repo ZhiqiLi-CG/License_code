@@ -110,13 +110,13 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "paper_role": "supporting_stress",
             "condition": "Qwen3.8-27B-long32k plus Commit Controller under the same official Harbor task",
             "tests": (
-                "Can a real model feed staged evidence into the transaction layer across two SkillFlow "
-                "OCR tasks under endpoint pressure?"
+                "Can a real model feed staged evidence into the transaction layer across Terminal-Bench "
+                "log-summary and two SkillFlow OCR tasks under endpoint pressure?"
             ),
             "evidence_status": "completed",
             "current_result": (
-                f"{bridge_summary['qwen_skillflow_govkernel_passes']}/"
-                f"{bridge_summary['qwen_skillflow_govkernel_trials']} official passes"
+                f"{bridge_summary['qwen_all_govkernel_passes']}/"
+                f"{bridge_summary['qwen_all_govkernel_trials']} official passes"
             ),
             "source_data": "model_in_loop_bridge.csv",
         },

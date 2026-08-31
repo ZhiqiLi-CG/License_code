@@ -16,7 +16,7 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     bridge = build_model_in_loop_bridge(Path("/data/zhiqi/License"))
 
     summary = bridge["summary"]
-    assert summary["model_in_loop_rows"] == 5
+    assert summary["model_in_loop_rows"] == 6
     assert summary["qwen_invoice_baseline_passes"] == 0
     assert summary["qwen_invoice_baseline_trials"] == 1
     assert summary["qwen_invoice_govkernel_passes"] == 5
@@ -30,6 +30,13 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     assert summary["qwen_skillflow_govkernel_trials"] == 10
     assert summary["qwen_skillflow_faithful_baseline_passes"] == 1
     assert summary["qwen_skillflow_faithful_baseline_trials"] == 10
+    assert summary["qwen_terminal_log_faithful_baseline_passes"] == 4
+    assert summary["qwen_terminal_log_faithful_baseline_trials"] == 5
+    assert summary["qwen_terminal_log_govkernel_passes"] == 5
+    assert summary["qwen_terminal_log_govkernel_trials"] == 5
+    assert summary["qwen_terminal_log_govkernel_errors"] == 0
+    assert summary["qwen_all_govkernel_passes"] == 15
+    assert summary["qwen_all_govkernel_trials"] == 15
     assert summary["runtime_reliability_rows"] == 6
     assert summary["materializer_rows_used_as_matched_agent"] == 0
 
@@ -41,6 +48,16 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     assert rows["SF_OCR_QWEN32K_MINISWE_BASELINE_K5"]["comparison_boundary"] == "faithful_baseline"
     assert rows["SF_OCR_QWEN32K_MINISWE_BASELINE_K5"]["passes"] == "1"
     assert rows["SF_OCR_QWEN32K_MINISWE_BASELINE_K5"]["n_trials"] == "10"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["comparison_boundary"] == "faithful_baseline"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["passes"] == "4"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["n_trials"] == "5"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["official_verifier_result"] == "mixed"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["comparison_boundary"] == "model_in_loop_commit_controller"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["passes"] == "5"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["n_trials"] == "5"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["n_errors"] == "0"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["uses_task_specific_materializer"] == "no"
     assert rows["TB_LOG_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
     assert rows["TB_LOG_MATERIALIZER_K5"]["passes"] == "5"
     assert rows["TB_LOG_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
@@ -76,6 +93,12 @@ def test_bridge_rows_name_actor_controller_boundary_and_official_result() -> Non
     assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["actor_model"] == "Qwen3.8-27B-long32k"
     assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["controller_boundary"] == "completion_trigger"
     assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["actor_model"] == "Qwen3.8-27B-long32k"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["controller_boundary"] == "none"
+    assert rows["TB_LOG_QWEN32K_MINISWE_BASELINE_K5"]["official_verifier_result"] == "mixed"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["actor_model"] == "Qwen3.8-27B-long32k"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["controller_boundary"] == "completion_trigger"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
     assert rows["TB_WAL_MATERIALIZER_K5"]["actor_model"] == "none_runtime_only"
     assert rows["TB_WAL_MATERIALIZER_K5"]["controller_boundary"] == "runtime_transaction"
     assert rows["TB_WAL_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
@@ -83,8 +106,8 @@ def test_bridge_rows_name_actor_controller_boundary_and_official_result() -> Non
     summary = bridge["summary"]
     assert summary["ordinary_agent_rows"] == 1
     assert summary["prompt_control_rows"] == 1
-    assert summary["matched_agent_controller_rows"] == 3
-    assert summary["faithful_baseline_rows"] == 1
+    assert summary["matched_agent_controller_rows"] == 4
+    assert summary["faithful_baseline_rows"] == 2
 
 
 def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -100,17 +123,19 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["bridge_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 12
+    assert len(rows) == 14
     assert rows[0]["bridge_id"] == "SF_INVOICE_QWEN_TERMINUS_FULL"
     assert rows[3]["bridge_id"] == "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"
     assert rows[4]["bridge_id"] == "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"
+    assert rows[5]["bridge_id"] == "TB_LOG_QWEN32K_MINISWE_BASELINE_K5"
+    assert rows[6]["bridge_id"] == "TB_LOG_QWEN_COMMIT_CONTROLLER_K5"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAModelLoopRows}{5}" in tex
+    assert "\\newcommand{\\LTAModelLoopRows}{6}" in tex
     assert "\\newcommand{\\LTAModelLoopOrdinaryRows}{1}" in tex
     assert "\\newcommand{\\LTAModelLoopPromptControlRows}{1}" in tex
-    assert "\\newcommand{\\LTAModelLoopMatchedControllerRows}{3}" in tex
-    assert "\\newcommand{\\LTAModelLoopFaithfulBaselineRows}{1}" in tex
+    assert "\\newcommand{\\LTAModelLoopMatchedControllerRows}{4}" in tex
+    assert "\\newcommand{\\LTAModelLoopFaithfulBaselineRows}{2}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceBaselinePasses}{0}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceBaselineTrials}{1}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenInvoiceGovPasses}{5}" in tex
@@ -122,6 +147,13 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
     assert "\\newcommand{\\LTAModelLoopQwenSkillflowGovTrials}{10}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenSkillflowFaithfulBaselinePasses}{1}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenSkillflowFaithfulBaselineTrials}{10}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenTBLogBaselinePasses}{4}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenTBLogBaselineTrials}{5}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenTBLogGovPasses}{5}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenTBLogGovTrials}{5}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenTBLogGovErrors}{0}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenAllGovPasses}{15}" in tex
+    assert "\\newcommand{\\LTAModelLoopQwenAllGovTrials}{15}" in tex
     assert "\\newcommand{\\LTAModelLoopMaterializerAsAgentRows}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

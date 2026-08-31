@@ -1,0 +1,25 @@
+job_name: tb21-lta-qwen-log-summary-govkernel-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_lta_qwen_log_summary_govkernel_official
+agent_timeout_multiplier: 1.0
+quiet: true
+
+environment:
+  type: docker
+  force_build: true
+
+agents:
+  - import_path: license_to_act.harbor_agents:LicenseToActMiniSweLogSummaryGovKernelAgent
+    model_name: openai/Qwen3.8-27B-long32k
+    env:
+      OPENAI_BASE_URL: http://172.17.0.1:18010/v1
+      OPENAI_API_KEY: dummy
+      MSWEA_API_KEY: dummy
+      QWEN_CODE_MAX_OUTPUT_TOKENS: "512"
+    kwargs:
+      max_tokens: 1024
+
+tasks:
+  - path: /data/zhiqi/License/datasets/terminal-bench-2-1/tasks/log-summary-date-ranges
+
+extra_instruction_paths:
+  - /data/zhiqi/License/License_code/prompts/lta_tb21_log_summary_commit_protocol.md

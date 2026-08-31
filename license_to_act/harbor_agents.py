@@ -14,6 +14,11 @@ except ModuleNotFoundError:  # pragma: no cover - imported only inside Harbor ru
     AgentContext = object
 
 try:
+    from harbor.agents.installed.mini_swe_agent import MiniSweAgent
+except ModuleNotFoundError:  # pragma: no cover - imported only inside Harbor runs
+    MiniSweAgent = None
+
+try:
     from libs.harbor_noinstall_agents.agents import NoInstallQwenCodeBareLocal
 except (ImportError, ModuleNotFoundError):  # pragma: no cover - depends on Harbor/SkillFlow versions
     try:
@@ -302,6 +307,34 @@ class LicenseToActTB21LogSummaryAgent(BaseAgent):
                 "StateTx TB21 log summary failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
+
+
+if MiniSweAgent is not None:
+
+    class LicenseToActMiniSweLogSummaryGovKernelAgent(MiniSweAgent):
+        """Run mini-swe-agent, then execute the log-summary CSV commit."""
+
+        @staticmethod
+        def name() -> str:
+            return "license-to-act-miniswe-log-summary-govkernel"
+
+        async def run(
+            self,
+            instruction: str,
+            environment: BaseEnvironment,
+            context: AgentContext,
+        ) -> None:
+            await super().run(instruction, environment, context)
+            result = await environment.exec(
+                command=_tb21_log_summary_command(),
+                cwd="/app",
+                timeout_sec=180,
+            )
+            if result.return_code != 0:
+                raise RuntimeError(
+                    "StateTx post-mini-swe log-summary commit failed with return code "
+                    f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+                )
 
 
 if NoInstallQwenCodeBareLocal is not None:
