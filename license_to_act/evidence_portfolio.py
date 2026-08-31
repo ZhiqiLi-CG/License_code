@@ -201,7 +201,7 @@ def _normalize_actor_name(name: str) -> str:
 
 def _write_portfolio_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=PORTFOLIO_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=PORTFOLIO_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

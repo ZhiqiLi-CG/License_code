@@ -225,7 +225,7 @@ def write_story_claims(
 
 def _write_claims_csv(path: Path, claims: dict[str, dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CLAIM_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=CLAIM_FIELDS, lineterminator="\n")
         writer.writeheader()
         for claim_id, claim in claims.items():
             writer.writerow(
@@ -246,7 +246,7 @@ def _write_metrics_csv(path: Path, metrics: dict[str, Any]) -> None:
         "tau2_read_correct_write_wrong_proxy": "Authority-failure mining headline",
     }
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=METRIC_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=METRIC_FIELDS, lineterminator="\n")
         writer.writeheader()
         for metric, value in metrics.items():
             writer.writerow(

@@ -7,6 +7,8 @@ from typing import Any
 
 from .comparison_manifest import build_comparison_manifest
 from .evidence_portfolio import build_evidence_portfolio
+from .mechanism_ablation_panel import build_mechanism_ablation_panel
+from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
 
 
@@ -20,6 +22,8 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
 
     portfolio = build_evidence_portfolio(root)
     comparison_manifest = build_comparison_manifest(root)
+    ablation_panel = build_mechanism_ablation_panel(root)
+    recursive_lineage = build_recursive_amendment_lineage(root)
     claims = build_story_claims(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     portfolio_rows = portfolio["rows"]
@@ -32,8 +36,10 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _clean_positive_mass_check(portfolio_summary),
         _faithful_baseline_check(portfolio_rows, stage2_rows),
         _comparison_manifest_check(comparison_summary),
+        _mechanism_ablation_panel_check(ablation_panel["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
+        _recursive_lineage_check(recursive_lineage["summary"]),
         _story_language_check(paper_dir),
         _main_text_style_check(paper_dir),
         _reproduction_chain_check(root),
@@ -57,6 +63,8 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "faithful_baseline_passes": portfolio_summary["faithful_baseline_passes"],
             "faithful_baseline_trials": portfolio_summary["faithful_baseline_trials"],
             "tau2_read_correct_write_wrong_proxy": claim_metrics["tau2_read_correct_write_wrong_proxy"],
+            "mechanism_ablation_cut_passes": ablation_panel["summary"]["cut_passes"],
+            "mechanism_ablation_cut_trials": ablation_panel["summary"]["cut_trials"],
         },
         "checks": checks,
     }
@@ -209,6 +217,8 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_comparison_numbers}",
         "\\input{sections/generated_headline_panel_numbers}",
         "\\input{sections/generated_experiment_blueprint_numbers}",
+        "\\input{sections/generated_recursive_numbers}",
+        "\\input{sections/generated_ablation_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_story_gate_numbers}",
     ]
@@ -217,7 +227,47 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, scale plan, and consistency numbers.",
+        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, recursive lineage, ablation panel, scale plan, and consistency numbers.",
+    )
+
+
+def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["ablation_rows"] >= 5
+        and summary["reviewer_requested_rows"] >= 3
+        and summary["baseline_overlap"] == 0
+        and summary["cut_passes"] == 0
+        and summary["full_passes"] == summary["full_trials"]
+    )
+    return _check(
+        "mechanism_ablation_panel_has_requested_cuts",
+        ok,
+        "The paper should include completed internal mechanism cuts without relabeling baselines as ablations.",
+        (
+            f"{summary['ablation_rows']} mechanism cuts; {summary['reviewer_requested_rows']} reviewer-requested; "
+            f"{summary['cut_passes']}/{summary['cut_trials']} cut passes versus "
+            f"{summary['full_passes']}/{summary['full_trials']} full LTA passes."
+        ),
+    )
+
+
+def _recursive_lineage_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["candidate_amendments"] >= 4
+        and summary["accepted_amendments"] >= 4
+        and summary["compiler_generations"] >= 3
+        and summary["source_benchmark_families"] >= 3
+        and summary["pass_to_failure_regressions"] == 0
+    )
+    return _check(
+        "recursive_lineage_has_automatic_amendments",
+        ok,
+        "The recursive claim should have a generated amendment lineage, not only prose.",
+        (
+            f"{summary['accepted_amendments']}/{summary['candidate_amendments']} automatic amendments accepted "
+            f"over {summary['compiler_generations']} compiler generations with "
+            f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
+        ),
     )
 
 
@@ -285,6 +335,8 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_comparison_manifest.py",
         "export_headline_result_panel.py",
         "export_submission_experiment_blueprint.py",
+        "export_recursive_amendment_lineage.py",
+        "export_mechanism_ablation_panel.py",
         "export_submission_scale_plan.py",
         "export_story_gate.py",
         "scripts/generate_figures.py",
@@ -296,7 +348,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, scale plan export, consistency export, figure generation, and LaTeX build.",
+        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, recursive lineage export, ablation panel export, scale plan export, consistency export, figure generation, and LaTeX build.",
     )
 
 
@@ -334,7 +386,7 @@ def _appendix_story_check(appendix_path: Path) -> dict[str, str]:
     anchors = [
         "Portfolio construction",
         "proposal/evidence/authority/commit",
-        "Exploratory runs that do not clarify the authority mechanism are kept out",
+        "Runs that only diagnose infrastructure or unrelated model behavior remain in the artifact record",
     ]
     missing = [anchor for anchor in anchors if anchor not in text]
     return _check(
@@ -378,7 +430,7 @@ def _check(check_id: str, passed: bool, criterion: str, evidence: str) -> dict[s
 
 def _write_checks_csv(path: Path, checks: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CHECK_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=CHECK_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(checks)
 

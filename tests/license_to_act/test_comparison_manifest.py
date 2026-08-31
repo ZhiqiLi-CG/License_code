@@ -18,7 +18,7 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     assert summary["faithful_baseline_trials"] == 5
     assert summary["faithful_baseline_passes"] == 0
     assert summary["mechanism_ablation_rows"] == 5
-    assert summary["completed_mechanism_ablation_rows"] == 3
+    assert summary["completed_mechanism_ablation_rows"] == 5
     assert summary["integration_stress_rows"] == 1
     assert summary["baseline_ablation_overlap"] == 0
 
@@ -42,7 +42,7 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     ablations = [row for row in rows if row["comparison_class"] == "mechanism_ablation"]
     assert len(ablations) == 5
     assert all("baseline" not in row["paper_role"] for row in ablations)
-    assert {row["evidence_status"] for row in ablations} >= {"seed_evidence", "planned"}
+    assert {row["evidence_status"] for row in ablations} == {"seed_evidence"}
 
 
 def test_write_comparison_manifest_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -66,7 +66,7 @@ def test_write_comparison_manifest_exports_csv_json_and_tex(tmp_path: Path) -> N
     assert "\\newcommand{\\LTAComparisonManifestRows}{8}" in tex
     assert "\\newcommand{\\LTAFaithfulBaselineRows}{1}" in tex
     assert "\\newcommand{\\LTAMechanismAblationRows}{5}" in tex
-    assert "\\newcommand{\\LTACompletedMechanismAblationRows}{3}" in tex
+    assert "\\newcommand{\\LTACompletedMechanismAblationRows}{5}" in tex
     assert "\\newcommand{\\LTABaselineAblationOverlap}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

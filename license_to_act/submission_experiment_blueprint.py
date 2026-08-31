@@ -321,7 +321,7 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
 
 def _write_blueprint_csv(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=BLUEPRINT_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=BLUEPRINT_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

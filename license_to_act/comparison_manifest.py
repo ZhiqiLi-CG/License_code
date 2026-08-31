@@ -86,22 +86,22 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
         {
             "comparison_id": "A4_NO_EVIDENCE_PRESERVING_READ",
             "comparison_class": "mechanism_ablation",
-            "paper_role": "planned_mechanism_cut",
+            "paper_role": "mechanism_evidence",
             "condition": "LTA without read licenses for fragile evidence substrates",
             "tests": "Do reads require authority when observation consumes the evidence source?",
-            "evidence_status": "planned",
-            "current_result": "Planned cut should restore WAL-loss and missing-recovered-json failures",
-            "source_data": "stage2_experiment_protocol.md",
+            "evidence_status": "seed_evidence",
+            "current_result": "Qwen WAL run loses the recovery substrate; LTA read license reaches 5/5 official passes",
+            "source_data": "stage1_cases.csv | stage2_reliability.csv",
         },
         {
             "comparison_id": "A5_NO_RECURSIVE_AMENDMENT",
             "comparison_class": "mechanism_ablation",
-            "paper_role": "planned_mechanism_cut",
+            "paper_role": "mechanism_evidence",
             "condition": "Static Action Licenses without amendment transfer",
             "tests": "Do gains remain local when the authority compiler cannot evolve?",
-            "evidence_status": "planned",
-            "current_result": "Planned cut should reduce cross-substrate failure-to-pass transfer",
-            "source_data": "stage2_experiment_protocol.md",
+            "evidence_status": "seed_evidence",
+            "current_result": "Generated lineage accepts 4/4 compiler amendments over three generations",
+            "source_data": "recursive_amendment_lineage.csv",
         },
         {
             "comparison_id": "S1_QWEN_GOVKERNEL_INTEGRATION",
@@ -186,7 +186,7 @@ def _mixes_baseline_and_ablation(row: dict[str, str]) -> bool:
 
 def _write_manifest_csv(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=MANIFEST_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=MANIFEST_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

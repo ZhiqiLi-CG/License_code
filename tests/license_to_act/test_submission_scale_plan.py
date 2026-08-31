@@ -19,8 +19,8 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     assert summary["current_clean_positive_trials"] == 25
     assert summary["current_faithful_baseline_trials"] == 5
     assert summary["mechanism_ablation_rows"] == 5
-    assert summary["completed_mechanism_ablation_rows"] == 3
-    assert summary["story_gate_checks"] == 12
+    assert summary["completed_mechanism_ablation_rows"] == 5
+    assert summary["story_gate_checks"] == 14
 
     rows = plan["rows"]
     assert [row["target_id"] for row in rows] == [
@@ -58,7 +58,7 @@ def test_write_submission_scale_plan_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTASubmissionScaleBenchmarks}{3}" in tex
     assert "\\newcommand{\\LTASubmissionCurrentCleanPasses}{25}" in tex
     assert "\\newcommand{\\LTASubmissionCurrentCleanTrials}{25}" in tex
-    assert "\\newcommand{\\LTASubmissionCompletedAblationRows}{3}" in tex
+    assert "\\newcommand{\\LTASubmissionCompletedAblationRows}{5}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
     assert summary["scale_target_rows"] == 7

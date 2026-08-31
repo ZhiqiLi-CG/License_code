@@ -185,7 +185,7 @@ def write_headline_result_panel(
 
 def _write_panel_csv(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=PANEL_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=PANEL_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

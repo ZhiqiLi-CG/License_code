@@ -161,7 +161,7 @@ def write_submission_scale_plan(
 
 def _write_scale_plan_csv(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=SCALE_PLAN_FIELDS)
+        writer = csv.DictWriter(handle, fieldnames=SCALE_PLAN_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
