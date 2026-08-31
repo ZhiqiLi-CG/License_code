@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 104 passed.
+2026-08-31: 107 passed.
 ```
 
 ## Official Harbor Anchors
@@ -140,6 +140,7 @@ python scripts/export_evidence_portfolio.py
 python scripts/export_comparison_manifest.py
 python scripts/export_headline_result_panel.py
 python scripts/export_submission_experiment_blueprint.py
+python scripts/export_proposal_effect_decomposition.py
 python scripts/export_boundary_patch_meta_agent.py
 python scripts/export_contract_refinement_lineage.py
 python scripts/export_mechanism_ablation_panel.py
@@ -156,7 +157,8 @@ The export scripts read large benchmark artifacts from `/data/zhiqi/License/arti
 and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_story_claims.py`, `export_evidence_portfolio.py`,
 `export_comparison_manifest.py`, `export_headline_result_panel.py`,
-`export_submission_experiment_blueprint.py`, `export_boundary_patch_meta_agent.py`,
+`export_submission_experiment_blueprint.py`, `export_proposal_effect_decomposition.py`,
+`export_boundary_patch_meta_agent.py`,
 `export_contract_refinement_lineage.py`,
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
 `export_tau2_matched_boundary.py`, `export_commit_pair_metrics.py`,
@@ -164,7 +166,7 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`. The paper imports those files for result counts,
 baseline and ablation separation, full-study targets, contract updates,
-meta-agent patch generation, model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
+proposal/effect decomposition, meta-agent patch generation, model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
 real-evidence auditing, and paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing State Contract JSON examples used in the appendix.
 `export_boundary_patch_meta_agent.py` defaults to the tracked frozen-proposer
@@ -176,7 +178,7 @@ is only needed when re-querying a local OpenAI-compatible model endpoint.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, meta-agent patch, contract-update, mechanism-ablation, model-in-loop, matched-tau2, commit-pair, real-evidence audit, State Contract example, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, proposal/effect, meta-agent patch, contract-update, mechanism-ablation, model-in-loop, matched-tau2, commit-pair, real-evidence audit, State Contract example, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.

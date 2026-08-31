@@ -26,7 +26,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["clean_positive_passes"] == 30
     assert summary["faithful_baseline_trials"] == 30
     assert summary["faithful_baseline_passes"] == 8
-    assert summary["tau2_read_correct_write_wrong_proxy"] == 19
+    assert summary["tau2_read_correct_write_wrong_proxy"] == 20
 
     rows = portfolio["rows"]
     assert [row["portfolio_id"] for row in rows] == [

@@ -12,6 +12,7 @@ from .evidence_portfolio import build_evidence_portfolio
 from .mechanism_ablation_panel import build_mechanism_ablation_panel
 from .model_in_loop_bridge import build_model_in_loop_bridge
 from .boundary_patch_meta_agent import build_meta_agent_patch_report, default_response_path
+from .proposal_effect_decomposition import build_proposal_effect_decomposition
 from .real_evidence_audit import build_real_evidence_audit
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
@@ -37,6 +38,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         root,
         response_path=default_response_path(root),
     )
+    proposal_effect = build_proposal_effect_decomposition(root)
     claims = build_story_claims(root)
     tau2_matched = build_tau2_matched_boundary_export(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
@@ -54,6 +56,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _model_in_loop_bridge_check(model_loop_bridge),
         _real_evidence_audit_check(real_evidence_audit["summary"]),
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
+        _proposal_effect_decomposition_check(proposal_effect["summary"]),
         _tau2_matched_boundary_check(tau2_matched["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
@@ -108,6 +111,10 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "meta_agent_candidates": meta_agent_patches["summary"]["meta_agent_candidates"],
             "meta_agent_accepted": meta_agent_patches["summary"]["accepted_candidates"],
             "meta_agent_source_f_to_p": meta_agent_patches["summary"]["source_failure_to_pass"],
+            "proposal_effect_gap_observations": proposal_effect["summary"]["gap_observations"],
+            "proposal_effect_boundary_source_successes": proposal_effect["summary"][
+                "boundary_effect_successes_on_source_gap_rows"
+            ],
         },
         "checks": checks,
     }
@@ -260,6 +267,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_comparison_numbers}",
         "\\input{sections/generated_headline_panel_numbers}",
         "\\input{sections/generated_experiment_blueprint_numbers}",
+        "\\input{sections/generated_proposal_effect_numbers}",
         "\\input{sections/generated_recursive_numbers}",
         "\\input{sections/generated_meta_agent_patch_numbers}",
         "\\input{sections/generated_ablation_numbers}",
@@ -275,7 +283,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, run-plan, contract-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, run-plan, proposal/effect, contract-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -412,6 +420,28 @@ def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
             f"read-correct/write-wrong "
             f"{summary['baseline_read_correct_write_wrong']}->{summary['boundary_read_correct_write_wrong']}; "
             f"boundary vetoes {summary['boundary_vetoes']}; regressions {summary['boundary_regressions']}."
+        ),
+    )
+
+
+def _proposal_effect_decomposition_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["rows"] >= 6
+        and summary["benchmark_count"] >= 3
+        and summary["planned_rows"] == 0
+        and summary["gap_observations"] >= 25
+        and summary["baseline_effect_successes_on_gap_rows"] == 0
+        and summary["boundary_effect_successes_on_source_gap_rows"] >= 5
+    )
+    return _check(
+        "proposal_effect_decomposition_has_real_gap_rows",
+        ok,
+        "RQ1 should be backed by real proposal/effect rows, not planned matrices.",
+        (
+            f"{summary['gap_observations']} proposal-to-effect gap observations across "
+            f"{summary['benchmark_count']} benchmark families; planned rows "
+            f"{summary['planned_rows']}; boundary source closures "
+            f"{summary['boundary_effect_successes_on_source_gap_rows']}."
         ),
     )
 
@@ -652,6 +682,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_comparison_manifest.py",
         "export_headline_result_panel.py",
         "export_submission_experiment_blueprint.py",
+        "export_proposal_effect_decomposition.py",
         "export_contract_refinement_lineage.py",
         "export_boundary_patch_meta_agent.py",
         "run_boundary_patch_meta_agent.py",
@@ -672,7 +703,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include generated tables and the paper build path.",
-        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
+        "README files mention result exports, comparison exports, full-study plan exports, proposal/effect exports, contract-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 

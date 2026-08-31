@@ -27,7 +27,7 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["faithful_baseline_trials"] == 30
     assert summary["model_loop_passes"] == 15
     assert summary["model_loop_trials"] == 15
-    assert summary["tau2_read_correct_write_wrong_proxy"] == 19
+    assert summary["tau2_read_correct_write_wrong_proxy"] == 20
     assert summary["submission_scale_rows"] == 24
     assert summary["commit_pair_accuracy"] == 1.0
     assert summary["unauthorized_commit_rate"] == 0.0
@@ -85,7 +85,7 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{30}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{15}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{15}" in tex
-    assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{19}" in tex
+    assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{20}" in tex
     assert "\\newcommand{\\LTAHeadlineSubmissionScaleRows}{24}" in tex
     assert "\\newcommand{\\LTAHeadlineCommitPairAccuracy}{1.000}" in tex
 
