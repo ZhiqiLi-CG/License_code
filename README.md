@@ -43,6 +43,8 @@ env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
 The sqlite-truncate anchor writes `/app/recover.json` from binary payload evidence in `/app/trunc.db`.
 The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
 
+`configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
+
 ## Paper Result Exports
 
 ```bash
