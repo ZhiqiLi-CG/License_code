@@ -1,0 +1,79 @@
+{
+  "schema": "boundary_patch_meta_agent_fixture_v1",
+  "model": "Mistral-Small-3.2-24B-Instruct-2506",
+  "source_case_ids": ["T2-A1", "T2-A48", "TB-SAN", "TB-WAL", "SF-INV"],
+  "responses": {
+    "T2-A1": {
+      "patch_id": "T2-A1-action-boundary-pre-commit",
+      "boundary_field": "ready",
+      "failure_summary": "Premature commit: the agent committed a cancellation before user intent and reservation state were fully verified.",
+      "proposed_change": "Introduce a pre-commit boundary check to verify user intent and reservation state before allowing the commit action.",
+      "applicability_condition": "The agent is considering a durable customer-service commit, but user intent and source state have not both been verified.",
+      "expected_effect": "The boundary asks for revision or escalation instead of committing an unready business write.",
+      "source_test": "Replay the source failure with the same actor and state.",
+      "positive_controls": ["Boundary transfer to a human agent when cancellation is not ready to commit."],
+      "regression_tests": ["Verify that the agent correctly handles cases where user intent and reservation state are fully verified before commit."],
+      "task_local_terms": ["user_intent", "reservation_state"]
+    },
+    "T2-A48": {
+      "patch_id": "T2-A48-action-boundary-pre-commit",
+      "boundary_field": "ready",
+      "failure_summary": "Premature commit: the agent accepted a user-side claim over source state before committing a business action.",
+      "proposed_change": "Replace unsupported compensation actions with a transfer to a human agent",
+      "applicability_condition": "When the agent is about to commit an action that involves unsupported compensation",
+      "expected_effect": "The boundary prevents premature commitment when the requested business action lacks source-state support.",
+      "source_test": "Replay the source failure with the same actor and state.",
+      "positive_controls": [
+        "Agent correctly identifies unsupported compensation scenarios.",
+        "Agent transfers control to a human agent for compensation handling."
+      ],
+      "regression_tests": [
+        "Verify that the agent does not prematurely commit in other scenarios.",
+        "Ensure that the agent's overall performance is not degraded by the patch."
+      ],
+      "task_local_terms": ["unsupported compensation", "transfer to a human agent"]
+    },
+    "TB-SAN": {
+      "patch_id": "TB-SAN-001",
+      "boundary_field": "preserve",
+      "failure_summary": "Overbroad commit: local secret removal was correct, but the final repository state changed too much.",
+      "proposed_change": "Instead of rewriting the entire commit history, only modify the contaminated working-tree paths and preserve the HEAD and remote references.",
+      "applicability_condition": "When a repository task has a local target change and the candidate effect mutates more than the contaminated paths.",
+      "expected_effect": "The agent keeps the useful local edit while avoiding collateral repository mutation.",
+      "source_test": "Replay the source failure with the same repository state.",
+      "positive_controls": [
+        "Contaminated paths are correctly identified and modified.",
+        "HEAD and remote references remain unchanged."
+      ],
+      "regression_tests": [
+        "Ensure that no additional paths are inadvertently modified.",
+        "Verify that the commit history remains intact except for the contaminated paths."
+      ],
+      "task_local_terms": ["contaminated_paths", "HEAD", "remote"]
+    },
+    "TB-WAL": {
+      "patch_id": "TB-WAL-001",
+      "boundary_field": "preserve",
+      "failure_summary": "Destructive observation: reading the database can consume the recovery substrate before the final artifact is written.",
+      "proposed_change": "Implement a preserving-read action that ensures critical data is read and stored before any state-changing operations.",
+      "applicability_condition": "When the agent encounters a read or recovery operation over fragile evidence that can be consumed by ordinary inspection.",
+      "expected_effect": "The recovery path preserves source evidence before producing the verifier-visible output.",
+      "source_test": "Replay the source failure with the same database files.",
+      "positive_controls": ["7/7 checks passed with the preserving-read boundary."],
+      "regression_tests": ["Verify that the agent does not time out and that the source evidence is preserved and recovered correctly."],
+      "task_local_terms": ["WAL", "preserving-read"]
+    },
+    "SF-INV": {
+      "patch_id": "SF-INV-001",
+      "boundary_field": "done",
+      "failure_summary": "Missing finalization: source evidence was present, but the required output artifact was never written.",
+      "proposed_change": "Implement a completion trigger that verifies the output state and ensures all necessary actions are taken before marking the task as done.",
+      "applicability_condition": "The agent has gathered the required source evidence but has not yet finalized the verifier-visible output.",
+      "expected_effect": "The boundary converts complete source evidence into the required artifact instead of allowing a false stop.",
+      "source_test": "Replay the source case where OCR evidence is gathered but the workbook is absent.",
+      "positive_controls": ["Agent successfully writes the workbook after implementing the completion trigger."],
+      "regression_tests": ["Test cases where the agent correctly finalizes the task without missing any steps."],
+      "task_local_terms": ["OCR", "workbook"]
+    }
+  }
+}

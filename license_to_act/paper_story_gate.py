@@ -11,6 +11,7 @@ from .commit_pair_metrics import build_commit_pair_member_rows, compute_commit_p
 from .evidence_portfolio import build_evidence_portfolio
 from .mechanism_ablation_panel import build_mechanism_ablation_panel
 from .model_in_loop_bridge import build_model_in_loop_bridge
+from .boundary_patch_meta_agent import build_meta_agent_patch_report, default_response_path
 from .real_evidence_audit import build_real_evidence_audit
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
@@ -32,6 +33,10 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     real_evidence_audit = build_real_evidence_audit(root)
     commit_pair_metrics = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     recursive_lineage = build_recursive_amendment_lineage(root)
+    meta_agent_patches = build_meta_agent_patch_report(
+        root,
+        response_path=default_response_path(root),
+    )
     claims = build_story_claims(root)
     tau2_matched = build_tau2_matched_boundary_export(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
@@ -53,6 +58,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
+        _meta_agent_patch_check(meta_agent_patches["summary"]),
         _action_boundary_story_check(paper_dir),
         _public_surface_hygiene_check(root),
         _story_language_check(paper_dir),
@@ -99,6 +105,9 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "authorized_commit_recall": commit_pair_metrics["summary"]["authorized_commit_recall"],
             "tau2_matched_pairs": tau2_matched["summary"]["complete_pairs"],
             "tau2_matched_reward_delta": tau2_matched["summary"]["reward_delta"],
+            "meta_agent_candidates": meta_agent_patches["summary"]["meta_agent_candidates"],
+            "meta_agent_accepted": meta_agent_patches["summary"]["accepted_candidates"],
+            "meta_agent_source_f_to_p": meta_agent_patches["summary"]["source_failure_to_pass"],
         },
         "checks": checks,
     }
@@ -252,6 +261,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_headline_panel_numbers}",
         "\\input{sections/generated_experiment_blueprint_numbers}",
         "\\input{sections/generated_recursive_numbers}",
+        "\\input{sections/generated_meta_agent_patch_numbers}",
         "\\input{sections/generated_ablation_numbers}",
         "\\input{sections/generated_model_loop_numbers}",
         "\\input{sections/generated_tau2_matched_boundary_numbers}",
@@ -265,7 +275,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, run-plan, contract-update, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, run-plan, contract-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -421,6 +431,27 @@ def _recursive_lineage_check(summary: dict[str, Any]) -> dict[str, str]:
         (
             f"{summary['accepted_amendments']}/{summary['candidate_amendments']} boundary updates accepted "
             f"over {summary['compiler_generations']} boundary generations with "
+            f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
+        ),
+    )
+
+
+def _meta_agent_patch_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["meta_agent_candidates"] >= 5
+        and summary["accepted_candidates"] >= 5
+        and summary["accepted_benchmark_families"] >= 3
+        and summary["source_failure_to_pass"] >= 5
+        and summary["pass_to_failure_regressions"] == 0
+    )
+    return _check(
+        "meta_agent_boundary_patch_generation",
+        ok,
+        "The boundary-update claim should include frozen-proposer candidates, not only deterministic signature rules.",
+        (
+            f"{summary['accepted_candidates']}/{summary['meta_agent_candidates']} frozen-proposer patches accepted; "
+            f"{summary['accepted_benchmark_families']} benchmark families; "
+            f"{summary['source_failure_to_pass']} source repairs; "
             f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
         ),
     )
@@ -622,6 +653,8 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "export_headline_result_panel.py",
         "export_submission_experiment_blueprint.py",
         "export_contract_refinement_lineage.py",
+        "export_boundary_patch_meta_agent.py",
+        "run_boundary_patch_meta_agent.py",
         "export_mechanism_ablation_panel.py",
         "export_model_in_loop_bridge.py",
         "export_tau2_matched_boundary.py",
@@ -639,7 +672,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include generated tables and the paper build path.",
-        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
+        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 

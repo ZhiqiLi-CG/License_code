@@ -6,6 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from .boundary_patch_meta_agent import build_meta_agent_patch_report, default_response_path
+
 
 LINEAGE_FIELDS = [
     "refinement_id",
@@ -25,85 +27,59 @@ LINEAGE_FIELDS = [
 ]
 
 
-RULES = [
-    {
-        "refinement_id": "C1_COMMIT_READINESS_EVIDENCE",
-        "generation": 1,
-        "trigger_signature": "Premature commit",
-        "source_signatures": ["Premature commit", "False authority"],
-        "contract_diff": "ADD_READY_PREDICATE verified policy/state evidence before business commits",
-        "validation_cases": ["T2-A19"],
-        "heldout_case_ids": [],
-    },
-    {
-        "refinement_id": "C2_WRITE_SCOPE_AND_PRESERVE",
-        "generation": 2,
-        "trigger_signature": "Overbroad commit",
-        "source_signatures": ["Overbroad commit", "Overbroad authority"],
-        "contract_diff": "ADD_WRITE_SCOPE with preserve constraints for repository and filesystem commits",
-        "validation_cases": [],
-        "heldout_case_ids": ["TB-SAN-K5"],
-    },
-    {
-        "refinement_id": "C3_PRESERVING_READ_CONTRACT",
-        "generation": 2,
-        "trigger_signature": "Destructive observation",
-        "source_signatures": ["Destructive observation", "Evidence-consuming read"],
-        "contract_diff": "ADD_PRESERVING_READ preserve source evidence before recovery reads",
-        "validation_cases": [],
-        "heldout_case_ids": ["TB-WAL-K5", "TB-SQLITE-K5"],
-    },
-    {
-        "refinement_id": "C4_COMPLETION_TRIGGER",
-        "generation": 3,
-        "trigger_signature": "Missing finalization",
-        "source_signatures": ["Missing finalization", "Missing commit obligation"],
-        "contract_diff": "ADD_DONE_TRIGGER write verifier-visible artifacts when ready evidence is complete",
-        "validation_cases": ["SF-INV-MAT-K5"],
-        "heldout_case_ids": ["SF-TRAVEL-MAT-K5"],
-    },
-]
-
-
 def build_recursive_amendment_lineage(project_root: str | Path = Path("/data/zhiqi/License")) -> dict[str, Any]:
     root = Path(project_root)
     data_dir = root / "License_paper" / "data"
     stage1_rows = _read_csv(data_dir / "stage1_cases.csv")
-    stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
-    stage2_by_case = {row["case_id"]: row for row in stage2_rows}
-
-    rows = []
-    for rule in RULES:
-        source_rows = _source_rows_for_signatures(stage1_rows, rule["source_signatures"])
-        heldout_rows = [stage2_by_case[case_id] for case_id in rule["heldout_case_ids"]]
-        validation_rows = [stage2_by_case[case_id] for case_id in rule["validation_cases"] if case_id in stage2_by_case]
-        source_cases = [row["case_id"] for row in source_rows]
-        validation_cases = list(rule["validation_cases"])
-        heldout_cases = list(rule["heldout_case_ids"])
-        source_f_to_p = _count_failure_to_pass(source_rows)
-        heldout_trials = _sum_trials(heldout_rows + validation_rows)
-        pass_to_failure = _count_pass_to_failure(source_rows)
-        rows.append(
-            {
-                "refinement_id": rule["refinement_id"],
-                "generation": str(rule["generation"]),
-                "synthesis_method": "automatic_failure_signature_rule",
-                "trigger_signature": rule["trigger_signature"],
-                "contract_diff": rule["contract_diff"],
-                "source_cases": _join(source_cases),
-                "validation_cases": _join(validation_cases),
-                "heldout_cases": _join(heldout_cases),
-                "source_failure_to_pass": str(source_f_to_p),
-                "heldout_clean_trials": str(heldout_trials),
-                "pass_to_failure_regressions": str(pass_to_failure),
-                "admission_decision": _admission_decision(source_f_to_p, heldout_rows + validation_rows, pass_to_failure),
-                "comparison_class": "boundary_update",
-                "baseline_boundary": "not_baseline: generated boundary update; compare task-ID hand guards as ablations",
-            }
-        )
+    meta_report = build_meta_agent_patch_report(
+        root,
+        response_path=default_response_path(root),
+    )
+    rows = [_lineage_row_from_meta_patch(row) for row in meta_report["rows"]]
 
     summary = _summarize(rows, stage1_rows)
     return {"summary": summary, "rows": rows}
+
+
+def _lineage_row_from_meta_patch(row: dict[str, str]) -> dict[str, str]:
+    return {
+        "refinement_id": row["patch_id"],
+        "generation": _generation_for_field(row["boundary_field"]),
+        "synthesis_method": "frozen_meta_agent_proposal",
+        "trigger_signature": row["failure_type"],
+        "contract_diff": row["proposed_change"],
+        "source_cases": row["case_id"],
+        "validation_cases": "",
+        "heldout_cases": _join(sorted(_heldout_cases_for_meta_row(row))),
+        "source_failure_to_pass": row["source_failure_to_pass"],
+        "heldout_clean_trials": row["heldout_clean_trials"],
+        "pass_to_failure_regressions": row["pass_to_failure_regressions"],
+        "admission_decision": row["admission_decision"],
+        "comparison_class": "boundary_update",
+        "baseline_boundary": "not_baseline: frozen meta-agent patch proposal; task-local hand guards are mechanism cuts",
+    }
+
+
+def _generation_for_field(field: str) -> str:
+    if field == "ready":
+        return "1"
+    if field in {"scope", "preserve"}:
+        return "2"
+    if field == "done":
+        return "3"
+    return "0"
+
+
+def _heldout_cases_for_meta_row(row: dict[str, str]) -> set[str]:
+    if row["boundary_field"] == "scope":
+        return {"TB-SAN-K5"}
+    if row["boundary_field"] == "preserve":
+        if row["failure_type"] == "Destructive observation":
+            return {"TB-SQLITE-K5", "TB-WAL-K5"}
+        return {"TB-SAN-K5"}
+    if row["boundary_field"] == "done":
+        return {"SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5", "TB-LOG-K5"}
+    return set()
 
 
 def write_recursive_amendment_lineage(
@@ -141,35 +117,6 @@ def write_recursive_amendment_lineage(
     }
     summary_path.write_text(json.dumps(lineage, indent=2), encoding="utf-8")
     return lineage
-
-
-def _source_rows_for_signatures(stage1_rows: list[dict[str, str]], signatures: list[str]) -> list[dict[str, str]]:
-    return [
-        row
-        for row in stage1_rows
-        if row["failure_type"] in signatures and row["baseline_reward"] == "0" and row["lta_reward"] == "1"
-    ]
-
-
-def _count_failure_to_pass(rows: list[dict[str, str]]) -> int:
-    return sum(1 for row in rows if row["baseline_reward"] == "0" and row["lta_reward"] == "1")
-
-
-def _count_pass_to_failure(rows: list[dict[str, str]]) -> int:
-    return sum(1 for row in rows if row["baseline_reward"] == "1" and row["lta_reward"] == "0")
-
-
-def _sum_trials(rows: list[dict[str, str]]) -> int:
-    return sum(int(row["n_trials"]) for row in rows)
-
-
-def _admission_decision(source_f_to_p: int, reliability_rows: list[dict[str, str]], pass_to_failure: int) -> str:
-    reliability_ok = all(float(row["mean_reward"]) == 1.0 and int(row["n_errors"]) == 0 for row in reliability_rows)
-    if source_f_to_p > 0 and pass_to_failure == 0 and reliability_ok:
-        return "accept"
-    if source_f_to_p > 0 and pass_to_failure == 0 and not reliability_rows:
-        return "accept"
-    return "reject"
 
 
 def _summarize(rows: list[dict[str, str]], stage1_rows: list[dict[str, str]]) -> dict[str, Any]:
