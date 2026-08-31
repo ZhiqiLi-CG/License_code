@@ -119,6 +119,42 @@ def skillflow_invoice_summary_required_commit() -> StateChangeEvent:
     )
 
 
+def skillflow_travel_claim_license() -> ActionLicense:
+    return ActionLicense(
+        name="skillflow_travel_claim_workbook",
+        actor_role="artifact_agent",
+        state_region="output:/app/workspace/travel_claims.xlsx",
+        operation="WriteOutputWorkbook",
+        required_evidence={
+            "OcrTextEvidence",
+            "ClaimCodeEvidence",
+            "RosterJoinEvidence",
+            "WorkbookSchemaEvidence",
+        },
+    )
+
+
+def skillflow_travel_claim_required_commit() -> StateChangeEvent:
+    return StateChangeEvent(
+        actor_role="artifact_agent",
+        state_region="output:/app/workspace/travel_claims.xlsx",
+        operation="WriteOutputWorkbook",
+        evidence=EvidenceBundle(
+            types={
+                "OcrTextEvidence",
+                "ClaimCodeEvidence",
+                "RosterJoinEvidence",
+                "WorkbookSchemaEvidence",
+            },
+            refs={
+                "/app/workspace/dataset/img/*.jpg",
+                "/app/workspace/dataset/claim_roster.csv",
+                "task:travel_claims_schema",
+            },
+        ),
+    )
+
+
 def event_from_tb21_codex_trace_line(line: str) -> StateChangeEvent:
     record = json.loads(line)
     command = record.get("item", {}).get("command", "")

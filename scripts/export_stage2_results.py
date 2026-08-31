@@ -69,6 +69,21 @@ DEFAULT_RELIABILITY_CASES = [
         "paper_use": "integration_stress",
         "interpretation": "Four of five trials pass; the failed trial is a Qwen context-window API error before GovKernel evidence.",
     },
+    {
+        "case_id": "SF-TRAVEL-MAT-K5",
+        "benchmark": "SkillFlow",
+        "task": "travel claim OCR merge",
+        "condition": "LTA travel-claim materializer",
+        "role": "OCR-to-workbook obligation",
+        "result_path": artifact_path(
+            "stage2",
+            "harbor",
+            "stage2-skillflow-lta-travel-claim-k5-py",
+            "result.json",
+        ),
+        "paper_use": "clean_reliability_anchor",
+        "interpretation": "OCR evidence is joined with the authoritative roster and committed as the verifier-visible workbook.",
+    },
 ]
 
 

@@ -4,6 +4,8 @@ from license_to_act.examples import (
     skillflow_clinic_shift_license,
     skillflow_invoice_summary_license,
     skillflow_invoice_summary_required_commit,
+    skillflow_travel_claim_license,
+    skillflow_travel_claim_required_commit,
     tau2_cancel_license,
     tb21_db_wal_recovery_license,
     tb21_db_wal_recovery_required_commit,
@@ -117,3 +119,27 @@ def test_skillflow_invoice_example_reports_missing_workbook_commit_after_ocr_rea
     assert decision.allowed is False
     assert decision.reason == "missing_commit_obligation"
     assert decision.license_name == "skillflow_invoice_summary_workbook"
+
+
+def test_skillflow_travel_claim_example_requires_roster_join_before_workbook_commit():
+    observed = [
+        StateChangeEvent(
+            actor_role="artifact_agent",
+            state_region="output:/app/workspace/travel_claims.xlsx",
+            operation="WriteOutputWorkbook",
+            evidence=EvidenceBundle(
+                types={"OcrTextEvidence", "ClaimCodeEvidence", "WorkbookSchemaEvidence"},
+                refs={"claim_001.jpg", "task:travel_claims_schema"},
+            ),
+        )
+    ]
+
+    decision = evaluate_commit_obligation(
+        skillflow_travel_claim_required_commit(),
+        observed,
+        [skillflow_travel_claim_license()],
+    )
+
+    assert decision.allowed is False
+    assert decision.reason == "missing_required_evidence"
+    assert decision.missing_evidence == {"RosterJoinEvidence"}

@@ -18,6 +18,24 @@ This repository contains the prototype authority layer, benchmark adapters, scri
 python -m pytest tests/license_to_act -q
 ```
 
+Current local check:
+
+```text
+38 passed
+```
+
+## Official Harbor Anchors
+
+```bash
+env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
+  -c configs/skillflow_lta_travel_claim_materializer_official.yaml \
+  --job-name stage2-skillflow-lta-travel-claim-k5-py \
+  --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
+  --n-attempts 5 --n-concurrent 1 -y
+```
+
+The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
+
 ## Paper Result Exports
 
 ```bash

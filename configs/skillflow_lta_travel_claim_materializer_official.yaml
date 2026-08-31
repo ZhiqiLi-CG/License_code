@@ -1,0 +1,14 @@
+job_name: skillflow-lta-travel-claim-materializer-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_travel_claim_materializer_official
+agent_timeout_multiplier: 0.5
+quiet: true
+
+environment:
+  type: docker
+  force_build: true
+
+agents:
+  - import_path: license_to_act.harbor_agents:LicenseToActTravelClaimMaterializerAgent
+
+tasks:
+  - path: /data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_travel_claim_merge

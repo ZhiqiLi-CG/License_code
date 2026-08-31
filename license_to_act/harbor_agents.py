@@ -46,6 +46,37 @@ class LicenseToActInvoiceMaterializerAgent(BaseAgent):
             )
 
 
+class LicenseToActTravelClaimMaterializerAgent(BaseAgent):
+    """Minimal Harbor agent that executes the SkillFlow travel-claim workbook obligation."""
+
+    @staticmethod
+    def name() -> str:
+        return "license-to-act-travel-claim-materializer"
+
+    def version(self) -> str | None:
+        return "0.1"
+
+    async def setup(self, environment: BaseEnvironment) -> None:
+        return None
+
+    async def run(
+        self,
+        instruction: str,
+        environment: BaseEnvironment,
+        context: AgentContext,
+    ) -> None:
+        result = await environment.exec(
+            command=_travel_claim_materializer_command(),
+            cwd="/app/workspace",
+            timeout_sec=240,
+        )
+        if result.return_code != 0:
+            raise RuntimeError(
+                "License-to-Act travel claim materializer failed with return code "
+                f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+            )
+
+
 class LicenseToActTB21SanitizeAgent(BaseAgent):
     """Minimal Harbor agent that executes the TB2.1 sanitize-repo license."""
 
@@ -355,6 +386,182 @@ if side_effects:
     raise SystemExit(f'prohibited side effects: {side_effects}')
 
 print(f'LTA_GOVKERNEL sanitized {len(changed_paths)} licensed files')
+PY"""
+
+
+def _travel_claim_materializer_command() -> str:
+    return r"""python3 - <<'PY'
+from __future__ import annotations
+
+from pathlib import Path
+from openpyxl import Workbook
+from PIL import Image
+import csv
+import json
+import re
+
+import pytesseract
+
+IMAGE_DIR = Path('/app/workspace/dataset/img')
+ROSTER_PATH = Path('/app/workspace/dataset/claim_roster.csv')
+OUTPUT_FILE = Path('/app/workspace/travel_claims.xlsx')
+EVIDENCE_LOG = Path('/logs/agent/lta-govkernel-travel-claim-evidence.json')
+COLUMNS = ['filename', 'claim_code', 'employee_id', 'trip_id', 'date', 'total_amount']
+PRE_EXISTING_OUTPUT = OUTPUT_FILE.exists()
+
+
+def normalize_token(value):
+    return value.upper().replace('O', '0').replace('I', '1').replace('L', '1')
+
+
+def parse_date(value):
+    text = normalize_token(value).strip()
+    match = re.fullmatch(r'(20\d{2})[-/](\d{1,2})[-/](\d{1,2})', text)
+    if match:
+        return format_date(int(match.group(1)), int(match.group(2)), int(match.group(3)))
+    match = re.fullmatch(r'(\d{1,2})[-/](\d{1,2})[-/](?:20)?(\d{2})', text)
+    if not match:
+        return None
+    first, second, year_suffix = int(match.group(1)), int(match.group(2)), int(match.group(3))
+    year = 2000 + year_suffix if year_suffix < 100 else year_suffix
+    if second > 12 and first <= 12:
+        month, day = first, second
+    else:
+        day, month = first, second
+    return format_date(year, month, day)
+
+
+def format_date(year, month, day):
+    if not (2000 <= year <= 2035 and 1 <= month <= 12 and 1 <= day <= 31):
+        return None
+    return f'{year:04d}-{month:02d}-{day:02d}'
+
+
+def candidate_lines(lines, index):
+    return [lines[position] for position in (index, index + 1, index + 2) if 0 <= position < len(lines)]
+
+
+def extract_claim_code(lines):
+    label = re.compile(r'CLAIM\s*CODE|CLAIM\s*REF|EXPENSE\s*CODE', re.I)
+    value = re.compile(r'C[L1I]M[-\s]*(20\d{2})[-\s]*(\d{1,3})', re.I)
+    for index, line in enumerate(lines):
+        if not label.search(line):
+            continue
+        for candidate in candidate_lines(lines, index):
+            match = value.search(normalize_token(candidate))
+            if match:
+                return f'CLM-{match.group(1)}-{int(match.group(2)):03d}'
+    match = value.search(normalize_token('\n'.join(lines)))
+    if match:
+        return f'CLM-{match.group(1)}-{int(match.group(2)):03d}'
+    return None
+
+
+def extract_date(lines):
+    label = re.compile(r'TRANSACTION\s*DATE|PURCHASE\s*DATE|\bDATE\b', re.I)
+    date = re.compile(r'20\d{2}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/](?:20)?\d{2}')
+    for index, line in enumerate(lines):
+        if not label.search(line):
+            continue
+        for candidate in candidate_lines(lines, index):
+            match = date.search(normalize_token(candidate))
+            if match:
+                parsed = parse_date(match.group(0))
+                if parsed:
+                    return parsed
+    for line in lines:
+        match = date.search(normalize_token(line))
+        if match:
+            parsed = parse_date(match.group(0))
+            if parsed:
+                return parsed
+    return None
+
+
+def extract_amount(lines):
+    label = re.compile(r'REIMBURSABLE\s+TOTAL|TOTAL\s+CLAIM|AMOUNT\s+CLAIMED|TOTAL\s+DUE', re.I)
+    ignored = re.compile(r'ADVANCE|CASH\s+PAID|TIP|TAX', re.I)
+    amount = re.compile(r'(?:[$]\s*)?(\d{1,3}(?:[,\s]\d{3})*(?:\.\d{1,2})?|\d+\.\d{1,2})')
+    candidates = []
+    for index, line in enumerate(lines):
+        if ignored.search(line) or not label.search(line):
+            continue
+        for priority, candidate in enumerate(candidate_lines(lines, index)):
+            if ignored.search(candidate):
+                continue
+            for match in amount.finditer(candidate):
+                try:
+                    candidates.append((4 - priority, float(match.group(1).replace(',', '').replace(' ', ''))))
+                except ValueError:
+                    pass
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return f'{candidates[0][1]:.2f}'
+
+
+def load_roster():
+    mapping = {}
+    with ROSTER_PATH.open(newline='', encoding='utf-8-sig') as handle:
+        for row in csv.DictReader(handle):
+            mapping[row['claim_code'].strip().upper()] = (row['employee_id'].strip(), row['trip_id'].strip())
+    return mapping
+
+
+def parse_image(image_path, roster):
+    text = pytesseract.image_to_string(Image.open(image_path))
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    claim_code = extract_claim_code(lines)
+    employee_id, trip_id = roster.get(claim_code or '', ('', ''))
+    return {
+        'filename': image_path.name,
+        'claim_code': claim_code or '',
+        'employee_id': employee_id,
+        'trip_id': trip_id,
+        'date': extract_date(lines) or '',
+        'total_amount': extract_amount(lines) or '',
+        'text_preview': text[:300],
+    }
+
+
+roster = load_roster()
+rows = []
+for image_path in sorted(IMAGE_DIR.iterdir(), key=lambda path: path.name):
+    if image_path.suffix.lower() not in {'.jpg', '.jpeg', '.png', '.tif', '.tiff'}:
+        continue
+    rows.append(parse_image(image_path, roster))
+
+wb = Workbook()
+ws = wb.active
+ws.title = 'claims'
+ws.append(COLUMNS)
+for row in rows:
+    ws.append([row[column] for column in COLUMNS])
+wb.save(OUTPUT_FILE)
+
+missing_required_rows = [
+    row['filename'] for row in rows if not row['claim_code'] or not row['date'] or not row['total_amount']
+]
+
+EVIDENCE_LOG.parent.mkdir(parents=True, exist_ok=True)
+EVIDENCE_LOG.write_text(json.dumps({
+    'license': 'skillflow_travel_claim_workbook',
+    'operation': 'WriteOutputWorkbook',
+    'state_region': 'output:/app/workspace/travel_claims.xlsx',
+    'evidence_types': ['OcrTextEvidence', 'ClaimCodeEvidence', 'RosterJoinEvidence', 'WorkbookSchemaEvidence'],
+    'pre_existing_output': PRE_EXISTING_OUTPUT,
+    'output_exists': OUTPUT_FILE.exists(),
+    'rows': rows,
+    'artifact_gate': {
+        'sheet': 'claims',
+        'columns': COLUMNS,
+        'row_count': len(rows),
+        'missing_required_rows': missing_required_rows,
+        'roster_authority': 'dataset/claim_roster.csv',
+    },
+}, indent=2) + '\n')
+
+print(f'LTA_GOVKERNEL wrote {OUTPUT_FILE} with {len(rows)} travel claim rows')
 PY"""
 
 
