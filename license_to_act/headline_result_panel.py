@@ -45,15 +45,15 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         {
             "panel_id": "H1_BREADTH",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does the commit-gap story span more than one durable substrate?",
+            "story_question": "Does the proposal-to-effect gap span more than one state substrate?",
             "result_sentence": (
-                f"The evidence spine spans {portfolio_summary['benchmark_count']} benchmark families, "
+                f"The current result set spans {portfolio_summary['benchmark_count']} benchmark families, "
                 f"{portfolio_summary['state_substrate_count']} state substrates, and "
                 f"{portfolio_summary['actor_backbone_count']} actor backbones."
             ),
             "why_it_matters": (
-                "The same reason-prepare-commit boundary appears in business records, terminal state, "
-                "and workflow artifacts."
+                "The same gap between internal progress and external effect appears in business records, "
+                "terminal state, and workflow artifacts."
             ),
             "source_data": "evidence_portfolio.csv",
         },
@@ -66,16 +66,16 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors."
             ),
             "why_it_matters": (
-                "The paper can lead with verifier-backed positive mass around one transaction mechanism."
+                "The paper can lead with verifier-backed positive mass around one executable boundary."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
         },
         {
             "panel_id": "H8_MODEL_IN_LOOP_BRIDGE",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does the transaction boundary help when the same model stays in the official trial?",
+            "story_question": "Does the action boundary help when the same model stays in the official trial?",
             "result_sentence": (
-                f"Qwen3.8-27B-long32k plus Commit Controller reaches "
+                f"Qwen3.8-27B-long32k plus commit controller reaches "
                 f"{bridge_summary['qwen_all_govkernel_passes']}/"
                 f"{bridge_summary['qwen_all_govkernel_trials']} official passes on Terminal-Bench log-summary "
                 "and two SkillFlow OCR tasks with zero errors. The same faithful mini-swe actor without "
@@ -85,23 +85,23 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"{bridge_summary['qwen_skillflow_faithful_baseline_trials']} on the OCR tasks."
             ),
             "why_it_matters": (
-                "This is the current matched-agent evidence: the actor remains Qwen, while the transaction "
-                "boundary controls the durable artifact commit."
+                "This is the current matched-agent evidence: the actor remains Qwen, while the action "
+                "boundary controls finalization."
             ),
             "source_data": "model_in_loop_bridge.csv",
         },
         {
             "panel_id": "H3_COMMIT_PAIR_ACCURACY",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does StateTx distinguish ready commits from premature commits?",
+            "story_question": "Does the boundary distinguish ready effects from premature effects?",
             "result_sentence": (
-                f"Across {pair_summary['pair_count']} current commit-pair groups, StateTx reaches "
+                f"Across {pair_summary['pair_count']} current commit-pair groups, the boundary reaches "
                 f"{pair_summary['commit_pair_accuracy']:.3f} pair accuracy, "
                 f"{pair_summary['unauthorized_commit_rate']:.3f} unauthorized commit rate, and "
                 f"{pair_summary['authorized_commit_recall']:.3f} authorized commit recall."
             ),
             "why_it_matters": (
-                "The mechanism metric tests both sides of the transaction story: block premature effects "
+                "The mechanism metric tests both sides of the action story: block premature effects "
                 "and still commit when the evidence is ready."
             ),
             "source_data": "commit_pair_metrics.csv | commit_pair_members.csv",
@@ -109,7 +109,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         {
             "panel_id": "H4_FAITHFUL_BASELINE_COUNTERPOINT",
             "paper_role": "faithful_baseline_counterpoint",
-            "story_question": "Does a stronger ordinary task agent solve the same commit boundary?",
+            "story_question": "Does a stronger ordinary task agent solve the same proposal-to-effect boundary?",
             "result_sentence": (
                 f"A matched Qwen3.8-27B-long32k mini-swe-agent baseline scores "
                 f"{comparison_summary['faithful_baseline_passes']}/"
@@ -125,29 +125,29 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         {
             "panel_id": "H5_TAU2_COMMIT_MINING",
             "paper_role": "main_positive_evidence",
-            "story_question": "Are premature commits visible beyond hand-picked examples?",
+            "story_question": "Is the proposal-to-effect gap visible beyond hand-picked examples?",
             "result_sentence": (
                 f"Mining {metrics['tau2_result_files']} local tau2 result files finds "
                 f"{metrics['tau2_read_correct_write_wrong_proxy']} cancellation commits where the "
                 "reservation read was matched but the policy-invalid write failed database or total reward."
             ),
             "why_it_matters": (
-                "The result supports the core intuition: reasoning had evidence, but the durable commit "
-                "boundary was not controlled."
+                "The result supports the core intuition: reasoning had evidence, but the final effect "
+                "was not controlled."
             ),
             "source_data": "tau2_commit_mining.csv",
         },
         {
             "panel_id": "H6_CONTRACT_REFINEMENT_TRANSFER",
             "paper_role": "main_positive_evidence",
-            "story_question": "Does a failure-derived contract refinement transfer across benchmarks?",
+            "story_question": "Does a failure-derived boundary update transfer across benchmarks?",
             "result_sentence": (
-                f"The contract-refinement ledger records {metrics['transfer_failure_to_pass']} failure-to-pass "
+                f"The boundary-update ledger records {metrics['transfer_failure_to_pass']} failure-to-pass "
                 f"repairs across {metrics['transfer_cases']} audited cases with "
                 f"{metrics['transfer_pass_to_failure']} pass-to-failure regressions."
             ),
             "why_it_matters": (
-                "The paper's self-improvement object is the reusable State Contract refinement, not a "
+                "The paper's self-improvement object is the reusable action-boundary update, not a "
                 "single-task wrapper."
             ),
             "source_data": "transfer_ledger.csv | stage1_cases.csv",
@@ -158,11 +158,11 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "story_question": "What must be scaled before final top-conference claim freeze?",
             "result_sentence": (
                 f"The submission plan contains {scale_summary['scale_target_rows']} frozen scale targets "
-                "covering tau2 write families, Terminal-Bench transaction pilots, SkillFlow completion triggers, "
+                "covering tau2 write families, Terminal-Bench action-boundary pilots, SkillFlow completion triggers, "
                 "model breadth, faithful baselines, mechanism cuts, and statistics."
             ),
             "why_it_matters": (
-                "The next experiments are selected by the story boundary rather than by blind benchmark piling."
+                "The next experiments are selected by the proposal-to-effect argument rather than by blind benchmark piling."
             ),
             "source_data": "submission_scale_plan.csv",
         },

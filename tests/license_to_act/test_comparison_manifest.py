@@ -24,7 +24,7 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
 
     rows = manifest["rows"]
     assert [row["comparison_id"] for row in rows] == [
-        "M1_FULL_STATETX_CLEAN_ANCHORS",
+        "M1_FULL_ACTION_BOUNDARY_CLEAN_ANCHORS",
         "B1_QWEN32K_MINISWE_MATCHED",
         "A1_PROMPT_ONLY_TEXT_CONTRACT",
         "A2_NO_COMPLETION_TRIGGER",

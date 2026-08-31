@@ -42,7 +42,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert "ablation" not in rows[4]["comparison_kind"]
     assert rows[5]["positive_result"] == "15/15 official passes"
     assert rows[5]["benchmarks"] == "Terminal-Bench 2.1 | SkillFlow"
-    assert "finalization triggers" in rows[5]["story_role"]
+    assert "boundary" in rows[5]["story_role"]
     assert rows[5]["source_data"] == "model_in_loop_bridge.csv"
     assert rows[5]["comparison_kind"] == "matched_agent_commit_controller"
 

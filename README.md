@@ -1,12 +1,12 @@
 # License_code
 
-Clean open-source code for **Stateful Agents Need Transactions: Separating Reasoning from Durable Effects**.
+Clean open-source code for **Beyond Better Reasoning: Recursive Self-Improvement at the Action Boundary**.
 
-This repository contains the StateTx prototype: State Contract primitives, Commit Controller adapters, benchmark scripts, and tests. Large experiment artifacts are intentionally kept outside this code repository.
+This repository contains the action-boundary prototype: State Contract primitives, commit-controller adapters, benchmark scripts, and tests. Large experiment artifacts are intentionally kept outside this code repository.
 
 ## Contents
 
-- `license_to_act/`: core transaction evaluator, State Contract examples, replay/materialization utilities, and Harbor agents.
+- `license_to_act/`: core boundary evaluator, State Contract examples, replay/finalization utilities, and Harbor agents.
 - `tests/`: focused pytest coverage for the commit protocol and benchmark slices.
 - `scripts/`: local replay and report-generation entry points.
 - `configs/`: Harbor configs for official benchmark probes.
@@ -70,7 +70,7 @@ env PYTHONPATH=/data/zhiqi/License/License_code MSWEA_API_KEY=dummy OPENAI_API_K
 The sqlite-truncate anchor writes `/app/recover.json` from binary payload evidence in `/app/trunc.db`.
 The log-summary anchor writes `/app/summary.csv` from bracketed severity tokens and filename dates in `/app/logs`.
 The travel-claim anchor writes `/app/workspace/travel_claims.xlsx` from OCR evidence and `dataset/claim_roster.csv`, then the SkillFlow official verifier scores the workbook.
-The three Stage-3 Qwen+Commit Controller commands keep `Qwen3.8-27B-long32k` inside the official trial while the Commit Controller owns finalization; the current artifacts score 15/15 across Terminal-Bench log-summary, invoice, and travel-claim anchors with zero exceptions.
+The three Stage-3 Qwen+controller commands keep `Qwen3.8-27B-long32k` inside the official trial while the action boundary owns finalization; the current artifacts score 15/15 across Terminal-Bench log-summary, invoice, and travel-claim anchors with zero exceptions.
 
 `configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
 
@@ -98,7 +98,7 @@ env PYTHONPATH=/data/zhiqi/License/License_code OPENAI_API_KEY=dummy harbor run 
   --n-attempts 5 --n-concurrent 1 -y
 ```
 
-Current artifacts record 7/20 Terminal-Bench passes and 1/10 SkillFlow OCR passes, or 8/30 across the current matched faithful-baseline pool. The Terminal-Bench baseline includes one `NonZeroAgentExitCodeError`; the SkillFlow K=10 job has zero runtime exceptions. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same commit boundary without the Commit Controller.
+Current artifacts record 7/20 Terminal-Bench passes and 1/10 SkillFlow OCR passes, or 8/30 across the current matched faithful-baseline pool. The Terminal-Bench baseline includes one `NonZeroAgentExitCodeError`; the SkillFlow K=10 job has zero runtime exceptions. These are faithful baselines, not ablations; they test whether a stronger long-context task agent solves the same action boundary without the commit controller.
 
 ## Paper Result Exports
 
@@ -130,10 +130,10 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
 `export_commit_pair_metrics.py`, `export_submission_scale_plan.py`,
 `export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
-`License_paper/sections`, which the paper imports for headline result,
-evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint,
-contract-lineage, mechanism-ablation, model-in-loop comparison, submission-scale,
-commit-pair metrics, real-evidence audit, and paper-code consistency numbers.
+`License_paper/sections`. The paper imports those files for result counts,
+baseline and ablation separation, full-study targets, contract updates,
+model-in-loop comparisons, commit-pair metrics, real-evidence auditing, and
+paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing State Contract JSON examples used in the appendix.
 
 ## Paper-Code Consistency
@@ -141,12 +141,12 @@ commit-pair metrics, real-evidence audit, and paper-code consistency numbers.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, story-claim, evidence-portfolio, comparison-manifest, headline-panel, experiment-blueprint, contract-lineage, mechanism-ablation, model-in-loop comparison, commit-pair, submission-scale, real-evidence audit, State Contract examples, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, contract-update, mechanism-ablation, model-in-loop, commit-pair, real-evidence audit, State Contract example, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.
 
-Faithful baselines and StateTx ablations are different evidence categories. Baseline
+Faithful baselines and action-boundary ablations are different evidence categories. Baseline
 configs should reproduce the external agent condition as cleanly as possible;
-ablations isolate parts of our transaction mechanism and are allowed to be shaped
+ablations isolate parts of our boundary mechanism and are allowed to be shaped
 around the paper mechanism.

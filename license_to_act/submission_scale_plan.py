@@ -33,7 +33,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
     story_gate = build_story_gate_report(root)
     metrics = claims["headline_metrics"]
     comparison_summary = comparison["summary"]
-    inclusion_rule = "Include only tasks that sharpen the reason/prepare/commit boundary."
+    inclusion_rule = "Include only tasks that sharpen the proposal-to-effect boundary."
 
     rows = [
         {
@@ -44,7 +44,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "condition_role": "method_scale",
             "target_n": "40",
             "paper_use": "main_positive",
-            "story_axis": "Candidate changes must be ready before business writes commit.",
+            "story_axis": "Proposed effects must be ready before business writes commit.",
             "current_positive_evidence": (
                 f"{metrics['tau2_read_correct_write_wrong_proxy']} read-correct/write-wrong cancellation commits "
                 f"from {metrics['tau2_result_files']} local result files; "
@@ -52,7 +52,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             ),
             "scale_target": "Run authorized and unauthorized write families across airline, retail, banking, and telecom.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Freeze write-family task list, then run full, prompt, static-contract, and transactional conditions.",
+            "next_run": "Freeze write-family task list, then run full, prompt, static-boundary, and action-boundary conditions.",
         },
         {
             "target_id": "S2_TAU2_AUTHORIZED_WRITES",
@@ -94,7 +94,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "condition_role": "method_scale",
             "target_n": "30",
             "paper_use": "main_positive",
-            "story_axis": "The commit boundary should transfer beyond airline policies.",
+            "story_axis": "The action boundary should transfer beyond airline policies.",
             "current_positive_evidence": (
                 f"{metrics['tau2_result_files']} local tau2 result files include retail traces for scale mining."
             ),
@@ -110,7 +110,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "condition_role": "method_scale",
             "target_n": "30",
             "paper_use": "main_positive",
-            "story_axis": "State-changing service actions should use the same prepare/commit protocol.",
+            "story_axis": "State-changing service actions should use the same proposal-to-effect boundary.",
             "current_positive_evidence": (
                 "The local tau2 inventory contains banking and telecom write-heavy domains."
             ),
@@ -133,7 +133,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             ),
             "scale_target": "Expand Git/history tasks from sanitize and leak recovery into a scoped-write pilot.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Run full agent, prompt-only, static hand guard, and StateTx conditions on frozen Git tasks.",
+            "next_run": "Run full agent, prompt-only, static hand guard, and action-boundary conditions on frozen Git tasks.",
         },
         {
             "target_id": "S7_TB_PRESERVING_READ",
@@ -174,7 +174,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "target_n": "15",
             "paper_use": "main_positive",
             "story_axis": "Security fixes require both code mutation and verifier-visible explanation.",
-            "current_positive_evidence": "Current Terminal-Bench evidence includes scoped code/security transaction anchors.",
+            "current_positive_evidence": "Current Terminal-Bench evidence includes scoped code/security boundary anchors.",
             "scale_target": "Run vulnerability-repair tasks with patch, side-effect, and report contracts.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Use source-code patch receipts plus original and added regression tests.",
@@ -260,9 +260,9 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "condition_role": "method_scale",
             "target_n": "16",
             "paper_use": "main_positive",
-            "story_axis": "Evidence from multiple files needs a single commit contract.",
+            "story_axis": "Evidence from multiple files needs one action boundary before output.",
             "current_positive_evidence": "The paper plan keeps cross-format tasks as positive breadth, not off-story filler.",
-            "scale_target": "Run reconciliation tasks with source authority and output-schema commit gates.",
+            "scale_target": "Run reconciliation tasks with source authority and output-schema boundary checks.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Use PDF/Excel/JSON source bindings and exact output schemas.",
         },
@@ -278,7 +278,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "current_positive_evidence": "Document-fraud is a planned positive family with clear source/verifier boundaries.",
             "scale_target": "Add fraud-detection families where source citations and output schema are both judged.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Run evidence-citation and schema gates against ordinary and transaction-controlled agents.",
+            "next_run": "Run evidence-citation and schema gates against ordinary and boundary-controlled agents.",
         },
         {
             "target_id": "S17_SF_SKILL_QUARANTINE_CANARIES",
@@ -288,9 +288,9 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "condition_role": "method_scale",
             "target_n": "16",
             "paper_use": "main_positive",
-            "story_axis": "Reusable skill bodies are context state that can pollute commits.",
+            "story_axis": "Reusable skill bodies are context state that can pollute external effects.",
             "current_positive_evidence": "The scale plan reserves skill-surface canaries for the final matrix.",
-            "scale_target": "Compare full visible skill bodies, names-only quarantine, body-on-demand, and StateTx.",
+            "scale_target": "Compare full visible skill bodies, names-only quarantine, body-on-demand, and action-boundary control.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Select families with large visible skill bodies and clear artifact verifiers.",
         },
@@ -323,7 +323,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "current_positive_evidence": (
                 f"{metrics['faithful_baseline_trials']} matched Qwen3.8-27B-long32k faithful-baseline trials."
             ),
-            "scale_target": "Run mini-swe, Codex, and Claude on the same Terminal-Bench transaction strata.",
+            "scale_target": "Run mini-swe, Codex, and Claude on the same Terminal-Bench action-boundary strata.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Report official pass and false-done rates without relabeling failures as ablations.",
         },
@@ -342,7 +342,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             ),
             "scale_target": "Run ordinary SkillFlow agents across OCR, healthcare, document, and cross-format families.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Keep no-skill and native-skill settings separate from StateTx ablations.",
+            "next_run": "Keep no-skill and native-skill settings separate from action-boundary ablations.",
         },
         {
             "target_id": "S21_TAU2_MECHANISM_ABLATIONS",
@@ -358,7 +358,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             ),
             "scale_target": "Cut readiness, source authority, and user-confirmation fields on paired tau2 tasks.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Run ablations after the full transaction condition and task list are frozen.",
+            "next_run": "Run ablations after the full boundary condition and task list are frozen.",
         },
         {
             "target_id": "S22_TB_MECHANISM_ABLATIONS",
@@ -388,7 +388,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "current_positive_evidence": "Seed ablations already include prompt-only and no-finalization-trigger cuts.",
             "scale_target": "Cut finalization, schema, source-join, and skill-body quarantine mechanisms.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Run after full StateTx and faithful baselines on the frozen SkillFlow families.",
+            "next_run": "Run after full action-boundary and faithful baselines on the frozen SkillFlow families.",
         },
         {
             "target_id": "S24_FREEZE_AND_STATISTICS",

@@ -141,7 +141,7 @@ def infer_condition_family(run_id: str) -> str:
     )
     memory_terms = ("prompt_checklist", "memory_lesson", "proofhandle", "recuris")
     if any(term in text for term in lta_terms):
-        return "transaction_layer_or_gate"
+        return "action_boundary_or_gate"
     if any(term in text for term in memory_terms):
         return "prompt_or_memory"
     return "baseline_or_probe"

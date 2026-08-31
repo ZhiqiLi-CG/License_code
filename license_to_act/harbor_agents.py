@@ -360,7 +360,7 @@ if NoInstallQwenCodeBareLocal is not None:
             )
             if result.return_code != 0:
                 raise RuntimeError(
-                    "StateTx post-Qwen Commit Controller failed with return code "
+                    "Action-boundary post-Qwen finalization failed with return code "
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
@@ -385,7 +385,7 @@ if NoInstallQwenCodeBareLocal is not None:
             )
             if result.return_code != 0:
                 raise RuntimeError(
-                    "StateTx post-Qwen travel Commit Controller failed with return code "
+                    "Action-boundary post-Qwen travel finalization failed with return code "
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 
@@ -410,7 +410,7 @@ if NoInstallQwenCodeBareLocal is not None:
             )
             if result.return_code != 0:
                 raise RuntimeError(
-                    "StateTx post-Qwen log-summary Commit Controller failed with return code "
+                    "Action-boundary post-Qwen log-summary finalization failed with return code "
                     f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
                 )
 

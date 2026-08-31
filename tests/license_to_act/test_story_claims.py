@@ -10,7 +10,7 @@ from license_to_act.story_claims import build_story_claims, write_story_claims
 def test_build_story_claims_from_current_license_artifacts() -> None:
     claims = build_story_claims(Path("/data/zhiqi/License"))
 
-    assert claims["thesis_slug"] == "commit_gap_transactions"
+    assert claims["thesis_slug"] == "action_boundary_rsi"
     metrics = claims["headline_metrics"]
     assert metrics["stage1_cases"] == 6
     assert metrics["stage1_failure_to_pass"] == 5
@@ -38,12 +38,12 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["tau2_infrastructure_error_simulations"] >= 39
 
     assert set(claims["claims"]) == {
-        "commit_gap_is_distinct_from_task_failure",
-        "candidate_change_is_not_commit",
+        "proposal_to_effect_gap_is_distinct_from_task_failure",
+        "proposal_is_not_effect",
         "contracts_are_not_operation_blacklists",
-        "commit_controller_stabilizes_transactions",
+        "boundary_stabilizes_external_effects",
         "completion_triggers_repair_missing_finalization",
-        "contract_refinements_transfer_across_state_substrates",
+        "boundary_updates_transfer_across_state_substrates",
     }
     for claim in claims["claims"].values():
         assert claim["positive_evidence"]
@@ -67,7 +67,7 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
     with Path(output["outputs"]["claims_csv"]).open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     assert len(rows) == 6
-    assert rows[0]["claim_id"] == "commit_gap_is_distinct_from_task_failure"
+    assert rows[0]["claim_id"] == "proposal_to_effect_gap_is_distinct_from_task_failure"
 
     metrics = {
         row["metric"]: row["value"]

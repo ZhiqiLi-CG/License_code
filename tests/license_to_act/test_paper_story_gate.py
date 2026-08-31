@@ -34,37 +34,33 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["faithful_baseline_not_ablation"]["status"] == "pass"
     assert checks["comparison_manifest_separates_roles"]["status"] == "pass"
     assert checks["mechanism_ablation_panel_has_requested_cuts"]["status"] == "pass"
-    assert checks["model_in_loop_bridge_separates_materializers"]["status"] == "pass"
-    assert "15/15" in checks["model_in_loop_bridge_separates_materializers"]["evidence"]
+    assert checks["model_in_loop_bridge_separates_runtime_executors"]["status"] == "pass"
+    assert "15/15" in checks["model_in_loop_bridge_separates_runtime_executors"]["evidence"]
     assert checks["real_evidence_audit_blocks_planned_main_results"]["status"] == "pass"
     assert "planned main positives: 0" in checks["real_evidence_audit_blocks_planned_main_results"]["evidence"]
     assert checks["license_workspace_only"]["status"] == "pass"
     assert checks["paper_imports_generated_numbers"]["status"] == "pass"
-    assert "consistency numbers" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "headline panel" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "experiment blueprint" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "model-in-loop comparison" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "contract lineage" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "reproducibility numbers" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "run-plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "model-in-loop" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "contract-update" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "ablation" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "scale plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "commit-pair" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "real-evidence audit" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert checks["contract_lineage_has_generated_refinements"]["status"] == "pass"
-    assert checks["transaction_story_framing"]["status"] == "pass"
-    assert checks["public_surface_uses_transaction_terms"]["status"] == "pass"
+    assert "real-evidence" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert checks["boundary_updates_have_generation_record"]["status"] == "pass"
+    assert checks["action_boundary_story_framing"]["status"] == "pass"
+    assert checks["public_surface_uses_action_boundary_terms"]["status"] == "pass"
     assert checks["story_language_anchors"]["status"] == "pass"
     assert checks["main_text_avoids_meta_curation_language"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
     assert "consistency export" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "headline panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "experiment blueprint" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "model-in-loop comparison" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "contract lineage" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "ablation panel" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "scale plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "full-study plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "model-in-loop exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "contract-update" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "ablation exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "commit-pair metrics" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "real-evidence audit" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert checks["appendix_serves_story"]["status"] == "pass"
+    assert checks["appendix_serves_argument"]["status"] == "pass"
     assert checks["appendix_uses_submission_scale_language"]["status"] == "pass"
     assert checks["code_paper_submodules_declared"]["status"] == "pass"
 

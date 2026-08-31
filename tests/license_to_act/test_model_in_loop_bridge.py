@@ -100,7 +100,7 @@ def test_bridge_rows_name_actor_controller_boundary_and_official_result() -> Non
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["controller_boundary"] == "completion_trigger"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
     assert rows["TB_WAL_MATERIALIZER_K5"]["actor_model"] == "none_runtime_only"
-    assert rows["TB_WAL_MATERIALIZER_K5"]["controller_boundary"] == "runtime_transaction"
+    assert rows["TB_WAL_MATERIALIZER_K5"]["controller_boundary"] == "runtime_boundary"
     assert rows["TB_WAL_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
 
     summary = bridge["summary"]

@@ -58,7 +58,7 @@ RULES = [
         "generation": 3,
         "trigger_signature": "Missing finalization",
         "source_signatures": ["Missing finalization", "Missing commit obligation"],
-        "contract_diff": "ADD_DONE_TRIGGER materialize verifier-visible artifacts when ready evidence is complete",
+        "contract_diff": "ADD_DONE_TRIGGER write verifier-visible artifacts when ready evidence is complete",
         "validation_cases": ["SF-INV-MAT-K5"],
         "heldout_case_ids": ["SF-TRAVEL-MAT-K5"],
     },
@@ -97,8 +97,8 @@ def build_recursive_amendment_lineage(project_root: str | Path = Path("/data/zhi
                 "heldout_clean_trials": str(heldout_trials),
                 "pass_to_failure_regressions": str(pass_to_failure),
                 "admission_decision": _admission_decision(source_f_to_p, heldout_rows + validation_rows, pass_to_failure),
-                "comparison_class": "contract_refinement",
-                "baseline_boundary": "not_baseline: generated State Contract refinement; compare task-ID hand guards as ablations",
+                "comparison_class": "boundary_update",
+                "baseline_boundary": "not_baseline: generated boundary update; compare task-ID hand guards as ablations",
             }
         )
 

@@ -24,7 +24,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-SAN-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "sanitize-git-repo",
-        "condition": "StateTx scoped Git transaction",
+        "condition": "Action-boundary scoped Git write",
         "role": "write-scope/preserve anchor",
         "result_path": artifact_path("stage2", "harbor", "stage2-tb21-lta-sanitize-k5-py", "result.json"),
         "paper_use": "clean_reliability_anchor",
@@ -34,7 +34,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-WAL-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "db-wal-recovery",
-        "condition": "StateTx WAL recovery transaction",
+        "condition": "Action-boundary WAL recovery",
         "role": "preserving-read anchor",
         "result_path": artifact_path("stage2", "harbor", "stage2-tb21-lta-db-wal-k5-py", "result.json"),
         "paper_use": "clean_reliability_anchor",
@@ -44,7 +44,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-SQLITE-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "sqlite-db-truncate",
-        "condition": "StateTx truncated SQLite recovery",
+        "condition": "Action-boundary truncated SQLite recovery",
         "role": "binary evidence recovery",
         "result_path": artifact_path(
             "stage2",
@@ -59,7 +59,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "TB-LOG-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "log-summary-date-ranges",
-        "condition": "StateTx log-summary CSV transaction",
+        "condition": "Action-boundary log-summary CSV write",
         "role": "log evidence to CSV artifact",
         "result_path": artifact_path(
             "stage3",
@@ -76,7 +76,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "SF-INV-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
-        "condition": "StateTx invoice completion trigger",
+        "condition": "Action-boundary invoice completion trigger",
         "role": "completion trigger",
         "result_path": artifact_path(
             "stage2",
@@ -85,7 +85,7 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "clean_reliability_anchor",
-        "interpretation": "Executable completion trigger materializes the verifier-visible workbook from OCR evidence.",
+        "interpretation": "Executable completion trigger writes the verifier-visible workbook from OCR evidence.",
     },
     {
         "case_id": "TB-QWEN32K-MSWE-K15",
@@ -102,7 +102,7 @@ DEFAULT_RELIABILITY_CASES = [
         "paper_use": "faithful_baseline",
         "interpretation": (
             "The 32k open-model agent solves some Git/WAL trials but remains unreliable "
-            "across Terminal-Bench transaction anchors, with sqlite truncation at 0/5."
+            "across Terminal-Bench boundary anchors, with sqlite truncation at 0/5."
         ),
     },
     {
@@ -145,7 +145,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "SF-INV-QG-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
-        "condition": "Qwen3.8-27B-long32k + Commit Controller",
+        "condition": "Qwen3.8-27B-long32k + action boundary",
         "role": "model integration stress",
         "result_path": artifact_path(
             "stage3",
@@ -154,13 +154,13 @@ DEFAULT_RELIABILITY_CASES = [
             "result.json",
         ),
         "paper_use": "integration_stress",
-        "interpretation": "Qwen remains in the official Harbor trial and the Commit Controller finalizes the workbook in all five runs.",
+        "interpretation": "Qwen remains in the official Harbor trial and the action boundary finalizes the workbook in all five runs.",
     },
     {
         "case_id": "TB-LOG-QG-K5",
         "benchmark": "Terminal-Bench 2.1",
         "task": "log-summary-date-ranges",
-        "condition": "Qwen3.8-27B-long32k + Commit Controller",
+        "condition": "Qwen3.8-27B-long32k + action boundary",
         "role": "model integration stress",
         "result_path": artifact_path(
             "stage3",
@@ -170,7 +170,7 @@ DEFAULT_RELIABILITY_CASES = [
         ),
         "paper_use": "integration_stress",
         "interpretation": (
-            "Qwen remains in the official Terminal-Bench trial and the Commit Controller "
+            "Qwen remains in the official Terminal-Bench trial and the action boundary "
             "finalizes the log-summary CSV in all five runs."
         ),
     },
@@ -178,7 +178,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "SF-TRAVEL-QG-K5",
         "benchmark": "SkillFlow",
         "task": "travel claim OCR merge",
-        "condition": "Qwen3.8-27B-long32k + Commit Controller",
+        "condition": "Qwen3.8-27B-long32k + action boundary",
         "role": "model integration stress",
         "result_path": artifact_path(
             "stage3",
@@ -188,7 +188,7 @@ DEFAULT_RELIABILITY_CASES = [
         ),
         "paper_use": "integration_stress",
         "interpretation": (
-            "Qwen remains in the official SkillFlow trial and the Commit Controller "
+            "Qwen remains in the official SkillFlow trial and the action boundary "
             "finalizes the travel-claim workbook in all five runs."
         ),
     },
@@ -196,7 +196,7 @@ DEFAULT_RELIABILITY_CASES = [
         "case_id": "SF-TRAVEL-MAT-K5",
         "benchmark": "SkillFlow",
         "task": "travel claim OCR merge",
-        "condition": "StateTx travel-claim completion trigger",
+        "condition": "Action-boundary travel-claim completion trigger",
         "role": "OCR-to-workbook completion",
         "result_path": artifact_path(
             "stage2",

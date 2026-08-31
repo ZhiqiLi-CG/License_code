@@ -80,7 +80,7 @@ def build_tau2_mining_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
             "Runs separated from agent-behavior claims, mostly context or runner failures.",
         ),
         _metric("cancel_decisions", summary["n_cancel_decisions"], "Observed cancel_reservation commits."),
-        _metric("revision_targets", summary["n_lta_vetoes"], "Commits lacking readiness under StateTx."),
+        _metric("revision_targets", summary["n_lta_vetoes"], "Commits lacking boundary readiness."),
         _metric("ready_commits", summary["n_lta_allows"], "Cancellation commits accepted by the readiness model."),
         _metric(
             "vetoes_with_user_intent",

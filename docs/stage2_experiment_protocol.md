@@ -2,17 +2,16 @@
 
 Date: 2026-08-30
 
-This document freezes the second-stage experimental spine for StateTx before expanding the result matrix. The goal is not to make a cautious audit paper. The goal is to support one bold story with enough real benchmark evidence that the story feels inevitable:
+This document freezes the second-stage experiment protocol before expanding the result matrix. The goal is not to make a cautious audit paper. The goal is to support one bold RSI argument with enough real benchmark evidence that the argument feels inevitable:
 
 ```text
-Reasoning is speculative, but external state is durable. User intent, task phrasing,
-model confidence, and observed evidence can propose a change, but a state-changing
-commit needs a transaction.
+A self-improving agent should learn not only better solutions, but better ways
+of acting on its own solutions.
 ```
 
 ## Core Claim
 
-StateTx shifts recursive self-improvement from editing advice to editing the State Contracts that decide when a Candidate Change may become a durable transition. The persistent object is a transaction contract, not a reflection:
+The paper shifts persistent improvement from editing advice to editing the action boundary that decides how a proposed change becomes an external effect. The persistent object is the boundary, not a reflection:
 
 ```text
 ready evidence, write scope, preserve constraints, done predicate,
@@ -32,10 +31,10 @@ Faithful baselines are not ablations. They must use the same task harness, offic
 Baseline ladder:
 
 1. Vanilla actor on official harness.
-2. Prompt-only commit protocol, where the model receives transaction language but no executable Commit Controller.
+2. Prompt-only commit protocol, where the model receives boundary language but no executable commit controller.
 3. Reflection/history or Recuris-style memory evolution, implemented as faithfully as local infrastructure permits.
-4. Fixed State Contract ledger without failure-derived refinement.
-5. Full StateTx with Commit Controller decisions and contract-refinement transfer.
+4. Fixed State Contract boundary without failure-derived update.
+5. Full action-boundary system with commit-controller decisions and boundary-update transfer.
 
 Ablations are our mechanism probes and may be intentionally narrower:
 
@@ -49,8 +48,8 @@ Ablations are our mechanism probes and may be intentionally narrower:
 
 Source/amendment split:
 
-- tau2 airline cancellation tasks that motivated the first amendment, including task 1 and task 48.
-- The refinement is: proposal evidence cannot commit without independent policy/source-state readiness.
+- tau2 airline cancellation tasks that motivated the first boundary update, including task 1 and task 48.
+- The update is: proposal evidence cannot commit without independent policy/source-state readiness.
 
 Control split:
 
@@ -60,11 +59,11 @@ Control split:
 
 Held-out split:
 
-- tau2: at least one non-airline domain after the license schema is frozen, preferring retail or telecom.
+- tau2: at least one non-airline domain after the contract schema is frozen, preferring retail or telecom.
 - Terminal-Bench 2.1: a stratified slice covering repo mutation, database recovery, artifact production, process state, and data/schema commit boundaries.
 - SkillFlow: OCR/Data Extraction plus at least two additional families with workbook/schema/materialization pressure.
 
-Gemma-4-31B-it remains held out until licenses, task slices, and parser decisions are frozen.
+Gemma-4-31B-it remains held out until contracts, task slices, and parser decisions are frozen.
 
 ## Model Plan
 
@@ -101,8 +100,8 @@ Batch B: tau2 commit mining.
 
 - Scan all local tau2 result files.
 - Separate infrastructure failures from agent decisions.
-- Count cancel commits where StateTx would request revision, where reservation reads were already matched, and where official reward or DB reward failed.
-- Purpose: convert the tau2 story from three examples into a distributional diagnosis.
+- Count cancel commits where the boundary would request revision, where reservation reads were already matched, and where official reward or DB reward failed.
+- Purpose: convert tau2 from three examples into a distributional diagnosis.
 
 Batch C: held-out task expansion.
 
@@ -112,7 +111,7 @@ Batch C: held-out task expansion.
 
 Batch D: ablations and transfer.
 
-- Run prompt-only, fixed-ledger, and selected ablations only after the task split is frozen.
+- Run prompt-only, fixed-boundary, and selected ablations only after the task split is frozen.
 - Report ablations as mechanism evidence, not as faithful competing systems.
 
 ## Paper Evidence Policy
@@ -125,14 +124,14 @@ The main paper should contain positive, story-serving results:
 
 Infrastructure errors, weak context-window failures, and noisy failed probes may be stored in artifacts but should only enter the paper when they clarify resource needs or boundary conditions.
 
-Before any paper-facing push, run the story gate:
+Before any paper-facing push, run the consistency check:
 
 ```bash
 python scripts/export_story_gate.py
 ```
 
-The gate must report zero failed checks. It verifies that the paper keeps the
-evidence spine broad enough for a top-conference claim, separates faithful
+The check must report zero failed checks. It verifies that the paper keeps the
+current evidence broad enough for a top-conference claim, separates faithful
 external-agent baselines from our mechanism cuts, imports generated numbers,
 uses License-only paper-facing evidence sources, documents the reproduction
-chain, and keeps the appendix aligned with the main story.
+chain, and keeps the appendix aligned with the main argument.

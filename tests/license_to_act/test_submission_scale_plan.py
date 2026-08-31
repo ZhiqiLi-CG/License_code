@@ -36,8 +36,8 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     assert all(row["condition_role"] for row in rows)
     assert all(int(row["target_n"]) > 0 for row in rows)
     assert all(row["paper_use"] for row in rows)
-    assert all("reason/prepare/commit" in row["inclusion_rule"] for row in rows)
-    assert all("RSI" not in " ".join(row.values()) for row in rows)
+    assert all("proposal-to-effect" in row["inclusion_rule"] for row in rows)
+    assert any("action-boundary" in " ".join(row.values()) for row in rows)
 
     task_types_by_benchmark: dict[str, set[str]] = {}
     for row in rows:

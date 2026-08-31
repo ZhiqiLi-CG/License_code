@@ -31,8 +31,8 @@ def test_build_submission_experiment_blueprint_separates_story_scale_baselines_a
     assert [row["blueprint_id"] for row in rows] == [
         "E1_TAU2_AIRLINE_COMMIT_READINESS",
         "E2_TAU2_CROSS_DOMAIN_COMMITS",
-        "E3_TB_12_TASK_TRANSACTION_PILOT",
-        "E4_TB_STRATIFIED_TRANSACTION_SWEEP",
+            "E3_TB_12_TASK_ACTION_BOUNDARY_PILOT",
+            "E4_TB_STRATIFIED_ACTION_BOUNDARY_SWEEP",
         "E5_SKILLFLOW_COMPLETION_TRIGGERS",
         "E6_SKILLFLOW_SKILL_COMMIT_TRANSFER",
         "E7_MODEL_BREADTH_HELDOUT",
@@ -42,10 +42,10 @@ def test_build_submission_experiment_blueprint_separates_story_scale_baselines_a
         "E11_CONTRACT_REFINEMENT_TRANSFER",
         "E12_FREEZE_STATISTICS_REGRESSION",
     ]
-    assert all("reason/prepare/commit" in row["inclusion_rule"] for row in rows)
+    assert all("proposal-to-effect" in row["inclusion_rule"] for row in rows)
     assert all("faithful baseline" not in row["comparison_class"] for row in rows if row["comparison_class"] == "mechanism_ablation")
     assert all("ablation" not in row["comparison_class"] for row in rows if row["comparison_class"] == "faithful_baseline")
-    assert all("RSI" not in " ".join(row.values()) for row in rows)
+    assert any("action-boundary" in " ".join(row.values()) for row in rows)
 
 
 def test_submission_experiment_blueprint_records_review_acceptance_gates() -> None:

@@ -40,7 +40,7 @@ def test_build_recursive_amendment_lineage_exposes_contract_refinement_generatio
 def test_recursive_amendment_lineage_keeps_baselines_and_ablation_boundaries_separate() -> None:
     rows = build_recursive_amendment_lineage(Path("/data/zhiqi/License"))["rows"]
 
-    assert all(row["comparison_class"] == "contract_refinement" for row in rows)
+    assert all(row["comparison_class"] == "boundary_update" for row in rows)
     assert all("task-ID" not in row["contract_diff"] for row in rows)
     assert any("READY_PREDICATE" in row["contract_diff"] for row in rows)
     assert any("DONE_TRIGGER" in row["contract_diff"] for row in rows)

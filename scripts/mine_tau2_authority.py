@@ -21,7 +21,7 @@ DEFAULT_OUTPUT = artifact_path("stage2", "tau2_commit_mining_20260830.json")
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Mine tau2 traces for commit-gap failures.")
+    parser = argparse.ArgumentParser(description="Mine tau2 traces for proposal-to-effect failures.")
     parser.add_argument("--root", type=Path, default=DEFAULT_TAU2_SIMULATION_ROOT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--current-time", default="2024-05-15T15:00:00")

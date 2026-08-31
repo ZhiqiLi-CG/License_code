@@ -78,7 +78,7 @@ def build_state_contract_examples() -> dict[str, Any]:
             "ready": "evidence required before a durable change can commit",
             "write_scope": "state region and side effects the change may touch",
             "preserve": "state regions or files that must not be consumed while reading evidence",
-            "done": "verifier-visible postcondition that closes the transaction",
+            "done": "verifier-visible postcondition that closes the external effect",
         },
         "examples": examples,
     }

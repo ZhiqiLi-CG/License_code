@@ -15,7 +15,7 @@ from license_to_act.story_claims import write_story_claims  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Export StateTx story claim/evidence files.")
+    parser = argparse.ArgumentParser(description="Export action-boundary claim/evidence files.")
     parser.add_argument("--paper-data-dir", type=Path, default=project_root() / "License_paper" / "data")
     parser.add_argument("--paper-sections-dir", type=Path, default=project_root() / "License_paper" / "sections")
     parser.add_argument("--summary", type=Path, default=artifact_path("paper_results", "lta_story_claims_20260831.json"))

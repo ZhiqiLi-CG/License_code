@@ -82,17 +82,17 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     }
 
     return {
-        "thesis_slug": "commit_gap_transactions",
-        "title_line": "Stateful Agents Need Transactions: Separating Reasoning from Durable Effects",
+        "thesis_slug": "action_boundary_rsi",
+        "title_line": "Beyond Better Reasoning: Recursive Self-Improvement at the Action Boundary",
         "central_sentence": (
-            "Reasoning is speculative, but external state is durable; agents need a "
-            "separate prepare-validate-commit layer for state changes."
+            "A self-improving agent should learn not only better solutions, but better "
+            "ways of turning those solutions into external effects."
         ),
         "headline_metrics": headline_metrics,
         "claims": _claims(headline_metrics, clean_rows, faithful_rows),
         "source_policy": (
             "Story claims use License workspace artifacts only. Faithful baselines and "
-            "StateTx mechanism cuts are kept as different evidence categories."
+            "action-boundary mechanism cuts are kept as different evidence categories."
         ),
     }
 
@@ -105,11 +105,11 @@ def _claims(
     clean_tasks = ", ".join(row["case_id"] for row in clean_rows)
     baseline_tasks = ", ".join(row["case_id"] for row in faithful_rows)
     return {
-        "commit_gap_is_distinct_from_task_failure": {
+        "proposal_to_effect_gap_is_distinct_from_task_failure": {
             "paper_section": "Introduction",
             "claim": (
-                "State-changing agents fail at the durability boundary: reasoning, preparation, "
-                "and commit are collapsed into one loop."
+                "State-changing agents can reach the right intermediate proposal while the final "
+                "external effect remains wrong or absent."
             ),
             "positive_evidence": [
                 f"{metrics['stage1_cases']} audited Stage-1 cases across tau2, Terminal-Bench, and SkillFlow",
@@ -120,11 +120,11 @@ def _claims(
                 "artifacts/stage2/tau2_commit_mining_20260830.json",
             ],
         },
-        "candidate_change_is_not_commit": {
+        "proposal_is_not_effect": {
             "paper_section": "tau2 Results",
             "claim": (
                 "User intent, task phrasing, and model confidence can motivate a business write, "
-                "but policy/source-state evidence must make the candidate ready before commit."
+                "but policy/source-state evidence must make the proposed effect ready before commit."
             ),
             "positive_evidence": [
                 f"{metrics['tau2_cancel_decisions']} tau2 cancel decisions mined",
@@ -150,10 +150,10 @@ def _claims(
                 "License_paper/data/diagnostic_cases.csv",
             ],
         },
-        "commit_controller_stabilizes_transactions": {
+        "boundary_stabilizes_external_effects": {
             "paper_section": "Stage-2 Reliability",
             "claim": (
-                "Executable transaction protocols are stable under official reruns, not just one-off scripts."
+                "Executable boundary protocols are stable under official reruns, not just one-off scripts."
             ),
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} clean Stage-2 anchors: {clean_tasks}",
@@ -172,11 +172,11 @@ def _claims(
         "completion_triggers_repair_missing_finalization": {
             "paper_section": "SkillFlow Results",
             "claim": (
-                "Runtime control is not only a veto: complete evidence can trigger a missing verifier-visible artifact."
+                "The boundary is not only a veto: complete evidence can trigger a missing verifier-visible artifact."
             ),
             "positive_evidence": [
                 (
-                    "Qwen3.8-27B-long32k plus Commit Controller reaches "
+                    "Qwen3.8-27B-long32k plus commit controller reaches "
                     f"{metrics['qwen_skillflow_govkernel_passes']}/"
                     f"{metrics['qwen_skillflow_govkernel_trials']} official passes "
                     "on invoice and travel-claim OCR anchors"
@@ -194,10 +194,10 @@ def _claims(
                 "License_paper/data/model_in_loop_bridge.csv",
             ],
         },
-        "contract_refinements_transfer_across_state_substrates": {
-            "paper_section": "Contract Refinement Transfer",
+        "boundary_updates_transfer_across_state_substrates": {
+            "paper_section": "Boundary Update Transfer",
             "claim": (
-                "A failure-derived commit-contract refinement transfers across business tools, terminal state, "
+                "A failure-derived boundary update transfers across business tools, terminal state, "
                 "and workflow artifacts."
             ),
             "positive_evidence": [

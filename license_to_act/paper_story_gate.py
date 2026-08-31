@@ -50,7 +50,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
-        _transaction_story_check(paper_dir),
+        _action_boundary_story_check(paper_dir),
         _public_surface_hygiene_check(root),
         _story_language_check(paper_dir),
         _main_text_style_check(paper_dir),
@@ -145,7 +145,7 @@ def _portfolio_breadth_check(summary: dict[str, Any]) -> dict[str, str]:
     return _check(
         "portfolio_breadth",
         ok,
-        "The main evidence spine spans multiple benchmark families, state substrates, and actor backbones.",
+        "The main result set spans multiple benchmark families, state substrates, and actor backbones.",
         (
             f"{summary['benchmark_count']} benchmark families; "
             f"{summary['state_substrate_count']} state substrates; "
@@ -259,7 +259,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated story, portfolio, comparison, headline panel, experiment blueprint, contract lineage, ablation panel, model-in-loop comparison, commit-pair metrics, scale plan, real-evidence audit, and consistency numbers.",
+        "main.tex imports generated result, comparison, run-plan, contract-update, ablation, model-in-loop, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -278,7 +278,7 @@ def _mechanism_ablation_panel_check(summary: dict[str, Any]) -> dict[str, str]:
         (
             f"{summary['ablation_rows']} mechanism cuts; {summary['high_priority_rows']} high-priority; "
             f"{summary['cut_passes']}/{summary['cut_trials']} cut passes versus "
-            f"{summary['full_passes']}/{summary['full_trials']} full StateTx passes."
+            f"{summary['full_passes']}/{summary['full_trials']} full boundary passes."
         ),
     )
 
@@ -312,19 +312,19 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and row_fields_present
     )
     return _check(
-        "model_in_loop_bridge_separates_materializers",
+        "model_in_loop_bridge_separates_runtime_executors",
         ok,
-        "Model-in-loop evidence should be reported separately from task-specific materializer reliability.",
+        "Model-in-loop evidence should be reported separately from task-specific executor reliability.",
         (
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
             f"{summary['matched_agent_controller_rows']} matched-controller, and "
             f"{summary['faithful_baseline_rows']} faithful-baseline rows carry actor, boundary, "
             f"and official-result fields. Qwen faithful OCR baseline: "
             f"{summary['qwen_skillflow_faithful_baseline_passes']}/"
-            f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+CommitController: "
+            f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+controller: "
             f"{summary['qwen_all_govkernel_passes']}/"
             f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
-            f"materializer-as-agent rows: "
+            f"executor-as-agent rows: "
             f"{summary['materializer_rows_used_as_matched_agent']}."
         ),
     )
@@ -385,12 +385,12 @@ def _recursive_lineage_check(summary: dict[str, Any]) -> dict[str, str]:
         and summary["pass_to_failure_regressions"] == 0
     )
     return _check(
-        "contract_lineage_has_generated_refinements",
+        "boundary_updates_have_generation_record",
         ok,
-        "The refinement claim should have a generated State Contract lineage, not only prose.",
+        "The boundary-improvement claim should have generated executable updates, not only prose.",
         (
-            f"{summary['accepted_amendments']}/{summary['candidate_amendments']} generated refinements accepted "
-            f"over {summary['compiler_generations']} contract generations with "
+            f"{summary['accepted_amendments']}/{summary['candidate_amendments']} boundary updates accepted "
+            f"over {summary['compiler_generations']} boundary generations with "
             f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
         ),
     )
@@ -402,22 +402,28 @@ def _story_language_check(paper_dir: Path) -> dict[str, str]:
         for relative in ["main.tex", "sections/01_introduction.tex", "sections/04_experiments.tex"]
     )
     anchors = [
-        "Reasoning is speculative",
-        "commit gap",
-        "Candidate Change",
+        "recursive self-improvement",
+        "action boundary",
+        "proposal-to-effect gap",
+        "frozen reasoner",
+        "proposed effects",
         "State Contract",
-        "Commit Controller",
+        "commit controller",
     ]
     missing = [anchor for anchor in anchors if anchor not in combined]
     return _check(
         "story_language_anchors",
         not missing,
         "The main paper should expose the idea before defensive details.",
-        "Core transaction story anchors appear in abstract, introduction, and experiment setup.",
+        (
+            "Core action-boundary RSI anchors appear in abstract, introduction, and experiment setup."
+            if not missing
+            else f"missing={missing}"
+        ),
     )
 
 
-def _transaction_story_check(paper_dir: Path) -> dict[str, str]:
+def _action_boundary_story_check(paper_dir: Path) -> dict[str, str]:
     main = (paper_dir / "main.tex").read_text(encoding="utf-8")
     intro = (paper_dir / "sections" / "01_introduction.tex").read_text(encoding="utf-8")
     formulation = (paper_dir / "sections" / "02_formulation.tex").read_text(encoding="utf-8")
@@ -426,14 +432,15 @@ def _transaction_story_check(paper_dir: Path) -> dict[str, str]:
     front_matter = main.split("\\input{sections/01_introduction}", maxsplit=1)[0]
     opening = "\n".join([front_matter, intro, formulation, method])
     required = [
-        "Stateful Agents Need Transactions",
-        "Reasoning is speculative",
-        "external state is durable",
-        "commit gap",
-        "transactional execution layer",
-        "Candidate Change",
+        "Beyond Better Reasoning",
+        "recursive self-improvement",
+        "action boundary",
+        "proposal-to-effect gap",
+        "frozen reasoner",
+        "external effects",
+        "proposed effects",
         "State Contract",
-        "Commit Controller",
+        "commit controller",
         "ready",
         "write scope",
         "preserve",
@@ -450,23 +457,24 @@ def _transaction_story_check(paper_dir: Path) -> dict[str, str]:
         "positive obligation",
         "institutional channel",
         "institution of action",
+        "Candidate Change",
     ]
     missing = [phrase for phrase in required if phrase not in opening]
     retired_hits = [phrase for phrase in retired_front_matter if phrase in front_matter]
     section_ok = (
-        "\\section{The Commit Gap}" in formulation
-        and "\\section{Transactional Execution for Agents}" in method
+        "\\section{Action Boundary RSI}" in formulation
+        and "\\section{Improving the Action Boundary}" in method
     )
     ok = not missing and not retired_hits and section_ok
     evidence = (
-        "Commit gap, State Contract, Candidate Change, and Commit Controller lead the front matter."
+        "Action boundary, proposal-to-effect gap, frozen reasoner, and State Contract implementation lead the front matter."
         if ok
         else f"missing={missing}; retired_front_matter={retired_hits}; section_ok={section_ok}"
     )
     return _check(
-        "transaction_story_framing",
+        "action_boundary_story_framing",
         ok,
-        "The paper should lead with transactional execution rather than legal or institutional terminology.",
+        "The paper should lead with action-boundary RSI rather than runtime internals or legal terminology.",
         evidence,
     )
 
@@ -509,12 +517,12 @@ def _public_surface_hygiene_check(root: Path) -> dict[str, str]:
 
     ok = not path_hits and not text_hits
     evidence = (
-        "Tracked root and paper public files use StateTx transaction naming."
+        "Tracked root and paper public files use action-boundary naming."
         if ok
         else f"retired_path_hits={path_hits}; retired_text_hits={text_hits}"
     )
     return _check(
-        "public_surface_uses_transaction_terms",
+        "public_surface_uses_action_boundary_terms",
         ok,
         "Tracked paper data, figures, READMEs, and root plans should not expose retired legal/authority framing.",
         evidence,
@@ -599,8 +607,8 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
     return _check(
         "reproduction_chain_mentions_portfolio",
         ok,
-        "Reproduction docs should include the story and portfolio generation path.",
-        "README files mention story export, portfolio export, comparison manifest export, headline panel export, experiment blueprint export, contract lineage export, ablation panel export, model-in-loop comparison export, commit-pair metrics export, scale plan export, real-evidence audit export, consistency export, figure generation, and LaTeX build.",
+        "Reproduction docs should include generated tables and the paper build path.",
+        "README files mention result exports, comparison exports, full-study plan exports, contract-update exports, ablation exports, model-in-loop exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 
@@ -636,16 +644,16 @@ def _code_paper_structure_check(root: Path) -> dict[str, str]:
 def _appendix_story_check(appendix_path: Path) -> dict[str, str]:
     text = appendix_path.read_text(encoding="utf-8")
     anchors = [
-        "Portfolio construction",
-        "reason/prepare/commit",
+        "Result set construction",
+        "proposal-to-effect boundary",
         "Runs that only diagnose infrastructure or unrelated model behavior remain in the artifact record",
     ]
     missing = [anchor for anchor in anchors if anchor not in text]
     return _check(
-        "appendix_serves_story",
+        "appendix_serves_argument",
         not missing,
-        "The appendix should support the story rather than archive weak exploratory logs.",
-        "Appendix opens detailed evidence with portfolio construction and inclusion criteria.",
+        "The appendix should support the action-boundary argument rather than archive weak exploratory logs.",
+        "Appendix opens detailed evidence with result-set construction and inclusion criteria.",
     )
 
 
@@ -657,8 +665,8 @@ def _appendix_scale_language_check(appendix_path: Path) -> dict[str, str]:
         "does not by itself prove",
     ]
     scale_anchors = [
-        "Submission-scale targets",
-        "Current positive spine",
+        "Full-study targets",
+        "Current positive results",
         "Scale evidence to add",
     ]
     blocked = [phrase for phrase in defensive_phrases if phrase in text]
@@ -666,8 +674,8 @@ def _appendix_scale_language_check(appendix_path: Path) -> dict[str, str]:
     return _check(
         "appendix_uses_submission_scale_language",
         not blocked and not missing,
-        "The appendix should frame remaining work as submission-scale evidence, not defensive unsupported-claim caveats.",
-        "Appendix uses current-positive-spine and scale-target language without unsupported-claim headings.",
+        "The appendix should frame remaining work as full-study evidence, not defensive unsupported-claim caveats.",
+        "Appendix uses current-positive-result and full-study-target language without unsupported-claim headings.",
     )
 
 

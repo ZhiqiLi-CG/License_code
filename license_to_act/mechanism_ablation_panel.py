@@ -72,10 +72,10 @@ def build_mechanism_ablation_panel(project_root: str | Path = Path("/data/zhiqi/
             _stage2_full(stage2, ["SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5"]),
         ),
         _row(
-            "PROMPT_ONLY_TRANSACTION_TEXT",
+            "PROMPT_ONLY_BOUNDARY_TEXT",
             "yes",
             "runtime commit control",
-            "Natural-language transaction text does not substitute for owning the durability boundary.",
+            "Natural-language boundary text does not substitute for owning the finalization boundary.",
             ["SF-INV"],
             _stage1_cut(stage1, ["SF-INV"]),
             ["SF-INV"],
@@ -145,7 +145,7 @@ def _row(
         "full_evidence_cases": _join(full_cases),
         "full_trials": str(full_trials),
         "full_passes": str(full_passes),
-        "paper_result": f"{cut_passes}/{cut_trials} cut pass versus {full_passes}/{full_trials} full StateTx pass",
+        "paper_result": f"{cut_passes}/{cut_trials} cut pass versus {full_passes}/{full_trials} full boundary pass",
         "comparison_class": "mechanism_ablation",
     }
 

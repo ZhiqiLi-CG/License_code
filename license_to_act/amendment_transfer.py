@@ -68,7 +68,7 @@ def build_amendment_transfer_report(
             "name": "separate_proposal_from_commit",
             "source_benchmark": "tau2-Bench",
             "rule": (
-                "User intent, task phrasing, and model confidence may propose a Candidate Change, "
+                "User intent, task phrasing, and model confidence may propose a change, "
                 "but durable commits require ready evidence, bounded write scope, preservation checks, "
                 "and a done predicate."
             ),
@@ -85,7 +85,7 @@ def build_amendment_transfer_report(
                 "Task goal evidence is not enough to rewrite repository history, remove remote config, "
                 "or perform destructive reads before the recovery protocol preserves the source."
             ),
-            "skillflow": "Observed OCR text is not a completed artifact until the output schema is materialized.",
+            "skillflow": "Observed OCR text is not a completed artifact until the output schema is written.",
         },
         "transfer_checks": {
             "terminal_bench_2_1": summarize_transfer_checks(terminal_bench_checks),
@@ -100,7 +100,7 @@ def build_amendment_transfer_report(
             },
         },
         "claim_boundary": (
-            "This report is a stage-1 transfer ledger: it supports the commit-gap hypothesis, "
+            "This report is a stage-1 transfer ledger: it supports the action-boundary hypothesis, "
             "but full paper claims still require scaling across more held-out tasks and models."
         ),
     }

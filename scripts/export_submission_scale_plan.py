@@ -15,7 +15,7 @@ from license_to_act.submission_scale_plan import write_submission_scale_plan  # 
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Export the StateTx submission-scale plan.")
+    parser = argparse.ArgumentParser(description="Export the action-boundary submission-scale plan.")
     parser.add_argument("--paper-data-dir", type=Path, default=project_root() / "License_paper" / "data")
     parser.add_argument("--paper-sections-dir", type=Path, default=project_root() / "License_paper" / "sections")
     parser.add_argument(

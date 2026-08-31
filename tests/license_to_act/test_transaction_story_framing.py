@@ -6,7 +6,7 @@ from pathlib import Path
 PAPER = Path("/data/zhiqi/License/License_paper")
 
 
-def test_main_paper_leads_with_transaction_story() -> None:
+def test_main_paper_leads_with_action_boundary_rsi_story() -> None:
     main = (PAPER / "main.tex").read_text(encoding="utf-8")
     intro = (PAPER / "sections" / "01_introduction.tex").read_text(encoding="utf-8")
     formulation = (PAPER / "sections" / "02_formulation.tex").read_text(encoding="utf-8")
@@ -15,18 +15,19 @@ def test_main_paper_leads_with_transaction_story() -> None:
     front_matter = main.split("\\input{sections/01_introduction}", maxsplit=1)[0]
     opening = "\n".join([front_matter, intro, formulation, method])
 
-    assert "Stateful Agents Need Transactions" in main
-    assert "The Commit Gap" in formulation
-    assert "Transactional Execution for Agents" in method
+    assert "Beyond Better Reasoning" in main
+    assert "Action Boundary RSI" in formulation
+    assert "Improving the Action Boundary" in method
 
     for anchor in [
-        "Reasoning is speculative",
-        "external state is durable",
-        "commit gap",
-        "transactional execution layer",
-        "Candidate Change",
+        "recursive self-improvement",
+        "action boundary",
+        "proposal-to-effect gap",
+        "frozen reasoner",
+        "external effects",
+        "proposed effects",
         "State Contract",
-        "Commit Controller",
+        "commit controller",
         "ready",
         "write scope",
         "preserve",
@@ -45,12 +46,13 @@ def test_main_paper_leads_with_transaction_story() -> None:
         "positive obligation",
         "institutional channel",
         "institution of action",
+        "Candidate Change",
     ]
     for phrase in retired_front_matter:
         assert phrase not in front_matter
 
 
-def test_story_gate_exports_transaction_consistency_check() -> None:
+def test_story_gate_exports_action_boundary_consistency_check() -> None:
     from license_to_act.paper_story_gate import build_story_gate_report
 
     report = build_story_gate_report(Path("/data/zhiqi/License"))
@@ -58,6 +60,6 @@ def test_story_gate_exports_transaction_consistency_check() -> None:
 
     assert report["summary"]["total_checks"] == 19
     assert report["summary"]["passed_checks"] == 19
-    assert checks["transaction_story_framing"]["status"] == "pass"
-    assert checks["public_surface_uses_transaction_terms"]["status"] == "pass"
-    assert "commit gap" in checks["transaction_story_framing"]["evidence"].lower()
+    assert checks["action_boundary_story_framing"]["status"] == "pass"
+    assert checks["public_surface_uses_action_boundary_terms"]["status"] == "pass"
+    assert "proposal-to-effect" in checks["action_boundary_story_framing"]["evidence"].lower()
