@@ -1,0 +1,20 @@
+job_name: skillflow-lta-qwen-invoice-govkernel-no-prompt-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_qwen_invoice_govkernel_no_prompt_official
+agent_timeout_multiplier: 0.5
+quiet: true
+
+environment:
+  type: docker
+  force_build: true
+
+agents:
+  - import_path: license_to_act.harbor_agents:LicenseToActQwenInvoiceGovKernelAgent
+    model_name: openai/Qwen3.8-27B
+    env:
+      OPENAI_BASE_URL: http://172.17.0.1:18002/v1
+      OPENAI_API_KEY: dummy
+      QWEN_CODE_MAX_OUTPUT_TOKENS: "256"
+    kwargs: {}
+
+tasks:
+  - path: /data/zhiqi/RSI1/external/SkillFlow/test_tasks/test_tasks/OCR-Data-Extraction/task_family_invoice_images

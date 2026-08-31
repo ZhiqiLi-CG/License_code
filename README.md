@@ -17,3 +17,15 @@ This repository contains the prototype authority layer, benchmark adapters, scri
 ```bash
 python -m pytest tests/license_to_act -q
 ```
+
+## Paper Result Exports
+
+```bash
+python scripts/build_lta_amendment_transfer_report.py
+python scripts/export_paper_results.py
+python scripts/mine_tau2_authority.py
+python scripts/export_stage2_results.py
+```
+
+The export scripts read large benchmark artifacts from `/data/zhiqi/License/artifacts`
+and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
