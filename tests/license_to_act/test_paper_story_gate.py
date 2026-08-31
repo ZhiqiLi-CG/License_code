@@ -6,15 +6,19 @@ from pathlib import Path
 import subprocess
 import sys
 
-from license_to_act.paper_story_gate import build_story_gate_report, write_story_gate_report
+from license_to_act.paper_story_gate import (
+    _public_surface_hygiene_check,
+    build_story_gate_report,
+    write_story_gate_report,
+)
 
 
 def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 16
-    assert summary["passed_checks"] == 16
+    assert summary["total_checks"] == 17
+    assert summary["passed_checks"] == 17
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 25
     assert summary["clean_positive_trials"] == 25
@@ -42,6 +46,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "scale plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert checks["contract_lineage_has_generated_refinements"]["status"] == "pass"
     assert checks["transaction_story_framing"]["status"] == "pass"
+    assert checks["public_surface_uses_transaction_terms"]["status"] == "pass"
     assert checks["story_language_anchors"]["status"] == "pass"
     assert checks["main_text_avoids_meta_curation_language"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
@@ -73,16 +78,45 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 16
+    assert len(rows) == 17
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{16}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{16}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{17}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{17}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
     assert summary["failed_checks"] == 0
+
+
+def test_public_surface_hygiene_flags_retired_names_inside_public_text(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    paper = root / "License_paper"
+    appendix = paper / "sections" / "appendix.tex"
+    appendix.parent.mkdir(parents=True)
+    (root / "README.md").write_text("StateTx public root.\n", encoding="utf-8")
+    appendix.write_text(
+        "Regenerate figures/tau2_authority_mining.pdf with "
+        "scripts/export_recursive_amendment_lineage.py.\n",
+        encoding="utf-8",
+    )
+
+    for repo in [root, paper]:
+        subprocess.run(["git", "init"], cwd=repo, text=True, capture_output=True, check=True)
+    subprocess.run(["git", "add", "README.md"], cwd=root, text=True, capture_output=True, check=True)
+    subprocess.run(
+        ["git", "add", "sections/appendix.tex"],
+        cwd=paper,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    check = _public_surface_hygiene_check(root)
+
+    assert check["status"] == "fail"
+    assert "License_paper/sections/appendix.tex" in check["evidence"]
 
 
 def test_export_story_gate_cli_writes_requested_outputs(tmp_path: Path) -> None:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
+import subprocess
 from typing import Any
 
 from .comparison_manifest import build_comparison_manifest
@@ -44,6 +45,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
         _transaction_story_check(paper_dir),
+        _public_surface_hygiene_check(root),
         _story_language_check(paper_dir),
         _main_text_style_check(paper_dir),
         _reproduction_chain_check(root),
@@ -378,6 +380,75 @@ def _transaction_story_check(paper_dir: Path) -> dict[str, str]:
         "The paper should lead with transactional execution rather than legal or institutional terminology.",
         evidence,
     )
+
+
+def _public_surface_hygiene_check(root: Path) -> dict[str, str]:
+    retired_path_fragments = [
+        "tau2_authority",
+        "license_examples",
+        "recursive_amendment",
+        "story-first-stage2-lta",
+    ]
+    retired_text_phrases = [
+        *retired_path_fragments,
+        "License-to-Act",
+        "Action License",
+        "GovKernel",
+        "OBLIGE",
+        "authority compiler",
+        "positive obligation",
+        "Agency Gap",
+    ]
+    tracked_paths = _tracked_public_paths(root)
+    existing_paths = [path for path in tracked_paths if (root / path).exists()]
+    path_hits = [
+        path for path in existing_paths if any(fragment in path for fragment in retired_path_fragments)
+    ]
+    text_hits: list[str] = []
+    for path in existing_paths:
+        if not path.endswith((".csv", ".json", ".md", ".tex")):
+            continue
+        full_path = root / path
+        if not full_path.exists():
+            continue
+        try:
+            text = full_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if any(phrase in text for phrase in retired_text_phrases):
+            text_hits.append(path)
+
+    ok = not path_hits and not text_hits
+    evidence = (
+        "Tracked root and paper public files use StateTx transaction naming."
+        if ok
+        else f"retired_path_hits={path_hits}; retired_text_hits={text_hits}"
+    )
+    return _check(
+        "public_surface_uses_transaction_terms",
+        ok,
+        "Tracked paper data, figures, READMEs, and root plans should not expose retired legal/authority framing.",
+        evidence,
+    )
+
+
+def _tracked_public_paths(root: Path) -> list[str]:
+    paths: list[str] = []
+    for repo, prefix in [
+        (root, ""),
+        (root / "License_paper", "License_paper/"),
+    ]:
+        result = subprocess.run(
+            ["git", "ls-files"],
+            cwd=repo,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            continue
+        paths.extend(f"{prefix}{line}" for line in result.stdout.splitlines() if line)
+    return paths
 
 
 def _main_text_style_check(paper_dir: Path) -> dict[str, str]:
