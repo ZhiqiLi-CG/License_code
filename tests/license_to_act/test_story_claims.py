@@ -25,8 +25,8 @@ def test_build_story_claims_from_current_license_artifacts() -> None:
     assert metrics["faithful_terminal_baseline_trials"] == 3
     assert metrics["faithful_skillflow_baseline_trials"] == 2
     assert metrics["faithful_baseline_mean_reward"] == 0.0
-    assert metrics["tau2_cancel_decisions"] == 35
-    assert metrics["tau2_read_correct_write_wrong_proxy"] == 14
+    assert metrics["tau2_cancel_decisions"] == 41
+    assert metrics["tau2_read_correct_write_wrong_proxy"] == 16
     assert metrics["tau2_result_files"] >= 64
     assert metrics["tau2_simulations"] >= 129
     assert metrics["tau2_infrastructure_error_simulations"] >= 39
@@ -83,7 +83,7 @@ def test_write_story_claims_exports_json_csv_and_tex(tmp_path: Path) -> None:
         f"\\newcommand{{\\LTATauTwoInfraErrors}}{{{output_metrics['tau2_infrastructure_error_simulations']}}}"
         in tex
     )
-    assert "\\newcommand{\\LTATauTwoRCWW}{14}" in tex
+    assert "\\newcommand{\\LTATauTwoRCWW}{16}" in tex
     assert json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))[
         "headline_metrics"
     ]["stage2_clean_anchor_count"] == 5
