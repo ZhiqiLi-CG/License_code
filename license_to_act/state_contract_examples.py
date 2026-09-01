@@ -23,7 +23,7 @@ from .examples import (
 
 
 def build_state_contract_examples() -> dict[str, Any]:
-    """Build paper-facing boundary-rule examples from the executable core objects."""
+    """Build paper-facing boundary-program examples from the executable core objects."""
 
     examples = [
         _contract(

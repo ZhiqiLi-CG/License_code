@@ -45,17 +45,19 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert "15/15" in checks["model_in_loop_bridge_separates_runtime_executors"]["evidence"]
     assert checks["proposal_effect_decomposition_has_real_gap_rows"]["status"] == "pass"
     assert checks["tau2_matched_boundary_pair_present"]["status"] == "pass"
-    assert checks["real_evidence_audit_blocks_planned_main_results"]["status"] == "pass"
-    assert "planned main positives: 0" in checks["real_evidence_audit_blocks_planned_main_results"]["evidence"]
+    assert summary["real_evidence_planned_rows"] == 0
+    assert checks["real_evidence_audit_has_only_real_results"]["status"] == "pass"
+    assert "0 planned rows" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
+    assert "planned main positives: 0" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
     assert checks["license_workspace_only"]["status"] == "pass"
     assert checks["paper_imports_generated_numbers"]["status"] == "pass"
     assert "reproducibility numbers" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "run-plan" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "scale-matrix" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "model-in-loop" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "tau2" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "boundary-update" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "proposal/effect" in checks["paper_imports_generated_numbers"]["evidence"].lower()
-    assert "meta-agent patch" in checks["paper_imports_generated_numbers"]["evidence"].lower()
+    assert "meta-agent update" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "ablation" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "commit-pair" in checks["paper_imports_generated_numbers"]["evidence"].lower()
     assert "real-evidence" in checks["paper_imports_generated_numbers"]["evidence"].lower()
@@ -69,12 +71,12 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["abstract_prioritizes_matched_action_boundary_evidence"]["status"] == "pass"
     assert checks["reproduction_chain_mentions_portfolio"]["status"] == "pass"
     assert "consistency export" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "full-study plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "scale-plan" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "model-in-loop exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "matched tau2 exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "boundary-update" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "proposal/effect" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
-    assert "meta-agent patch" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
+    assert "meta-agent update" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "ablation exports" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "commit-pair metrics" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()
     assert "real-evidence audit" in checks["reproduction_chain_mentions_portfolio"]["evidence"].lower()

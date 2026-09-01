@@ -56,7 +56,7 @@ def _lineage_row_from_meta_patch(row: dict[str, str]) -> dict[str, str]:
         "pass_to_failure_regressions": row["pass_to_failure_regressions"],
         "admission_decision": row["admission_decision"],
         "comparison_class": "boundary_update",
-        "baseline_boundary": "not_baseline: frozen meta-agent patch proposal; task-local hand guards are mechanism cuts",
+        "baseline_boundary": "not_baseline: frozen meta-agent update proposal; task-local boundary shortcuts are mechanism cuts",
     }
 
 

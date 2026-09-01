@@ -29,7 +29,6 @@ def build_real_evidence_audit(project_root: str | Path = Path("/data/zhiqi/Licen
     rows.extend(_stage2_rows(data_dir / "stage2_reliability.csv"))
     rows.extend(_model_loop_rows(data_dir / "model_in_loop_bridge.csv"))
     rows.extend(_tau2_rows(data_dir / "tau2_commit_mining.csv", root / "artifacts/stage2/tau2_commit_mining_20260830.json"))
-    rows.extend(_scale_plan_rows(data_dir / "submission_scale_plan.csv"))
 
     summary = {
         "audit_rows": len(rows),
@@ -171,22 +170,6 @@ def _tau2_rows(csv_path: Path, artifact_path: Path) -> list[dict[str, str]]:
                 f"commits from {metrics.get('result_files', '0')} result files"
             ),
         )
-    ]
-
-
-def _scale_plan_rows(path: Path) -> list[dict[str, str]]:
-    return [
-        _row(
-            evidence_id=f"scale_plan:{row['target_id']}",
-            source_table=path.name,
-            paper_role="planned_scale_target",
-            evidence_kind="planned_matrix",
-            source_ref=path.name,
-            artifact_status="not_applicable",
-            counts_as_main_result="no",
-            notes=f"target role: {row['paper_use']}; next run: {row['next_run']}",
-        )
-        for row in _read_csv(path)
     ]
 
 

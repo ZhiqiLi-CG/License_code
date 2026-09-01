@@ -21,7 +21,7 @@ BRIDGE_FIELDS = [
     "passes",
     "pass_at_5",
     "official_verifier_result",
-    "uses_task_specific_materializer",
+    "uses_runtime_only_adapter",
     "paper_use",
     "source_path",
 ]
@@ -83,7 +83,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "Terminus-2",
             "condition": "ordinary task agent, no action boundary",
             "comparison_boundary": "ordinary_agent",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_counterpoint",
             "source_path": artifacts
             / "probes/skillflow_terminus_qwen_invoice_images_forcebuild/2026-08-30__17-34-38/result.json",
@@ -96,7 +96,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "Terminus-2",
             "condition": "natural-language boundary instructions only",
             "comparison_boundary": "prompt_only_control",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "mechanism_cut",
             "source_path": artifacts
             / "probes/skillflow_terminus_qwen_invoice_images_lta_commit_protocol_forcebuild/2026-08-30__18-05-01/result.json",
@@ -109,7 +109,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "QwenInvoiceActionBoundaryAgent",
             "condition": "Qwen in loop plus commit-controller completion trigger",
             "comparison_boundary": "model_in_loop_commit_controller",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
             / "probes/skillflow_lta_qwen_invoice_govkernel_official_out256/skillflow-lta-qwen-invoice-govkernel-official-out256/result.json",
@@ -123,7 +123,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "QwenInvoiceActionBoundaryAgent",
             "condition": "Qwen in loop plus commit-controller completion trigger, K=5",
             "comparison_boundary": "model_in_loop_commit_controller",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
             / "stage3/harbor/stage3-skillflow-qwen-govkernel-invoice-k5-real3-20260831/result.json",
@@ -137,7 +137,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "QwenTravelClaimActionBoundaryAgent",
             "condition": "Qwen in loop plus commit-controller completion trigger, K=5",
             "comparison_boundary": "model_in_loop_commit_controller",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
             / "stage3/harbor/stage3-skillflow-qwen-govkernel-travel-k5-real-20260831/result.json",
@@ -151,7 +151,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "mini-swe-agent",
             "condition": "faithful long-context open-model baseline, K=5",
             "comparison_boundary": "faithful_baseline",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_counterpoint",
             "source_path": artifacts
             / "stage3/harbor/stage3-tb21-miniswe-qwen-long32k-log-summary-k5-real-20260831/result.json",
@@ -165,7 +165,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "mini-swe-agent + action boundary",
             "condition": "Qwen in loop plus action-boundary log-summary finalization, K=5",
             "comparison_boundary": "model_in_loop_commit_controller",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_positive",
             "source_path": artifacts
             / "stage3/harbor/stage3-tb21-miniswe-govkernel-log-summary-k5-real3-20260831/result.json",
@@ -178,7 +178,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "mini-swe-agent",
             "condition": "faithful long-context open-model baseline, K=5 per OCR anchor",
             "comparison_boundary": "faithful_baseline",
-            "uses_task_specific_materializer": "no",
+            "uses_runtime_only_adapter": "no",
             "paper_use": "model_in_loop_counterpoint",
             "source_path": artifacts
             / "stage3/harbor/stage3-skillflow-miniswe-qwen-long32k-ocr-k5-real-20260831/result.json",
@@ -191,7 +191,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "scoped Git boundary executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-sanitize-k5-py/result.json",
         },
@@ -203,7 +203,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "WAL recovery boundary executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-db-wal-k5-py/result.json",
         },
@@ -215,7 +215,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "SQLite truncate boundary executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts / "stage2/harbor/stage2-tb21-lta-sqlite-truncate-k5-py/result.json",
         },
@@ -227,7 +227,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "log-summary CSV boundary executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts
             / "stage3/harbor/stage3-tb21-lta-log-summary-k5-real-20260831/result.json",
@@ -240,7 +240,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "invoice completion-trigger executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts / "stage2/harbor/stage2-skillflow-lta-invoice-materializer-k5-py/result.json",
         },
@@ -252,7 +252,7 @@ def _case_specs(root: Path) -> list[dict[str, Any]]:
             "harness": "travel-claim completion-trigger executor",
             "condition": "runtime boundary anchor, K=5",
             "comparison_boundary": "runtime_reliability",
-            "uses_task_specific_materializer": "yes",
+            "uses_runtime_only_adapter": "yes",
             "paper_use": "runtime_reliability",
             "source_path": artifacts / "stage2/harbor/stage2-skillflow-lta-travel-claim-k5-py/result.json",
         },
@@ -277,7 +277,7 @@ def _row_from_case(case: dict[str, Any]) -> dict[str, str]:
         "passes": str(stats["passes"]),
         "pass_at_5": _format_optional(stats["pass_at_5"]),
         "official_verifier_result": _official_verifier_result(stats),
-        "uses_task_specific_materializer": case["uses_task_specific_materializer"],
+        "uses_runtime_only_adapter": case["uses_runtime_only_adapter"],
         "paper_use": case["paper_use"],
         "source_path": str(case["source_path"]),
     }
@@ -331,10 +331,10 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
     commit_controller_k5 = _require_row(rows, "SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5")
     travel_controller_k5 = _require_row(rows, "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5")
     terminal_log_controller_k5 = _require_row(rows, "TB_LOG_QWEN_COMMIT_CONTROLLER_K5")
-    materializer_as_agent = [
+    runtime_adapter_as_agent = [
         row
         for row in rows
-        if row["uses_task_specific_materializer"] == "yes"
+        if row["uses_runtime_only_adapter"] == "yes"
         and row["comparison_boundary"] == "model_in_loop_commit_controller"
     ]
     baseline_passes = _sum_int(baseline_rows, "passes")
@@ -378,7 +378,7 @@ def _summarize(rows: list[dict[str, str]]) -> dict[str, Any]:
         "qwen_all_govkernel_passes": skillflow_gov_passes + terminal_log_gov_passes,
         "qwen_all_govkernel_trials": skillflow_gov_trials + terminal_log_gov_trials,
         "runtime_reliability_rows": len(runtime_rows),
-        "materializer_rows_used_as_matched_agent": len(materializer_as_agent),
+        "runtime_adapter_rows_used_as_matched_agent": len(runtime_adapter_as_agent),
     }
 
 
@@ -394,7 +394,7 @@ def _sum_int(rows: list[dict[str, str]], field: str) -> int:
 
 
 def _actor_model(case: dict[str, Any]) -> str:
-    if case["uses_task_specific_materializer"] == "yes":
+    if case["uses_runtime_only_adapter"] == "yes":
         return "none_runtime_only"
     return str(case.get("actor_model") or case["actor_backbone"])
 
@@ -466,7 +466,7 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAModelLoopQwenAllGovPasses": summary["qwen_all_govkernel_passes"],
         "LTAModelLoopQwenAllGovTrials": summary["qwen_all_govkernel_trials"],
         "LTAModelLoopRuntimeRows": summary["runtime_reliability_rows"],
-        "LTAModelLoopMaterializerAsAgentRows": summary["materializer_rows_used_as_matched_agent"],
+        "LTAModelLoopRuntimeAdapterAsAgentRows": summary["runtime_adapter_rows_used_as_matched_agent"],
     }
     lines = [
         "% Auto-generated by License_code/license_to_act/model_in_loop_bridge.py.",

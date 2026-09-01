@@ -14,7 +14,7 @@ from license_to_act.state_contract_examples import write_state_contract_examples
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export paper-facing boundary-rule examples.")
+    parser = argparse.ArgumentParser(description="Export paper-facing boundary-program examples.")
     parser.add_argument("--project-root", type=Path, default=Path("/data/zhiqi/License"))
     parser.add_argument("--paper-data-dir", type=Path, default=None)
     parser.add_argument("--summary", type=Path, default=None)

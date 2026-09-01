@@ -9,12 +9,12 @@ import sys
 from license_to_act.real_evidence_audit import build_real_evidence_audit, write_real_evidence_audit
 
 
-def test_real_evidence_audit_separates_real_results_from_scale_plans() -> None:
+def test_real_evidence_audit_contains_only_real_result_rows() -> None:
     audit = build_real_evidence_audit(Path("/data/zhiqi/License"))
 
     summary = audit["summary"]
     assert summary["real_harbor_rows"] >= 8
-    assert summary["planned_rows"] >= 1
+    assert summary["planned_rows"] == 0
     assert summary["main_positive_planned_rows"] == 0
     assert summary["missing_artifact_rows"] == 0
     assert summary["unparseable_artifact_rows"] == 0
@@ -26,8 +26,7 @@ def test_real_evidence_audit_separates_real_results_from_scale_plans() -> None:
     assert rows["headline:H7_RUNTIME_RELIABILITY_SUPPORT"]["evidence_kind"] == "derived_from_real_artifacts"
     assert rows["headline:H7_RUNTIME_RELIABILITY_SUPPORT"]["counts_as_main_result"] == "no"
     scale_target_rows = [row for row in audit["rows"] if row["evidence_id"].startswith("scale_plan:")]
-    assert all(row["paper_role"] == "planned_scale_target" for row in scale_target_rows)
-    assert all("target role:" in row["notes"] for row in scale_target_rows)
+    assert scale_target_rows == []
     assert rows["stage2:TB-WAL-K5"]["evidence_kind"] == "real_official_harbor"
     assert rows["stage2:TB-WAL-K5"]["counts_as_main_result"] == "no"
     assert rows["stage2:SF-INV-MAT-K5"]["counts_as_main_result"] == "no"
@@ -55,13 +54,15 @@ def test_write_real_evidence_audit_exports_csv_json_and_tex(tmp_path: Path) -> N
 
     rows = list(csv.DictReader(Path(output["outputs"]["audit_csv"]).open(newline="", encoding="utf-8")))
     assert any(row["evidence_kind"] == "real_official_harbor" for row in rows)
-    assert any(row["evidence_kind"] == "planned_matrix" for row in rows)
+    assert all(row["evidence_kind"] != "planned_matrix" for row in rows)
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTARealEvidenceHarborRows}" in tex
+    assert "\\newcommand{\\LTARealEvidencePlannedRows}{0}" in tex
     assert "\\newcommand{\\LTARealEvidenceMainPositivePlannedRows}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
+    assert summary["planned_rows"] == 0
     assert summary["main_positive_planned_rows"] == 0
 
 

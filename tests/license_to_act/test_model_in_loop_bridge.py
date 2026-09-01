@@ -12,7 +12,7 @@ from license_to_act.model_in_loop_bridge import (
 )
 
 
-def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers() -> None:
+def test_build_model_in_loop_bridge_separates_agent_evidence_from_runtime_adapters() -> None:
     bridge = build_model_in_loop_bridge(Path("/data/zhiqi/License"))
 
     summary = bridge["summary"]
@@ -38,7 +38,7 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     assert summary["qwen_all_govkernel_passes"] == 15
     assert summary["qwen_all_govkernel_trials"] == 15
     assert summary["runtime_reliability_rows"] == 6
-    assert summary["materializer_rows_used_as_matched_agent"] == 0
+    assert summary["runtime_adapter_rows_used_as_matched_agent"] == 0
 
     rows = {row["bridge_id"]: row for row in bridge["rows"]}
     assert rows["SF_INVOICE_QWEN_TERMINUS_FULL"]["comparison_boundary"] == "ordinary_agent"
@@ -57,21 +57,21 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_materializers(
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["n_trials"] == "5"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["n_errors"] == "0"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
-    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["uses_task_specific_materializer"] == "no"
+    assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["uses_runtime_only_adapter"] == "no"
     assert rows["TB_LOG_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
     assert rows["TB_LOG_MATERIALIZER_K5"]["passes"] == "5"
     assert rows["TB_LOG_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
     assert rows["SF_TRAVEL_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
     assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["passes"] == "5"
     assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["pass_at_5"] == "1"
-    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["uses_task_specific_materializer"] == "no"
+    assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["uses_runtime_only_adapter"] == "no"
     assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["passes"] == "5"
     assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["pass_at_5"] == "1"
-    assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["uses_task_specific_materializer"] == "no"
+    assert rows["SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"]["uses_runtime_only_adapter"] == "no"
     assert all(
         row["comparison_boundary"] != "model_in_loop_commit_controller"
         for row in rows.values()
-        if row["uses_task_specific_materializer"] == "yes"
+        if row["uses_runtime_only_adapter"] == "yes"
     )
 
 
@@ -154,10 +154,10 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
     assert "\\newcommand{\\LTAModelLoopQwenTBLogGovErrors}{0}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenAllGovPasses}{15}" in tex
     assert "\\newcommand{\\LTAModelLoopQwenAllGovTrials}{15}" in tex
-    assert "\\newcommand{\\LTAModelLoopMaterializerAsAgentRows}{0}" in tex
+    assert "\\newcommand{\\LTAModelLoopRuntimeAdapterAsAgentRows}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
-    assert summary["materializer_rows_used_as_matched_agent"] == 0
+    assert summary["runtime_adapter_rows_used_as_matched_agent"] == 0
     assert set(rows[0]) >= {"actor_model", "controller_boundary", "official_verifier_result"}
 
 

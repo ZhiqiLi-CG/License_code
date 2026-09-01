@@ -64,7 +64,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_use": "positive_non_regression",
             "story_axis": "Prepared business writes must still commit.",
             "current_positive_evidence": (
-                f"{metrics['stage1_preserved_positive']} legal tau2 commit preserved in the seed ledger."
+                f"{metrics['stage1_preserved_positive']} legal tau2 commit preserved in the seed record."
             ),
             "scale_target": "Pair invalid-write cases with legal same-operation commits across airline and retail.",
             "inclusion_rule": inclusion_rule,
@@ -133,7 +133,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             ),
             "scale_target": "Expand Git/history tasks from sanitize and leak recovery into a scoped-write pilot.",
             "inclusion_rule": inclusion_rule,
-            "next_run": "Run full agent, prompt-only, static hand guard, and action-boundary conditions on frozen Git tasks.",
+            "next_run": "Run full agent, prompt-only, static task-local boundary, and learned action-boundary conditions on frozen Git tasks.",
         },
         {
             "target_id": "S7_TB_PRESERVING_READ",
@@ -275,7 +275,7 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
             "target_n": "16",
             "paper_use": "main_positive",
             "story_axis": "Document evidence should trigger an auditable artifact, not a loose final answer.",
-            "current_positive_evidence": "Document-fraud is a planned positive family with clear source/verifier boundaries.",
+            "current_positive_evidence": "Document-fraud is a target family with clear source/verifier boundaries.",
             "scale_target": "Add fraud-detection families where source citations and output schema are both judged.",
             "inclusion_rule": inclusion_rule,
             "next_run": "Run evidence-citation and schema gates against ordinary and boundary-controlled agents.",

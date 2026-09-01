@@ -98,6 +98,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
                 "qwen_skillflow_govkernel_trials"
             ],
             "real_evidence_harbor_rows": real_evidence_audit["summary"]["real_harbor_rows"],
+            "real_evidence_planned_rows": real_evidence_audit["summary"]["planned_rows"],
             "real_evidence_main_positive_planned_rows": real_evidence_audit["summary"][
                 "main_positive_planned_rows"
             ],
@@ -285,7 +286,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, run-plan, proposal/effect, boundary-update, meta-agent patch, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, scale-matrix, proposal/effect, boundary-update, meta-agent update, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -334,13 +335,13 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and summary["qwen_skillflow_govkernel_trials"] >= 10
         and summary["qwen_skillflow_faithful_baseline_trials"] >= 10
         and summary["qwen_skillflow_faithful_baseline_passes"] < summary["qwen_skillflow_govkernel_passes"]
-        and summary["materializer_rows_used_as_matched_agent"] == 0
+        and summary["runtime_adapter_rows_used_as_matched_agent"] == 0
         and row_fields_present
     )
     return _check(
         "model_in_loop_bridge_separates_runtime_executors",
         ok,
-        "Model-in-loop evidence should be reported separately from task-specific executor reliability.",
+        "Model-in-loop evidence should not count runtime-only adapters as matched-agent causal evidence.",
         (
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
             f"{summary['matched_agent_controller_rows']} matched-boundary, and "
@@ -350,8 +351,8 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
             f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+boundary: "
             f"{summary['qwen_all_govkernel_passes']}/"
             f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
-            f"executor-as-agent rows: "
-            f"{summary['materializer_rows_used_as_matched_agent']}."
+            f"runtime-adapter-as-agent rows: "
+            f"{summary['runtime_adapter_rows_used_as_matched_agent']}."
         ),
     )
 
@@ -360,19 +361,19 @@ def _real_evidence_audit_check(summary: dict[str, Any]) -> dict[str, str]:
     ok = (
         summary["real_harbor_rows"] >= 8
         and summary["derived_real_rows"] >= 1
-        and summary["planned_rows"] >= 1
+        and summary["planned_rows"] == 0
         and summary["main_positive_planned_rows"] == 0
         and summary["missing_artifact_rows"] == 0
         and summary["unparseable_artifact_rows"] == 0
     )
     return _check(
-        "real_evidence_audit_blocks_planned_main_results",
+        "real_evidence_audit_has_only_real_results",
         ok,
-        "Main positive results must be backed by parseable real artifacts or derived real-artifact analyses, not planned matrices.",
+        "The evidence audit must contain real artifacts or derived real-artifact analyses, not planned matrices.",
         (
             f"{summary['real_harbor_rows']} parseable Harbor rows; "
             f"{summary['derived_real_rows']} derived real-artifact rows; "
-            f"{summary['planned_rows']} planned rows isolated; "
+            f"{summary['planned_rows']} planned rows; "
             f"planned main positives: {summary['main_positive_planned_rows']}; "
             f"missing artifacts: {summary['missing_artifact_rows']}; "
             f"unparseable artifacts: {summary['unparseable_artifact_rows']}."
@@ -767,7 +768,7 @@ def _abstract_headline_check(paper_dir: Path) -> dict[str, str]:
     return _check(
         "abstract_prioritizes_matched_action_boundary_evidence",
         ok,
-        "The abstract should not use task-specific executor reliability as the headline causal evidence.",
+        "The abstract should prioritize matched action-boundary evidence over runtime-only adapter reliability.",
         evidence,
     )
 
@@ -802,7 +803,7 @@ def _reproduction_chain_check(root: Path) -> dict[str, str]:
         "reproduction_chain_mentions_portfolio",
         ok,
         "Reproduction docs should include generated tables and the paper build path.",
-        "README files mention result exports, comparison exports, full-study plan exports, proposal/effect exports, boundary-update exports, meta-agent patch exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
+        "README files mention result exports, comparison exports, scale-plan exports, proposal/effect exports, boundary-update exports, meta-agent update exports, ablation exports, model-in-loop exports, matched tau2 exports, commit-pair metrics, real-evidence audit, consistency export, figure generation, and LaTeX build.",
     )
 
 

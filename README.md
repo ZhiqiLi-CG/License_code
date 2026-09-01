@@ -2,11 +2,11 @@
 
 Clean open-source code for **Beyond Better Reasoning: Recursive Self-Improvement at the Action Boundary**.
 
-This repository contains the action-boundary prototype: boundary-rule primitives, controller adapters, benchmark scripts, and tests. Large experiment artifacts are intentionally kept outside this code repository.
+This repository contains the action-boundary prototype: boundary-program primitives, controller adapters, benchmark scripts, and tests. Large experiment artifacts are intentionally kept outside this code repository.
 
 ## Contents
 
-- `license_to_act/`: core boundary evaluator, boundary-rule examples, replay/finalization utilities, and Harbor agents.
+- `license_to_act/`: core boundary evaluator, boundary-program examples, replay/finalization utilities, and Harbor agents.
 - `tests/`: focused pytest coverage for the commit protocol and benchmark slices.
 - `scripts/`: local replay and report-generation entry points.
 - `configs/`: Harbor configs for official benchmark probes.
@@ -221,9 +221,9 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`. The paper imports those files for result counts,
 baseline and ablation separation, full-study targets, boundary updates,
-proposal/effect decomposition, meta-agent patch generation, model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
+proposal/effect decomposition, meta-agent update generation, model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
 real-evidence auditing, and paper-code consistency numbers.
-`export_state_contract_examples.py` writes the paper-facing boundary-rule JSON examples used in the appendix.
+`export_state_contract_examples.py` writes the paper-facing boundary-program JSON examples used in the appendix.
 `export_boundary_patch_meta_agent.py` defaults to the tracked frozen-proposer
 fixture under `data/boundary_patch_meta_agent/`; `run_boundary_patch_meta_agent.py`
 is only needed when re-querying a local OpenAI-compatible model endpoint.
@@ -233,7 +233,7 @@ is only needed when re-querying a local OpenAI-compatible model endpoint.
 Before pushing paper-facing changes:
 
 1. Run the full `tests/license_to_act` suite.
-2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, full-study-plan, proposal/effect, meta-agent patch, boundary-update, mechanism-ablation, model-in-loop, matched-tau2, commit-pair, real-evidence audit, boundary-rule example, and paper-code consistency exports.
+2. Regenerate stage-1, stage-2, claim, evidence, comparison, main-result, scale-plan, proposal/effect, meta-agent update, boundary-update, mechanism-ablation, model-in-loop, matched-tau2, commit-pair, real-evidence audit, boundary-program example, and paper-code consistency exports.
 3. Regenerate paper figures from `License_paper/scripts/generate_figures.py`.
 4. Compile the paper.
 5. Scan touched files for placeholders.
