@@ -47,6 +47,18 @@ def test_retail_task1_script_narrows_exchange_to_thermostat():
     assert "only the thermostat exchange" in joined
 
 
+@pytest.mark.parametrize("task_id", ["6", "7", "8", "9"])
+def test_retail_desk_lamp_scripts_narrow_exchange_to_latest_scope(task_id):
+    utterances = scripted_tau2_user_utterances("retail", task_id)
+
+    joined = " ".join(utterances)
+    assert "Mei Kovacs" in joined
+    assert "28236" in joined
+    assert "water bottle" in joined
+    assert "desk lamp" in joined
+    assert "only the desk lamp exchange" in joined
+
+
 def test_unknown_script_is_explicitly_rejected():
     with pytest.raises(KeyError):
         scripted_tau2_user_utterances("airline", "999")

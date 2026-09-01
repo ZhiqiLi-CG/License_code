@@ -38,6 +38,38 @@ _SCRIPTED_TAU2_USERS: dict[tuple[str, str], list[str]] = {
         "For the thermostat, I want one compatible with Google Home instead of Apple HomeKit.",
         "Yes, please proceed with only the thermostat exchange once you have checked the details.",
     ],
+    (
+        "retail",
+        "6",
+    ): [
+        "Hi, I am Mei Kovacs in zip code 28236. I want to exchange the water bottle and the desk lamp from a delivered order.",
+        "For the water bottle, I want a bigger one. For the desk lamp, I want a less bright one and prefer battery > USB > AC.",
+        "Yes, please proceed with only the desk lamp exchange once you have checked the details.",
+    ],
+    (
+        "retail",
+        "7",
+    ): [
+        "Hi, I am Mei Kovacs in zip code 28236. I want to exchange the water bottle and the desk lamp from a delivered order.",
+        "For the water bottle, I want a bigger one. For the desk lamp, I want a less bright one and prefer AC adapter > battery > USB.",
+        "Yes, please proceed with only the desk lamp exchange once you have checked the details.",
+    ],
+    (
+        "retail",
+        "8",
+    ): [
+        "Hi, I am Mei Kovacs in zip code 28236. I want to exchange the water bottle and the desk lamp from a delivered order.",
+        "For the water bottle, I want a bigger one. For the desk lamp, I want a brighter one and prefer battery > USB > AC.",
+        "Yes, please proceed with only the desk lamp exchange once you have checked the details.",
+    ],
+    (
+        "retail",
+        "9",
+    ): [
+        "Hi, I am Mei Kovacs in zip code 28236. I want to exchange the water bottle and the desk lamp from a delivered order.",
+        "For the water bottle, I want a bigger one. For the desk lamp, I want a brighter one and prefer AC adapter > battery > USB.",
+        "Yes, please proceed with only the desk lamp exchange once you have checked the details.",
+    ],
 }
 
 

@@ -221,6 +221,52 @@ def test_retail_exchange_candidate_stops_when_user_refuses_exchange():
     assert retail_exchange_candidate_from_trace(messages) is None
 
 
+def test_retail_exchange_candidate_respects_desk_lamp_brightness_and_power_order():
+    cases = [
+        (
+            "I want to exchange the water bottle and the desk lamp. "
+            "For the desk lamp, I want a less bright one and prefer battery > USB > AC. "
+            "Yes, please proceed with only the desk lamp exchange.",
+            "7453605304",
+        ),
+        (
+            "I want to exchange the water bottle and the desk lamp. "
+            "For the desk lamp, I want a less bright one and prefer AC adapter > battery > USB. "
+            "Yes, please proceed with only the desk lamp exchange.",
+            "1569765161",
+        ),
+        (
+            "I want to exchange the water bottle and the desk lamp. "
+            "For the desk lamp, I want a brighter one and prefer battery > USB > AC. "
+            "Yes, please proceed with only the desk lamp exchange.",
+            "9083642334",
+        ),
+        (
+            "I want to exchange the water bottle and the desk lamp. "
+            "For the desk lamp, I want a brighter one and prefer AC adapter > battery > USB. "
+            "Yes, please proceed with only the desk lamp exchange.",
+            "7624783998",
+        ),
+    ]
+
+    for user_text, expected_new_item_id in cases:
+        messages = [
+            {"role": "user", "content": user_text},
+            {"role": "tool", "content": json.dumps(_desk_lamp_order())},
+            {"role": "tool", "content": json.dumps(_desk_lamp_product())},
+            {"role": "tool", "content": json.dumps(_desk_lamp_user())},
+        ]
+
+        candidate = retail_exchange_candidate_from_trace(messages)
+
+        assert candidate == {
+            "order_id": "#W6390527",
+            "item_ids": ["8384507844"],
+            "new_item_ids": [expected_new_item_id],
+            "payment_method_id": "paypal_7644869",
+        }
+
+
 def _reservation(**overrides):
     reservation = {
         "reservation_id": "Q69X3R",
@@ -326,6 +372,104 @@ def _retail_user():
                 "id": "credit_card_9513926",
                 "brand": "mastercard",
                 "last_four": "2478",
+            }
+        },
+    }
+
+
+def _desk_lamp_order():
+    return {
+        "order_id": "#W6390527",
+        "user_id": "mei_kovacs_8020",
+        "status": "delivered",
+        "items": [
+            {
+                "name": "Water Bottle",
+                "product_id": "8310926033",
+                "item_id": "3229676465",
+                "price": 51.94,
+                "options": {"capacity": "500ml", "material": "plastic", "color": "black"},
+            },
+            {
+                "name": "Desk Lamp",
+                "product_id": "6817146515",
+                "item_id": "8384507844",
+                "price": 137.94,
+                "options": {
+                    "color": "white",
+                    "brightness": "medium",
+                    "power source": "USB",
+                },
+            },
+        ],
+        "payment_history": [
+            {
+                "transaction_type": "payment",
+                "amount": 189.88,
+                "payment_method_id": "paypal_7644869",
+            }
+        ],
+    }
+
+
+def _desk_lamp_product():
+    return {
+        "name": "Desk Lamp",
+        "product_id": "6817146515",
+        "variants": {
+            "9083642334": {
+                "item_id": "9083642334",
+                "options": {"color": "white", "brightness": "high", "power source": "USB"},
+                "available": True,
+                "price": 164.28,
+            },
+            "7624783998": {
+                "item_id": "7624783998",
+                "options": {"color": "black", "brightness": "high", "power source": "AC adapter"},
+                "available": True,
+                "price": 154.17,
+            },
+            "5370728469": {
+                "item_id": "5370728469",
+                "options": {"color": "silver", "brightness": "medium", "power source": "USB"},
+                "available": True,
+                "price": 164.97,
+            },
+            "1569765161": {
+                "item_id": "1569765161",
+                "options": {"color": "silver", "brightness": "low", "power source": "AC adapter"},
+                "available": True,
+                "price": 143.02,
+            },
+            "7453605304": {
+                "item_id": "7453605304",
+                "options": {"color": "silver", "brightness": "low", "power source": "battery"},
+                "available": True,
+                "price": 150.01,
+            },
+            "9190635437": {
+                "item_id": "9190635437",
+                "options": {"color": "black", "brightness": "low", "power source": "USB"},
+                "available": True,
+                "price": 153.23,
+            },
+            "8384507844": {
+                "item_id": "8384507844",
+                "options": {"color": "white", "brightness": "medium", "power source": "USB"},
+                "available": False,
+                "price": 137.94,
+            },
+        },
+    }
+
+
+def _desk_lamp_user():
+    return {
+        "user_id": "mei_kovacs_8020",
+        "payment_methods": {
+            "paypal_7644869": {
+                "source": "paypal",
+                "id": "paypal_7644869",
             }
         },
     }

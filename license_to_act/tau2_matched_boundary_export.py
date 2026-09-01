@@ -46,7 +46,18 @@ RETAIL_TASK1_FIXTURE = (
     / "tau2_matched_boundary"
     / "retail_task1_qwen32k_scripted_scope_k5_summary.json"
 )
-DEFAULT_FIXTURES = (DEFAULT_FIXTURE, RETAIL_TASK0_FIXTURE, RETAIL_TASK1_FIXTURE)
+RETAIL_SCOPE_FAMILY_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "retail_tasks6_9_qwen32k_scripted_scope_family_k20_summary.json"
+)
+DEFAULT_FIXTURES = (
+    DEFAULT_FIXTURE,
+    RETAIL_TASK0_FIXTURE,
+    RETAIL_TASK1_FIXTURE,
+    RETAIL_SCOPE_FAMILY_FIXTURE,
+)
 
 
 def build_tau2_matched_boundary_export(
@@ -301,6 +312,8 @@ def _block_latex_commands(blocks: list[dict[str, Any]]) -> dict[str, str]:
             prefix = "LTATauTwoRetailMatched"
         elif paper_use == "matched_tau2_retail_scope_k5":
             prefix = "LTATauTwoRetailScopeMatched"
+        elif paper_use == "matched_tau2_retail_scope_family_k20":
+            prefix = "LTATauTwoRetailScopeFamilyMatched"
         else:
             continue
         commands.update(

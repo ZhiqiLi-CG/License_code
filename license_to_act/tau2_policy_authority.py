@@ -20,6 +20,7 @@ GENERIC_PRODUCT_TOKENS = {
     "the",
     "with",
 }
+BRIGHTNESS_RANK = {"low": 0, "medium": 1, "high": 2}
 
 
 def evaluate_tau2_tool_call(
@@ -277,7 +278,11 @@ def best_retail_replacement_variant(
             continue
         if not variant.get("available"):
             continue
-        score = retail_variant_preference_score(variant.get("options") or {}, text)
+        score = retail_variant_preference_score(
+            variant.get("options") or {},
+            text,
+            old_item.get("options") or {},
+        )
         if score <= 0:
             continue
         scored.append((score, str(variant.get("item_id", variant_id)), variant))
@@ -287,8 +292,13 @@ def best_retail_replacement_variant(
     return scored[0][2]
 
 
-def retail_variant_preference_score(options: dict[str, Any], text: str) -> int:
+def retail_variant_preference_score(
+    options: dict[str, Any],
+    text: str,
+    old_options: dict[str, Any] | None = None,
+) -> int:
     score = 0
+    old_options = old_options or {}
     for option_name, option_value in options.items():
         name = str(option_name).lower()
         value = str(option_value).lower()
@@ -296,6 +306,8 @@ def retail_variant_preference_score(options: dict[str, Any], text: str) -> int:
         if any(retail_option_is_rejected(phrase, text) for phrase in phrases):
             score -= 5
             continue
+        score += retail_comparative_option_score(name, value, old_options, text)
+        score += retail_ordered_option_score(name, phrases, text)
         if any(phrase and phrase in text for phrase in phrases):
             score += 3
             continue
@@ -303,6 +315,60 @@ def retail_variant_preference_score(options: dict[str, Any], text: str) -> int:
         if value_tokens and all(token in text for token in value_tokens):
             score += 1
     return score
+
+
+def retail_comparative_option_score(
+    option_name: str,
+    option_value: str,
+    old_options: dict[str, Any],
+    text: str,
+) -> int:
+    if option_name != "brightness":
+        return 0
+    old_value = str(old_options.get("brightness", "")).lower()
+    if old_value not in BRIGHTNESS_RANK or option_value not in BRIGHTNESS_RANK:
+        return 0
+    old_rank = BRIGHTNESS_RANK[old_value]
+    new_rank = BRIGHTNESS_RANK[option_value]
+    if "less bright" in text or "dimmer" in text or "lower brightness" in text:
+        if new_rank < old_rank:
+            return 8
+        if new_rank > old_rank:
+            return -4
+    if "brighter" in text or "more bright" in text or "higher brightness" in text:
+        if new_rank > old_rank:
+            return 8
+        if new_rank < old_rank:
+            return -4
+    return 0
+
+
+def retail_ordered_option_score(option_name: str, phrases: set[str], text: str) -> int:
+    for preferences in retail_ordered_preferences(text):
+        for index, preference in enumerate(preferences):
+            if retail_preference_matches_option(preference, phrases):
+                return max(1, len(preferences) - index) * 4
+    return 0
+
+
+def retail_ordered_preferences(text: str) -> list[list[str]]:
+    groups: list[list[str]] = []
+    for match in re.finditer(r"\bprefer\s+([a-z0-9 /-]+(?:\s*>\s*[a-z0-9 /-]+)+)", text):
+        group = [part.strip() for part in match.group(1).split(">") if part.strip()]
+        if len(group) >= 2:
+            groups.append(group)
+    return groups
+
+
+def retail_preference_matches_option(preference: str, phrases: set[str]) -> bool:
+    preference = preference.strip().lower()
+    if not preference:
+        return False
+    return any(
+        phrase == preference or phrase.startswith(f"{preference} ")
+        for phrase in phrases
+        if phrase
+    )
 
 
 def retail_option_phrases(option_name: str, option_value: str) -> set[str]:

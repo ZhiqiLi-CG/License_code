@@ -169,6 +169,8 @@ def _tau2_matched_rows(report: dict[str, Any]) -> list[dict[str, str]]:
             rows.append(_tau2_retail_completion_matched_row(block))
         elif block["paper_use"] == "matched_tau2_retail_scope_k5":
             rows.append(_tau2_retail_scope_matched_row(block))
+        elif block["paper_use"] == "matched_tau2_retail_scope_family_k20":
+            rows.append(_tau2_retail_scope_family_matched_row(block))
     return rows
 
 
@@ -256,6 +258,37 @@ def _tau2_retail_scope_matched_row(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['complete_pairs']} matched seeds; baseline makes "
             f"{summary['baseline_retail_exchange_tool_calls']} exchange calls, boundary makes "
             f"{summary['boundary_retail_exchange_tool_calls']} scoped thermostat-only exchange calls "
+            f"through {summary['boundary_completion_triggers']} completion triggers."
+        ),
+    }
+
+
+def _tau2_retail_scope_family_matched_row(summary: dict[str, Any]) -> dict[str, str]:
+    proposal_successes = int(summary["boundary_completion_triggers"])
+    baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
+    boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
+    return {
+        "decomposition_id": "TAU2_RETAIL6_9_QWEN_SCOPE_FAMILY_MATCHED_K20",
+        "benchmark": "tau2-Bench",
+        "task_family": "retail tasks 6-9 scoped desk-lamp exchange",
+        "evidence_type": "matched_actor_k20_scope_family",
+        "actor_backbone": "Qwen3.8-27B-long32k",
+        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "n_trials": str(summary["baseline_trials"]),
+        "proposal_success_definition": (
+            "order, product variants, comparative brightness preference, payment method, "
+            "and latest-only desk-lamp scope are present before the exchange remains text-only"
+        ),
+        "proposal_successes": str(proposal_successes),
+        "effect_successes_without_boundary": str(baseline_effect),
+        "proposal_to_effect_gaps": str(proposal_successes - baseline_effect),
+        "effect_successes_with_boundary": str(boundary_effect),
+        "source_ref": str(summary["source_paths"][0]),
+        "counts_as_planned": "no",
+        "notes": (
+            f"{summary['complete_pairs']} matched seeds over retail tasks 6-9; baseline makes "
+            f"{summary['baseline_retail_exchange_tool_calls']} exchange calls, boundary makes "
+            f"{summary['boundary_retail_exchange_tool_calls']} scoped desk-lamp exchange calls "
             f"through {summary['boundary_completion_triggers']} completion triggers."
         ),
     }
