@@ -130,7 +130,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P2_TERMINAL_WRITE_SCOPE",
             "Terminal-Bench 2.1",
-            "Codex GPT-5.5 diagnosis / commit-controller runtime",
+            "Codex GPT-5.5 diagnosis / action-boundary runtime",
             "action-boundary scoped Git write",
             "TB-SAN-scoped-ready",
             "ready",
@@ -145,7 +145,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P2_TERMINAL_WRITE_SCOPE",
             "Terminal-Bench 2.1",
-            "Codex GPT-5.5 diagnosis / commit-controller runtime",
+            "Codex GPT-5.5 diagnosis / action-boundary runtime",
             "action-boundary scoped Git write",
             "TB-SAN-overbroad-candidate",
             "premature",
@@ -160,7 +160,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P3_TERMINAL_PRESERVING_READ",
             "Terminal-Bench 2.1",
-            "Qwen3.8-27B diagnosis / commit-controller runtime",
+            "Qwen3.8-27B diagnosis / action-boundary runtime",
             "action-boundary preserving-read check",
             "TB-WAL-preserving-ready",
             "ready",
@@ -175,7 +175,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
         _member(
             "P3_TERMINAL_PRESERVING_READ",
             "Terminal-Bench 2.1",
-            "Qwen3.8-27B diagnosis / commit-controller runtime",
+            "Qwen3.8-27B diagnosis / action-boundary runtime",
             "action-boundary preserving-read check",
             "TB-WAL-destructive-read-candidate",
             "premature",
@@ -196,7 +196,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
             "ready",
             True,
             True,
-            stage2["SF-INV-MAT-K5"]["mean_reward"],
+            stage2["SF-INV-BP-K5"]["mean_reward"],
             "workflow artifact",
             "stage1_cases.csv | stage2_reliability.csv",
             "current_positive_spine",
@@ -211,7 +211,7 @@ def build_commit_pair_member_rows(project_root: str | Path = Path("/data/zhiqi/L
             "ready",
             True,
             True,
-            stage2["SF-TRAVEL-MAT-K5"]["mean_reward"],
+            stage2["SF-TRAVEL-BP-K5"]["mean_reward"],
             "workflow artifact",
             "stage2_reliability.csv",
             "current_positive_spine",

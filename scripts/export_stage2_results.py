@@ -73,7 +73,7 @@ DEFAULT_RELIABILITY_CASES = [
         ),
     },
     {
-        "case_id": "SF-INV-MAT-K5",
+        "case_id": "SF-INV-BP-K5",
         "benchmark": "SkillFlow",
         "task": "invoice image extraction",
         "condition": "Action-boundary invoice completion trigger",
@@ -193,7 +193,7 @@ DEFAULT_RELIABILITY_CASES = [
         ),
     },
     {
-        "case_id": "SF-TRAVEL-MAT-K5",
+        "case_id": "SF-TRAVEL-BP-K5",
         "benchmark": "SkillFlow",
         "task": "travel claim OCR merge",
         "condition": "Action-boundary travel-claim completion trigger",

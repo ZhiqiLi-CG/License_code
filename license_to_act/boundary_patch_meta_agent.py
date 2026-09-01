@@ -264,7 +264,7 @@ def _heldout_ids_for_field(field: str) -> set[str]:
     if field == "preserve":
         return {"TB-WAL-K5", "TB-SQLITE-K5"}
     if field == "done":
-        return {"SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5", "TB-LOG-K5"}
+        return {"SF-INV-BP-K5", "SF-TRAVEL-BP-K5", "TB-LOG-K5"}
     return set()
 
 

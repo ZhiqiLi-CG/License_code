@@ -78,8 +78,8 @@ def build_stage1_cases(report: dict[str, Any]) -> list[dict[str, Any]]:
                 "baseline_agent": _agent_label(check["baseline"]["agent"]),
                 "baseline_variant": "Vanilla",
                 "baseline_reward": _format_reward(check["baseline"]["reward"]),
-                "lta_agent": "commit-controller runtime",
-                "lta_variant": "boundary executor",
+                "lta_agent": "action-boundary runtime",
+                "lta_variant": "boundary program",
                 "lta_reward": _format_reward(check["license_to_act"]["reward"]),
                 "comparison_type": "diagnostic-to-official slice",
                 "official_verifier": "official Harbor verifier",
@@ -185,7 +185,7 @@ def build_diagnostic_cases(
                         "case_id": "TB-SAN-L",
                         "benchmark": "Terminal-Bench 2.1",
                         "task": "sanitize-git-repo",
-                        "agent": "commit-controller runtime",
+                        "agent": "action-boundary runtime",
                         "reward_or_status": _format_reward(check["license_to_act"]["reward"]),
                         "failure_or_role": "Scoped boundary commit",
                         "evidence": (
@@ -211,7 +211,7 @@ def build_diagnostic_cases(
                         "case_id": "TB-WAL-L",
                         "benchmark": "Terminal-Bench 2.1",
                         "task": "db-wal-recovery",
-                        "agent": "commit-controller runtime",
+                        "agent": "action-boundary runtime",
                         "reward_or_status": _format_reward(check["license_to_act"]["reward"]),
                         "failure_or_role": "Preserving read-and-commit protocol",
                         "evidence": (

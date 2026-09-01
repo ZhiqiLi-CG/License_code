@@ -96,7 +96,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "story_role": "executable boundary is stable in terminal state",
             "benchmarks": "Terminal-Bench 2.1",
             "state_substrates": "terminal state",
-            "actor_backbones": "commit-controller runtime",
+            "actor_backbones": "action-boundary runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(tb_clean_rows)}/{_sum_int(tb_clean_rows, 'n_trials')} official passes",
             "paper_use": "supporting_reproduction",
@@ -107,7 +107,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "story_role": "completion triggers finalize missing workflow artifacts",
             "benchmarks": "SkillFlow",
             "state_substrates": "workflow artifacts",
-            "actor_backbones": "commit-controller runtime",
+            "actor_backbones": "action-boundary runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(sf_clean_rows)}/{_sum_int(sf_clean_rows, 'n_trials')} official passes",
             "paper_use": "supporting_reproduction",
@@ -210,7 +210,7 @@ def _actor_backbones(stage1_rows: list[dict[str, str]], stage2_rows: list[dict[s
         raw_names.add(row["condition"])
     normalized = {_normalize_actor_name(name) for name in raw_names}
     normalized.discard("")
-    normalized.discard("CommitController runtime")
+    normalized.discard("action-boundary runtime")
     return sorted(normalized)
 
 
@@ -224,7 +224,7 @@ def _normalize_actor_name(name: str) -> str:
     if "Qwen" in name:
         return "Qwen3.8-27B"
     if "LTA" in name or "GovKernel" in name or "CommitController" in name:
-        return "CommitController runtime"
+        return "action-boundary runtime"
     return ""
 
 

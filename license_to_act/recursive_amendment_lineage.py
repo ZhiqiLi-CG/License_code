@@ -78,7 +78,7 @@ def _heldout_cases_for_meta_row(row: dict[str, str]) -> set[str]:
             return {"TB-SQLITE-K5", "TB-WAL-K5"}
         return {"TB-SAN-K5"}
     if row["boundary_field"] == "done":
-        return {"SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5", "TB-LOG-K5"}
+        return {"SF-INV-BP-K5", "SF-TRAVEL-BP-K5", "TB-LOG-K5"}
     return set()
 
 

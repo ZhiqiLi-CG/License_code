@@ -65,7 +65,7 @@ def test_write_recursive_amendment_lineage_exports_csv_json_and_tex(tmp_path: Pa
     rows = list(csv.DictReader(Path(output["outputs"]["lineage_csv"]).open(newline="", encoding="utf-8")))
     assert len(rows) == 5
     assert rows[0]["source_cases"] == "T2-A1"
-    assert rows[4]["heldout_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5 | TB-LOG-K5"
+    assert rows[4]["heldout_cases"] == "SF-INV-BP-K5 | SF-TRAVEL-BP-K5 | TB-LOG-K5"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTARecursiveCandidateAmendments}{5}" in tex

@@ -37,7 +37,7 @@ def test_build_mechanism_ablation_panel_separates_internal_cuts_from_baselines()
     assert rows["PROMPT_ONLY_BOUNDARY_TEXT"]["high_priority"] == "yes"
     assert "baseline" not in rows["PROMPT_ONLY_BOUNDARY_TEXT"]["comparison_class"]
     assert rows["ABLATE_COMPLETION_TRIGGER"]["cut_evidence_cases"] == "SF-INV"
-    assert rows["ABLATE_COMPLETION_TRIGGER"]["full_evidence_cases"] == "SF-INV-MAT-K5 | SF-TRAVEL-MAT-K5"
+    assert rows["ABLATE_COMPLETION_TRIGGER"]["full_evidence_cases"] == "SF-INV-BP-K5 | SF-TRAVEL-BP-K5"
     assert rows["ABLATE_WRITE_SCOPE_AND_PRESERVE"]["paper_result"] == "0/1 cut pass versus 5/5 full boundary pass"
     assert all(row["comparison_class"] == "mechanism_ablation" for row in rows.values())
 

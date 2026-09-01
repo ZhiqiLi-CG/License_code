@@ -58,10 +58,10 @@ def test_build_model_in_loop_bridge_separates_agent_evidence_from_runtime_adapte
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["n_errors"] == "0"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["uses_runtime_only_adapter"] == "no"
-    assert rows["TB_LOG_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
-    assert rows["TB_LOG_MATERIALIZER_K5"]["passes"] == "5"
-    assert rows["TB_LOG_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
-    assert rows["SF_TRAVEL_MATERIALIZER_K5"]["comparison_boundary"] == "runtime_reliability"
+    assert rows["TB_LOG_BOUNDARY_PROGRAM_K5"]["comparison_boundary"] == "runtime_reliability"
+    assert rows["TB_LOG_BOUNDARY_PROGRAM_K5"]["passes"] == "5"
+    assert rows["TB_LOG_BOUNDARY_PROGRAM_K5"]["official_verifier_result"] == "pass"
+    assert rows["SF_TRAVEL_BOUNDARY_PROGRAM_K5"]["comparison_boundary"] == "runtime_reliability"
     assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["passes"] == "5"
     assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["pass_at_5"] == "1"
     assert rows["SF_INVOICE_QWEN_COMMIT_CONTROLLER_K5"]["uses_runtime_only_adapter"] == "no"
@@ -99,9 +99,9 @@ def test_bridge_rows_name_actor_controller_boundary_and_official_result() -> Non
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["actor_model"] == "Qwen3.8-27B-long32k"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["controller_boundary"] == "completion_trigger"
     assert rows["TB_LOG_QWEN_COMMIT_CONTROLLER_K5"]["official_verifier_result"] == "pass"
-    assert rows["TB_WAL_MATERIALIZER_K5"]["actor_model"] == "none_runtime_only"
-    assert rows["TB_WAL_MATERIALIZER_K5"]["controller_boundary"] == "runtime_boundary"
-    assert rows["TB_WAL_MATERIALIZER_K5"]["official_verifier_result"] == "pass"
+    assert rows["TB_WAL_BOUNDARY_PROGRAM_K5"]["actor_model"] == "none_runtime_only"
+    assert rows["TB_WAL_BOUNDARY_PROGRAM_K5"]["controller_boundary"] == "runtime_boundary"
+    assert rows["TB_WAL_BOUNDARY_PROGRAM_K5"]["official_verifier_result"] == "pass"
 
     summary = bridge["summary"]
     assert summary["ordinary_agent_rows"] == 1
@@ -129,6 +129,11 @@ def test_write_model_in_loop_bridge_exports_csv_json_and_tex(tmp_path: Path) -> 
     assert rows[4]["bridge_id"] == "SF_TRAVEL_QWEN_COMMIT_CONTROLLER_K5"
     assert rows[5]["bridge_id"] == "TB_LOG_QWEN32K_MINISWE_BASELINE_K5"
     assert rows[6]["bridge_id"] == "TB_LOG_QWEN_COMMIT_CONTROLLER_K5"
+    public_label_fields = {"bridge_id", "actor_backbone", "harness", "condition"}
+    for row in rows:
+        public_text = " ".join(row[field] for field in public_label_fields).lower()
+        assert "materializer" not in public_text
+        assert "executor" not in public_text
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAModelLoopRows}{6}" in tex

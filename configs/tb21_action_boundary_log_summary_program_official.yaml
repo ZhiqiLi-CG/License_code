@@ -1,5 +1,5 @@
-job_name: tb21-lta-log-summary-materializer-official
-jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_lta_log_summary_materializer_official
+job_name: tb21-action-boundary-log-summary-program-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/tb21_action_boundary_log_summary_program_official
 agent_timeout_multiplier: 0.5
 quiet: true
 

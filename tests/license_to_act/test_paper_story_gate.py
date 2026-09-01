@@ -41,8 +41,11 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert checks["faithful_baseline_not_ablation"]["status"] == "pass"
     assert checks["comparison_manifest_separates_roles"]["status"] == "pass"
     assert checks["mechanism_ablation_panel_has_requested_cuts"]["status"] == "pass"
-    assert checks["model_in_loop_bridge_separates_runtime_executors"]["status"] == "pass"
-    assert "15/15" in checks["model_in_loop_bridge_separates_runtime_executors"]["evidence"]
+    assert checks["model_in_loop_bridge_separates_runtime_reliability"]["status"] == "pass"
+    assert "15/15" in checks["model_in_loop_bridge_separates_runtime_reliability"]["evidence"]
+    assert "bad public runtime labels: []" in checks[
+        "model_in_loop_bridge_separates_runtime_reliability"
+    ]["evidence"]
     assert checks["proposal_effect_decomposition_has_real_gap_rows"]["status"] == "pass"
     assert checks["tau2_matched_boundary_pair_present"]["status"] == "pass"
     assert summary["real_evidence_planned_rows"] == 0

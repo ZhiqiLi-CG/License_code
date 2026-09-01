@@ -68,8 +68,8 @@ def build_mechanism_ablation_panel(project_root: str | Path = Path("/data/zhiqi/
             "Complete prepared evidence is insufficient when no runtime trigger owns finalization.",
             ["SF-INV"],
             _stage1_cut(stage1, ["SF-INV"]),
-            ["SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5"],
-            _stage2_full(stage2, ["SF-INV-MAT-K5", "SF-TRAVEL-MAT-K5"]),
+            ["SF-INV-BP-K5", "SF-TRAVEL-BP-K5"],
+            _stage2_full(stage2, ["SF-INV-BP-K5", "SF-TRAVEL-BP-K5"]),
         ),
         _row(
             "PROMPT_ONLY_BOUNDARY_TEXT",

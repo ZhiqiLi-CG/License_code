@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-09-01: 135 passed.
+2026-09-01: 136 passed.
 ```
 
 ## Official Harbor Anchors
@@ -37,13 +37,13 @@ env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
   --n-attempts 5 --n-concurrent 1 -y
 
 env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
-  -c configs/tb21_lta_log_summary_materializer_official.yaml \
+  -c configs/tb21_action_boundary_log_summary_program_official.yaml \
   --job-name stage3-tb21-lta-log-summary-k5-real-20260831 \
   --jobs-dir /data/zhiqi/License/artifacts/stage3/harbor \
   --n-attempts 5 --n-concurrent 1 -y
 
 env PYTHONPATH=/data/zhiqi/License/License_code harbor run \
-  -c configs/skillflow_lta_travel_claim_materializer_official.yaml \
+  -c configs/skillflow_action_boundary_travel_claim_program_official.yaml \
   --job-name stage2-skillflow-action-boundary-travel-claim-k5-py \
   --jobs-dir /data/zhiqi/License/artifacts/stage2/harbor \
   --n-attempts 5 --n-concurrent 1 -y

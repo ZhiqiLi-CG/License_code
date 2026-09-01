@@ -181,18 +181,35 @@ def test_story_gate_exports_action_boundary_consistency_check() -> None:
 
 def test_public_configs_and_prompts_use_action_boundary_names() -> None:
     config_paths = [
+        Path("/data/zhiqi/License/License_code/configs/skillflow_action_boundary_invoice_program_official.yaml"),
+        Path("/data/zhiqi/License/License_code/configs/skillflow_action_boundary_travel_claim_program_official.yaml"),
         Path("/data/zhiqi/License/License_code/configs/skillflow_action_boundary_qwen_invoice_no_prompt_official.yaml"),
         Path("/data/zhiqi/License/License_code/configs/skillflow_action_boundary_qwen_invoice_official.yaml"),
         Path("/data/zhiqi/License/License_code/configs/skillflow_action_boundary_qwen_travel_claim_official.yaml"),
+        Path("/data/zhiqi/License/License_code/configs/tb21_action_boundary_log_summary_program_official.yaml"),
         Path("/data/zhiqi/License/License_code/configs/tb21_action_boundary_qwen_log_summary_official.yaml"),
+        Path("/data/zhiqi/License/License_code/configs/tb21_action_boundary_sanitize_program_official.yaml"),
     ]
     for path in config_paths:
         text = path.read_text(encoding="utf-8")
         assert "GovKernelAgent" not in text
-        assert "ActionBoundaryAgent" in text
+        assert "action-boundary" in text or "ActionBoundaryAgent" in text or "BoundaryProgramAgent" in text
         assert "govkernel" not in "\n".join(
             line for line in text.splitlines() if line.startswith("job_name:")
         )
+        assert "materializer" not in text
+        assert "executor" not in text
+
+    harbor_agents = Path("/data/zhiqi/License/License_code/license_to_act/harbor_agents.py").read_text(encoding="utf-8")
+    for phrase in [
+        "commit-controller runtime",
+        "boundary executor",
+        "runtime executor",
+        "MaterializerAgent",
+        "license-to-act-invoice-materializer",
+        "license-to-act-travel-claim-materializer",
+    ]:
+        assert phrase not in harbor_agents
 
     prompt_titles = [
         Path("/data/zhiqi/License/License_code/prompts/action_boundary_skillflow_invoice_commit_protocol.md").read_text(

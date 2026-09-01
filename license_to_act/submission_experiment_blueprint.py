@@ -125,7 +125,7 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
                 "Gate A/C: same agent +/- action boundary; removing completion triggers restores missing-workbook failures; "
                 "wrong artifact-write rate is reported."
             ),
-            "baseline_boundary": "Runtime executors are compared against matched agents and named mechanism cuts.",
+            "baseline_boundary": "Runtime-only boundary programs are separated from matched-agent comparisons and named mechanism cuts.",
         },
         {
             "blueprint_id": "E6_SKILLFLOW_SKILL_COMMIT_TRANSFER",

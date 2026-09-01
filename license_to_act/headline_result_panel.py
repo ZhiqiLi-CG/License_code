@@ -148,12 +148,12 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "runtime_reliability_evidence",
             "story_question": "Do the executable boundary protocols reproduce under official verifiers?",
             "result_sentence": (
-                f"Runtime-only boundary protocols achieve {portfolio_summary['clean_positive_passes']}/"
+                f"Runtime-only boundary programs achieve {portfolio_summary['clean_positive_passes']}/"
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors; these "
                 "rows are implementation reliability checks, not counted as matched-agent evidence."
             ),
             "why_it_matters": (
-                "This keeps deterministic or task-family executors out of the main causal comparison while "
+                "This keeps deterministic boundary-program checks out of the main causal comparison while "
                 "still documenting that the released code reproduces the reported verifier states."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",

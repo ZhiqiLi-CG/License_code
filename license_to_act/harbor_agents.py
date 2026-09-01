@@ -123,12 +123,12 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover - depends on Harb
                         pass
 
 
-class LicenseToActInvoiceMaterializerAgent(BaseAgent):
+class LicenseToActInvoiceBoundaryProgramAgent(BaseAgent):
     """Minimal Harbor agent that executes the SkillFlow invoice workbook obligation."""
 
     @staticmethod
     def name() -> str:
-        return "license-to-act-invoice-materializer"
+        return "action-boundary-invoice-program"
 
     def version(self) -> str | None:
         return "0.1"
@@ -143,23 +143,23 @@ class LicenseToActInvoiceMaterializerAgent(BaseAgent):
         context: AgentContext,
     ) -> None:
         result = await environment.exec(
-            command=_invoice_materializer_command(),
+            command=_invoice_boundary_program_command(),
             cwd="/app/workspace",
             timeout_sec=180,
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "Action-boundary invoice executor failed with return code "
+                "Action-boundary invoice program failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
 
 
-class LicenseToActTravelClaimMaterializerAgent(BaseAgent):
+class LicenseToActTravelClaimBoundaryProgramAgent(BaseAgent):
     """Minimal Harbor agent that executes the SkillFlow travel-claim workbook obligation."""
 
     @staticmethod
     def name() -> str:
-        return "license-to-act-travel-claim-materializer"
+        return "action-boundary-travel-claim-program"
 
     def version(self) -> str | None:
         return "0.1"
@@ -174,16 +174,15 @@ class LicenseToActTravelClaimMaterializerAgent(BaseAgent):
         context: AgentContext,
     ) -> None:
         result = await environment.exec(
-            command=_travel_claim_materializer_command(),
+            command=_travel_claim_boundary_program_command(),
             cwd="/app/workspace",
             timeout_sec=240,
         )
         if result.return_code != 0:
             raise RuntimeError(
-                "Action-boundary travel-claim executor failed with return code "
+                "Action-boundary travel-claim program failed with return code "
                 f"{result.return_code}\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
-
 
 class LicenseToActTB21SanitizeAgent(BaseAgent):
     """Minimal Harbor agent that executes the TB2.1 sanitize-repo license."""
@@ -356,7 +355,7 @@ if NoInstallQwenCodeBareLocal is not None:
         ) -> None:
             await super().run(instruction, environment, context)
             result = await environment.exec(
-                command=_invoice_materializer_command(),
+                command=_invoice_boundary_program_command(),
                 cwd="/app/workspace",
                 timeout_sec=180,
             )
@@ -381,7 +380,7 @@ if NoInstallQwenCodeBareLocal is not None:
         ) -> None:
             await super().run(instruction, environment, context)
             result = await environment.exec(
-                command=_travel_claim_materializer_command(),
+                command=_travel_claim_boundary_program_command(),
                 cwd="/app/workspace",
                 timeout_sec=240,
             )
@@ -452,7 +451,7 @@ else:
     LicenseToActQwenLogSummaryGovKernelAgent = LicenseToActQwenLogSummaryActionBoundaryAgent
 
 
-def _invoice_materializer_command() -> str:
+def _invoice_boundary_program_command() -> str:
     return r"""python3 - <<'PY'
 from __future__ import annotations
 
@@ -663,7 +662,7 @@ print(f'STATETX sanitized {len(changed_paths)} scoped files')
 PY"""
 
 
-def _travel_claim_materializer_command() -> str:
+def _travel_claim_boundary_program_command() -> str:
     return r"""python3 - <<'PY'
 from __future__ import annotations
 

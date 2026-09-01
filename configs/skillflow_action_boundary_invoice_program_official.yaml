@@ -1,5 +1,5 @@
-job_name: skillflow-lta-invoice-materializer-official
-jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_lta_invoice_materializer_official
+job_name: skillflow-action-boundary-invoice-program-official
+jobs_dir: /data/zhiqi/License/artifacts/probes/skillflow_action_boundary_invoice_program_official
 agent_timeout_multiplier: 0.5
 quiet: true
 
@@ -8,7 +8,7 @@ environment:
   force_build: true
 
 agents:
-  - import_path: license_to_act.harbor_agents:LicenseToActInvoiceMaterializerAgent
+  - import_path: license_to_act.harbor_agents:LicenseToActInvoiceBoundaryProgramAgent
     model_name: null
     kwargs: {}
 

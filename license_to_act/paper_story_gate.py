@@ -319,6 +319,15 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and row.get("official_verifier_result") in {"pass", "fail", "mixed", "error"}
         for row in rows
     )
+    public_label_fields = ("bridge_id", "actor_backbone", "harness", "condition")
+    bad_public_labels = [
+        row["bridge_id"]
+        for row in rows
+        if any(
+            bad in " ".join(str(row.get(field, "")) for field in public_label_fields).lower()
+            for bad in ("materializer", "executor", "commit-controller runtime")
+        )
+    ]
     ok = (
         summary["model_in_loop_rows"] >= 4
         and summary["ordinary_agent_rows"] >= 1
@@ -337,11 +346,12 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
         and summary["qwen_skillflow_faithful_baseline_passes"] < summary["qwen_skillflow_govkernel_passes"]
         and summary["runtime_adapter_rows_used_as_matched_agent"] == 0
         and row_fields_present
+        and not bad_public_labels
     )
     return _check(
-        "model_in_loop_bridge_separates_runtime_executors",
+        "model_in_loop_bridge_separates_runtime_reliability",
         ok,
-        "Model-in-loop evidence should not count runtime-only adapters as matched-agent causal evidence.",
+        "Model-in-loop evidence should not count runtime-only boundary programs as matched-agent causal evidence.",
         (
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
             f"{summary['matched_agent_controller_rows']} matched-boundary, and "
@@ -352,7 +362,8 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
             f"{summary['qwen_all_govkernel_passes']}/"
             f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
             f"runtime-adapter-as-agent rows: "
-            f"{summary['runtime_adapter_rows_used_as_matched_agent']}."
+            f"{summary['runtime_adapter_rows_used_as_matched_agent']}; "
+            f"bad public runtime labels: {bad_public_labels}."
         ),
     )
 

@@ -186,7 +186,7 @@ def _claims(
         "runtime_reliability_is_supporting_evidence": {
             "paper_section": "Reproducibility",
             "claim": (
-                "Runtime-only boundary protocols reproduce their verifier-visible states, but they are supporting evidence rather than matched-agent causal evidence."
+                "Runtime-only boundary programs reproduce their verifier-visible states, but they are supporting evidence rather than matched-agent causal evidence."
             ),
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} reliability tasks: {clean_tasks}",
