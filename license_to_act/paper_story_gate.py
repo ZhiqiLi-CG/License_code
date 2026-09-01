@@ -55,6 +55,11 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _mechanism_ablation_panel_check(ablation_panel["summary"]),
         _model_in_loop_bridge_check(model_loop_bridge),
         _real_evidence_audit_check(real_evidence_audit["summary"]),
+        _real_result_scale_check(
+            real_evidence_audit["summary"],
+            tau2_matched["summary"],
+            model_loop_bridge["summary"],
+        ),
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _proposal_effect_decomposition_check(proposal_effect["summary"]),
         _tau2_matched_boundary_check(tau2_matched["summary"]),
@@ -399,6 +404,43 @@ def _real_evidence_audit_check(summary: dict[str, Any]) -> dict[str, str]:
             f"planned main positives: {summary['main_positive_planned_rows']}; "
             f"missing artifacts: {summary['missing_artifact_rows']}; "
             f"unparseable artifacts: {summary['unparseable_artifact_rows']}."
+        ),
+    )
+
+
+def _real_result_scale_check(
+    real_summary: dict[str, Any],
+    tau2_summary: dict[str, Any],
+    model_loop_summary: dict[str, Any],
+) -> dict[str, str]:
+    ok = (
+        real_summary["real_harbor_rows"] >= 25
+        and real_summary["main_result_rows"] >= 20
+        and real_summary["planned_rows"] == 0
+        and real_summary["main_positive_planned_rows"] == 0
+        and tau2_summary["complete_pairs"] >= 80
+        and tau2_summary["retention_complete_pairs"] >= 15
+        and tau2_summary["boundary_regressions"] == 0
+        and tau2_summary["retention_boundary_regressions"] == 0
+        and model_loop_summary["qwen_all_govkernel_passes"]
+        == model_loop_summary["qwen_all_govkernel_trials"]
+        and model_loop_summary["qwen_all_govkernel_trials"] >= 15
+        and model_loop_summary["runtime_adapter_rows_used_as_matched_agent"] == 0
+    )
+    return _check(
+        "real_result_scale_not_toy",
+        ok,
+        "Main paper evidence should be real, matched where claimed, and large enough to avoid toy-example framing.",
+        (
+            f"{real_summary['real_harbor_rows']} parseable official Harbor rows; "
+            f"{real_summary['main_result_rows']} main-result rows; "
+            f"{real_summary['planned_rows']} planned rows; "
+            f"{tau2_summary['complete_pairs']} tau2 matched pairs plus "
+            f"{tau2_summary['retention_complete_pairs']} retention pairs; "
+            f"Qwen+boundary {model_loop_summary['qwen_all_govkernel_passes']}/"
+            f"{model_loop_summary['qwen_all_govkernel_trials']}; "
+            f"runtime-adapter-as-agent rows "
+            f"{model_loop_summary['runtime_adapter_rows_used_as_matched_agent']}."
         ),
     )
 

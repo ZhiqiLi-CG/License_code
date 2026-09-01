@@ -17,8 +17,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 25
-    assert summary["passed_checks"] == 25
+    assert summary["total_checks"] == 26
+    assert summary["passed_checks"] == 26
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
@@ -50,6 +50,12 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
         "model_in_loop_bridge_separates_runtime_reliability"
     ]["evidence"]
     assert checks["proposal_effect_decomposition_has_real_gap_rows"]["status"] == "pass"
+    assert checks["real_result_scale_not_toy"]["status"] == "pass"
+    assert "26 parseable official Harbor rows" in checks["real_result_scale_not_toy"]["evidence"]
+    assert "80 tau2 matched pairs plus 15 retention pairs" in checks[
+        "real_result_scale_not_toy"
+    ]["evidence"]
+    assert "runtime-adapter-as-agent rows 0" in checks["real_result_scale_not_toy"]["evidence"]
     assert checks["tau2_matched_boundary_pair_present"]["status"] == "pass"
     assert checks["tau2_retention_controls_preserve_legitimate_effects"]["status"] == "pass"
     assert summary["real_evidence_planned_rows"] == 0
@@ -108,12 +114,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 25
+    assert len(rows) == 26
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{25}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{25}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{26}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{26}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
