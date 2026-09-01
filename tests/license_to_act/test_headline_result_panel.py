@@ -21,6 +21,7 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["benchmarks"] == 3
     assert summary["state_substrates"] == 3
     assert summary["actor_backbones"] == 4
+    assert summary["main_matched_actor_backbones"] == 2
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
     assert summary["faithful_baseline_passes"] == 8
@@ -50,6 +51,8 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert rows["H2_TAU2_MATCHED_BOUNDARY"]["paper_role"] == "main_positive_evidence"
     assert "80 paired seeds" in rows["H2_TAU2_MATCHED_BOUNDARY"]["result_sentence"]
     assert "0 boundary regressions" in rows["H2_TAU2_MATCHED_BOUNDARY"]["result_sentence"]
+    assert "2 primary matched actor models" in rows["H1_BREADTH"]["result_sentence"]
+    assert "4 actor backbones" in rows["H1_BREADTH"]["result_sentence"]
     assert rows["H7_RUNTIME_RELIABILITY_SUPPORT"]["paper_role"] == "runtime_reliability_evidence"
     assert "not counted as matched-agent evidence" in rows["H7_RUNTIME_RELIABILITY_SUPPORT"]["result_sentence"]
     assert rows["H8_MODEL_IN_LOOP_BRIDGE"]["paper_role"] == "main_positive_evidence"

@@ -14,6 +14,11 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["benchmark_count"] == 3
     assert summary["state_substrate_count"] == 3
     assert summary["actor_backbone_count"] == 4
+    assert summary["main_matched_actor_backbone_count"] == 2
+    assert summary["main_matched_actor_backbones"] == [
+        "Mistral-Small-3.2-24B",
+        "Qwen3.8-27B-long32k",
+    ]
     assert summary["actor_backbones"] == [
         "Codex GPT-5.5",
         "Mistral-Small-3.2-24B",
@@ -44,6 +49,8 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["paper_use"] == "main_argument"
     assert "80 paired seeds" in by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["positive_result"]
     assert by_id["P1_STAGE1_TRANSFER"]["paper_use"] == "rsi_seed_support"
+    assert by_id["P1_STAGE1_TRANSFER"]["comparison_kind"] == "seed_cross_substrate_casebook"
+    assert "same proposal-to-effect failure class" in by_id["P1_STAGE1_TRANSFER"]["story_role"]
     assert by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["comparison_kind"] == "faithful_baseline"
     assert by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["paper_use"] == "main_counterpoint"
     assert "ablation" not in by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["comparison_kind"]
@@ -80,6 +87,7 @@ def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> No
     assert "\\newcommand{\\LTAEvidenceBenchmarks}{3}" in tex
     assert "\\newcommand{\\LTAEvidenceSubstrates}{3}" in tex
     assert "\\newcommand{\\LTAEvidenceBackbones}{4}" in tex
+    assert "\\newcommand{\\LTAEvidenceMainMatchedBackbones}{2}" in tex
     assert "\\newcommand{\\LTAEvidenceCleanPositivePasses}{30}" in tex
     assert "\\newcommand{\\LTAEvidenceFaithfulBaselinePasses}{8}" in tex
     assert "\\newcommand{\\LTAEvidenceFaithfulBaselineTrials}{30}" in tex

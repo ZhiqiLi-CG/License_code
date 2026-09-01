@@ -27,6 +27,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["benchmark_count"] == 3
     assert summary["state_substrate_count"] == 3
     assert summary["actor_backbone_count"] == 4
+    assert summary["main_matched_actor_backbone_count"] == 2
     assert summary["tau2_matched_pairs"] == 80
     assert summary["tau2_matched_reward_delta"] == 0.9875
     assert summary["meta_agent_candidates"] == 5

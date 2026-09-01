@@ -84,6 +84,9 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "benchmark_count": portfolio_summary["benchmark_count"],
             "state_substrate_count": portfolio_summary["state_substrate_count"],
             "actor_backbone_count": portfolio_summary["actor_backbone_count"],
+            "main_matched_actor_backbone_count": portfolio_summary[
+                "main_matched_actor_backbone_count"
+            ],
             "clean_positive_passes": portfolio_summary["clean_positive_passes"],
             "clean_positive_trials": portfolio_summary["clean_positive_trials"],
             "faithful_baseline_passes": portfolio_summary["faithful_baseline_passes"],
@@ -165,15 +168,17 @@ def _portfolio_breadth_check(summary: dict[str, Any]) -> dict[str, str]:
         summary["benchmark_count"] >= 3
         and summary["state_substrate_count"] >= 3
         and summary["actor_backbone_count"] >= 4
+        and summary["main_matched_actor_backbone_count"] >= 2
     )
     return _check(
         "portfolio_breadth",
         ok,
-        "The main result set spans multiple benchmark families, state substrates, and actor backbones.",
+        "The evidence separates primary matched model breadth from broader diagnostic and counterpoint breadth.",
         (
             f"{summary['benchmark_count']} benchmark families; "
             f"{summary['state_substrate_count']} state substrates; "
-            f"{summary['actor_backbone_count']} actor backbones."
+            f"{summary['main_matched_actor_backbone_count']} primary matched actor models; "
+            f"{summary['actor_backbone_count']} broader actor backbones."
         ),
     )
 

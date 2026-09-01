@@ -49,6 +49,8 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "result_sentence": (
                 f"The current result set spans {portfolio_summary['benchmark_count']} benchmark families, "
                 f"{portfolio_summary['state_substrate_count']} state substrates, and "
+                f"{portfolio_summary['main_matched_actor_backbone_count']} primary matched actor models; "
+                f"broader diagnostic and counterpoint evidence touches "
                 f"{portfolio_summary['actor_backbone_count']} actor backbones."
             ),
             "why_it_matters": (
@@ -146,7 +148,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         {
             "panel_id": "H7_RUNTIME_RELIABILITY_SUPPORT",
             "paper_role": "runtime_reliability_evidence",
-            "story_question": "Do the executable boundary protocols reproduce under official verifiers?",
+            "story_question": "Do the executable boundary programs reproduce under official verifiers?",
             "result_sentence": (
                 f"Runtime-only boundary programs achieve {portfolio_summary['clean_positive_passes']}/"
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors; these "
@@ -173,6 +175,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "benchmarks": portfolio_summary["benchmark_count"],
         "state_substrates": portfolio_summary["state_substrate_count"],
         "actor_backbones": portfolio_summary["actor_backbone_count"],
+        "main_matched_actor_backbones": portfolio_summary["main_matched_actor_backbone_count"],
         "clean_positive_passes": portfolio_summary["clean_positive_passes"],
         "clean_positive_trials": portfolio_summary["clean_positive_trials"],
         "faithful_baseline_passes": comparison_summary["faithful_baseline_passes"],

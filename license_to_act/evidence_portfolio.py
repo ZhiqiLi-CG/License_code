@@ -68,12 +68,12 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
         {
             "portfolio_id": "P1_STAGE1_TRANSFER",
-            "story_role": "same boundary update moves across state substrates",
+            "story_role": "the same proposal-to-effect failure class appears across state substrates",
             "benchmarks": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
             "state_substrates": "business records | terminal state | workflow artifacts",
             "actor_backbones": "Qwen3.8-27B | Mistral-Small-3.2-24B | Codex GPT-5.5",
-            "comparison_kind": "paired_or_diagnostic_transfer",
-            "positive_result": f"{transfer_ftp} failure-to-pass, {transfer_ptf} pass-to-failure",
+            "comparison_kind": "seed_cross_substrate_casebook",
+            "positive_result": f"{transfer_ftp} failure-to-pass seed repairs, {transfer_ptf} pass-to-failure",
             "paper_use": "rsi_seed_support",
             "source_data": "stage1_cases.csv | transfer_ledger.csv",
         },
@@ -140,6 +140,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
     ]
 
+    main_matched_actor_backbones = _main_matched_actor_backbones(rows)
+
     summary = {
         "benchmark_count": len(benchmarks),
         "benchmarks": benchmarks,
@@ -147,6 +149,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         "state_substrates": ["business records", "terminal state", "workflow artifacts"],
         "actor_backbone_count": len(actor_backbones),
         "actor_backbones": actor_backbones,
+        "main_matched_actor_backbone_count": len(main_matched_actor_backbones),
+        "main_matched_actor_backbones": main_matched_actor_backbones,
         "stage1_failure_to_pass": transfer_ftp,
         "stage1_pass_to_failure": transfer_ptf,
         "clean_positive_trials": clean_trials,
@@ -214,6 +218,19 @@ def _actor_backbones(stage1_rows: list[dict[str, str]], stage2_rows: list[dict[s
     return sorted(normalized)
 
 
+def _main_matched_actor_backbones(rows: list[dict[str, Any]]) -> list[str]:
+    matched_kinds = {"matched_actor_action_boundary", "matched_agent_commit_controller"}
+    names: set[str] = set()
+    for row in rows:
+        if row["paper_use"] != "main_argument" or row["comparison_kind"] not in matched_kinds:
+            continue
+        for name in str(row["actor_backbones"]).split("|"):
+            cleaned = name.strip()
+            if cleaned and cleaned != "action-boundary runtime":
+                names.add(cleaned)
+    return sorted(names)
+
+
 def _normalize_actor_name(name: str) -> str:
     if "Codex GPT-5.5" in name:
         return "Codex GPT-5.5"
@@ -240,6 +257,7 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAEvidenceBenchmarks": summary["benchmark_count"],
         "LTAEvidenceSubstrates": summary["state_substrate_count"],
         "LTAEvidenceBackbones": summary["actor_backbone_count"],
+        "LTAEvidenceMainMatchedBackbones": summary["main_matched_actor_backbone_count"],
         "LTAEvidenceCleanPositivePasses": summary["clean_positive_passes"],
         "LTAEvidenceCleanPositiveTrials": summary["clean_positive_trials"],
         "LTAEvidenceFaithfulBaselinePasses": summary["faithful_baseline_passes"],
