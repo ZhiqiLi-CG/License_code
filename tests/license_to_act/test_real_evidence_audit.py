@@ -39,6 +39,17 @@ def test_real_evidence_audit_contains_only_real_result_rows() -> None:
     assert rows["model_loop:TB_WAL_BOUNDARY_PROGRAM_K5"]["counts_as_main_result"] == "no"
     assert rows["model_loop:SF_OCR_QWEN32K_MINISWE_BASELINE_K5"]["notes"] == "1/10 passes; mixed"
 
+    headline_main_rows = [
+        row
+        for row in rows.values()
+        if row["evidence_id"].startswith("headline:")
+        and row["paper_role"] == "main_positive_evidence"
+    ]
+    assert headline_main_rows
+    assert all(row["counts_as_main_result"] == "yes" for row in headline_main_rows)
+    assert all(row["evidence_kind"] != "planned_matrix" for row in headline_main_rows)
+    assert rows["headline:H7_RUNTIME_RELIABILITY_SUPPORT"]["paper_role"] != "main_positive_evidence"
+
 
 def test_write_real_evidence_audit_exports_csv_json_and_tex(tmp_path: Path) -> None:
     output = write_real_evidence_audit(
