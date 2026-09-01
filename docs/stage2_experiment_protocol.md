@@ -26,7 +26,9 @@ The narrative must stay unified across the required benchmark families:
 
 ## Frozen Baseline Contract
 
-Faithful baselines are not ablations. They must use the same task harness, official verifiers, comparable model budgets, and no hidden access to LTA-specific executors.
+Faithful baselines are not ablations. They must use the same task harness,
+official verifiers, comparable model budgets, and no hidden access to the
+action-boundary completion code.
 
 Baseline ladder:
 

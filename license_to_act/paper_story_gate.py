@@ -590,6 +590,8 @@ def _public_surface_hygiene_check(root: Path) -> dict[str, str]:
         "positive obligation",
         "Agency Gap",
         "boundary-rule",
+        "Boundary rules",
+        "rules and controllers are implementation details",
         "hand-written rule",
         "hand-authored rule",
         "task-specific executor",

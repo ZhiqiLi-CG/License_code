@@ -148,7 +148,10 @@ def test_public_surface_hygiene_flags_hand_rule_framing(tmp_path: Path) -> None:
     appendix = paper / "sections" / "appendix.tex"
     appendix.parent.mkdir(parents=True)
     (root / "README.md").write_text("clean root\n", encoding="utf-8")
-    appendix.write_text("This is a task-specific executor baseline.\n", encoding="utf-8")
+    appendix.write_text(
+        "Boundary rules and controllers are implementation details.\n",
+        encoding="utf-8",
+    )
 
     for repo in [root, paper]:
         subprocess.run(["git", "init"], cwd=repo, text=True, capture_output=True, check=True)
