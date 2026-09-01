@@ -166,7 +166,9 @@ def _tau2_matched_rows(report: dict[str, Any]) -> list[dict[str, str]]:
         if block["paper_use"] == "matched_tau2_k20":
             rows.append(_tau2_airline_matched_row(block))
         elif block["paper_use"] == "matched_tau2_retail_completion_k5":
-            rows.append(_tau2_retail_matched_row(block))
+            rows.append(_tau2_retail_completion_matched_row(block))
+        elif block["paper_use"] == "matched_tau2_retail_scope_k5":
+            rows.append(_tau2_retail_scope_matched_row(block))
     return rows
 
 
@@ -197,7 +199,7 @@ def _tau2_airline_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     }
 
 
-def _tau2_retail_matched_row(summary: dict[str, Any]) -> dict[str, str]:
+def _tau2_retail_completion_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     proposal_successes = int(summary["boundary_completion_triggers"])
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
     boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
@@ -224,6 +226,37 @@ def _tau2_retail_matched_row(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['baseline_retail_exchange_tool_calls']} exchange calls, boundary makes "
             f"{summary['boundary_retail_exchange_tool_calls']} trace-derived exchange calls through "
             f"{summary['boundary_completion_triggers']} completion triggers."
+        ),
+    }
+
+
+def _tau2_retail_scope_matched_row(summary: dict[str, Any]) -> dict[str, str]:
+    proposal_successes = int(summary["boundary_completion_triggers"])
+    baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
+    boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
+    return {
+        "decomposition_id": "TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5",
+        "benchmark": "tau2-Bench",
+        "task_family": "retail task 1 scoped exchange",
+        "evidence_type": "matched_actor_k5_scope",
+        "actor_backbone": "Qwen3.8-27B-long32k",
+        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "n_trials": str(summary["baseline_trials"]),
+        "proposal_success_definition": (
+            "order and variant evidence are present, and the latest user confirmation "
+            "narrows the desired exchange to the thermostat only"
+        ),
+        "proposal_successes": str(proposal_successes),
+        "effect_successes_without_boundary": str(baseline_effect),
+        "proposal_to_effect_gaps": str(proposal_successes - baseline_effect),
+        "effect_successes_with_boundary": str(boundary_effect),
+        "source_ref": str(summary["source_paths"][0]),
+        "counts_as_planned": "no",
+        "notes": (
+            f"{summary['complete_pairs']} matched seeds; baseline makes "
+            f"{summary['baseline_retail_exchange_tool_calls']} exchange calls, boundary makes "
+            f"{summary['boundary_retail_exchange_tool_calls']} scoped thermostat-only exchange calls "
+            f"through {summary['boundary_completion_triggers']} completion triggers."
         ),
     }
 

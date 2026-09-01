@@ -160,6 +160,8 @@ def retail_exchange_candidate_from_trace(messages: list[Any]) -> dict[str, Any] 
         return None
     if not user_confirmed_state_change(messages):
         return None
+    if user_refused_retail_exchange(messages):
+        return None
     order = extract_latest_retail_order_any(messages)
     if order is None or str(order.get("status", "")).lower() != "delivered":
         return None
@@ -175,6 +177,13 @@ def retail_exchange_candidate_from_trace(messages: list[Any]) -> dict[str, Any] 
         for item in (order.get("items") or [])
         if retail_product_name_is_mentioned(item, user_text)
     ]
+    scoped_text = latest_retail_only_exchange_scope(messages)
+    if scoped_text:
+        scoped_items = [
+            item for item in selected_items if retail_product_name_is_mentioned(item, scoped_text)
+        ]
+        if scoped_items:
+            selected_items = scoped_items
     if not selected_items:
         return None
 
@@ -222,6 +231,35 @@ def retail_product_name_is_mentioned(item: dict[str, Any], text: str) -> bool:
         if token not in GENERIC_PRODUCT_TOKENS
     ]
     return any(token in text for token in tokens)
+
+
+def latest_retail_only_exchange_scope(messages: list[Any]) -> str:
+    for message in reversed(messages):
+        if field(message, "role") != "user":
+            continue
+        text = str(field(message, "content", "") or "").lower()
+        for sentence in reversed(re.split(r"[.!?;]\s*", text)):
+            if "exchange" in sentence and re.search(r"\bonly\b", sentence):
+                return sentence
+    return ""
+
+
+def user_refused_retail_exchange(messages: list[Any]) -> bool:
+    for message in reversed(messages):
+        if field(message, "role") != "user":
+            continue
+        text = str(field(message, "content", "") or "").lower()
+        if "exchange" in text:
+            return any(
+                phrase in text
+                for phrase in (
+                    "do not exchange anything",
+                    "don't exchange anything",
+                    "do not want to exchange anything",
+                    "don't want to exchange anything",
+                )
+            )
+    return False
 
 
 def best_retail_replacement_variant(

@@ -29,6 +29,15 @@ _SCRIPTED_TAU2_USERS: dict[tuple[str, str], list[str]] = {
         "For the thermostat, I want one compatible with Google Home instead of Apple HomeKit.",
         "Yes, please proceed with the exchange once you have checked the order and replacement details.",
     ],
+    (
+        "retail",
+        "1",
+    ): [
+        "Hi, I am Yusuf Rossi in zip code 19122. I received order #W2378156 and want to exchange the mechanical keyboard and smart thermostat.",
+        "For the keyboard, I want the same mechanical keyboard with clicky switches, full size, and RGB backlight. If that exact keyboard is not available, I would rather only exchange the thermostat.",
+        "For the thermostat, I want one compatible with Google Home instead of Apple HomeKit.",
+        "Yes, please proceed with only the thermostat exchange once you have checked the details.",
+    ],
 }
 
 

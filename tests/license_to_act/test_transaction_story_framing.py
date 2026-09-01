@@ -133,8 +133,10 @@ def test_tau2_matched_blocks_are_not_conflated_in_public_paper_text() -> None:
 
     assert "live matched \\(K=20\\) block on airline task 48" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=20\\)" in results
-    assert "\\(\\tau^2\\) matched retail exchange, \\(K=5\\)" in results
+    assert "\\(\\tau^2\\) matched retail completion, \\(K=5\\)" in results
+    assert "\\(\\tau^2\\) matched retail scope, \\(K=5\\)" in results
     assert "retail task 0" in public_text
+    assert "Retail task 1 tests scope" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=5\\)" not in results
 
 

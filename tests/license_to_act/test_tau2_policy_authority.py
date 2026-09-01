@@ -168,6 +168,59 @@ def test_retail_exchange_candidate_requires_complete_product_evidence():
     assert retail_exchange_candidate_from_trace(messages) is None
 
 
+def test_retail_exchange_candidate_uses_latest_only_scope():
+    messages = [
+        {
+            "role": "user",
+            "content": (
+                "I want to exchange the mechanical keyboard and smart thermostat in order #W2378156. "
+                "For the keyboard, I want clicky switches, full size, and RGB. "
+                "If that exact keyboard is not available, I would rather only exchange the thermostat."
+            ),
+        },
+        {"role": "tool", "content": json.dumps(_retail_order())},
+        {"role": "tool", "content": json.dumps(_keyboard_product())},
+        {
+            "role": "user",
+            "content": "For the thermostat, I want Google Home instead of Apple HomeKit.",
+        },
+        {"role": "tool", "content": json.dumps(_thermostat_product())},
+        {"role": "tool", "content": json.dumps(_retail_user())},
+        {
+            "role": "user",
+            "content": "Yes, please proceed with only the thermostat exchange.",
+        },
+    ]
+
+    candidate = retail_exchange_candidate_from_trace(messages)
+
+    assert candidate == {
+        "order_id": "#W2378156",
+        "item_ids": ["4983901480"],
+        "new_item_ids": ["7747408585"],
+        "payment_method_id": "credit_card_9513926",
+    }
+
+
+def test_retail_exchange_candidate_stops_when_user_refuses_exchange():
+    messages = [
+        {
+            "role": "user",
+            "content": (
+                "I want to exchange the keyboard and thermostat in order #W2378156. "
+                "For the keyboard I want clicky switches, full size, and no backlight."
+            ),
+        },
+        {"role": "tool", "content": json.dumps(_retail_order())},
+        {"role": "tool", "content": json.dumps(_keyboard_product())},
+        {"role": "tool", "content": json.dumps(_thermostat_product())},
+        {"role": "tool", "content": json.dumps(_retail_user())},
+        {"role": "user", "content": "Do not exchange anything. I changed my mind."},
+    ]
+
+    assert retail_exchange_candidate_from_trace(messages) is None
+
+
 def _reservation(**overrides):
     reservation = {
         "reservation_id": "Q69X3R",
