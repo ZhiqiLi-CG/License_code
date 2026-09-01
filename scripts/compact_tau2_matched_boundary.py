@@ -23,6 +23,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--user-mode", required=True)
     parser.add_argument("--paper-use", required=True)
     parser.add_argument("--expected-complete-pairs", type=int, default=None)
+    parser.add_argument("--task-ids", nargs="+", default=None)
     args = parser.parse_args(argv)
 
     compact = compact_tau2_matched_report(
@@ -32,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         user_mode=args.user_mode,
         paper_use=args.paper_use,
         expected_complete_pairs=args.expected_complete_pairs,
+        task_ids=args.task_ids,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(compact, indent=2), encoding="utf-8")

@@ -19,11 +19,11 @@ def test_build_proposal_effect_decomposition_uses_real_rows_not_plans() -> None:
     assert summary["rows"] == 9
     assert summary["benchmark_count"] == 3
     assert summary["planned_rows"] == 0
-    assert summary["gap_observations"] == 74
-    assert summary["gap_source_observations"] == 54
+    assert summary["gap_observations"] == 103
+    assert summary["gap_source_observations"] == 83
     assert summary["gap_distributional_observations"] == 20
-    assert summary["baseline_effect_successes_on_gap_rows"] == 0
-    assert summary["boundary_effect_successes_on_source_gap_rows"] == 54
+    assert summary["baseline_effect_successes_on_gap_rows"] == 1
+    assert summary["boundary_effect_successes_on_source_gap_rows"] == 84
 
     rows = {row["decomposition_id"]: row for row in report["rows"]}
     assert rows["TAU2_MINED_CANCEL_RCWW"]["evidence_type"] == "distributional_mining"
@@ -32,14 +32,14 @@ def test_build_proposal_effect_decomposition_uses_real_rows_not_plans() -> None:
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["evidence_type"] == "matched_actor_k20"
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["proposal_successes"] == "20"
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
-    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K5"]["evidence_type"] == "matched_actor_k5_completion"
-    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K5"]["proposal_successes"] == "5"
-    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K5"]["effect_successes_without_boundary"] == "0"
-    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K5"]["effect_successes_with_boundary"] == "5"
-    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5"]["evidence_type"] == "matched_actor_k5_scope"
-    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5"]["proposal_successes"] == "5"
-    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5"]["effect_successes_without_boundary"] == "0"
-    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5"]["effect_successes_with_boundary"] == "5"
+    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["evidence_type"] == "matched_actor_k20_completion"
+    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["proposal_successes"] == "20"
+    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["effect_successes_without_boundary"] == "1"
+    assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
+    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K20"]["evidence_type"] == "matched_actor_k20_scope"
+    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K20"]["proposal_successes"] == "20"
+    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K20"]["effect_successes_without_boundary"] == "0"
+    assert rows["TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
     assert (
         rows["TAU2_RETAIL6_9_QWEN_SCOPE_FAMILY_MATCHED_K20"]["evidence_type"]
         == "matched_actor_k20_scope_family"
@@ -74,11 +74,11 @@ def test_write_proposal_effect_decomposition_exports_csv_json_and_tex(tmp_path: 
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAProposalEffectRows}{9}" in tex
-    assert "\\newcommand{\\LTAProposalEffectGapObservations}{74}" in tex
-    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{54}" in tex
+    assert "\\newcommand{\\LTAProposalEffectGapObservations}{103}" in tex
+    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{84}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
-    assert summary["gap_rate_on_gap_rows"] == 1.0
+    assert round(summary["gap_rate_on_gap_rows"], 3) == 0.99
 
 
 def test_export_proposal_effect_decomposition_cli_writes_requested_outputs(tmp_path: Path) -> None:

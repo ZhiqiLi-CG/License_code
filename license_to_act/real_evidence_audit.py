@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .headline_result_panel import build_headline_result_panel
+
 
 AUDIT_FIELDS = [
     "evidence_id",
@@ -23,7 +25,7 @@ def build_real_evidence_audit(project_root: str | Path = Path("/data/zhiqi/Licen
     data_dir = root / "License_paper" / "data"
 
     rows: list[dict[str, str]] = []
-    rows.extend(_headline_rows(data_dir / "headline_result_panel.csv"))
+    rows.extend(_headline_rows(build_headline_result_panel(root)["rows"], source_table="headline_result_panel.csv"))
     rows.extend(_stage2_rows(data_dir / "stage2_reliability.csv"))
     rows.extend(_model_loop_rows(data_dir / "model_in_loop_bridge.csv"))
     rows.extend(_tau2_rows(data_dir / "tau2_commit_mining.csv", root / "artifacts/stage2/tau2_commit_mining_20260830.json"))
@@ -84,16 +86,16 @@ def write_real_evidence_audit(
     return audit
 
 
-def _headline_rows(path: Path) -> list[dict[str, str]]:
+def _headline_rows(headline_rows: list[dict[str, str]], *, source_table: str) -> list[dict[str, str]]:
     rows = []
-    for row in _read_csv(path):
+    for row in headline_rows:
         source_data = row["source_data"]
         evidence_kind = "planned_matrix" if "submission_scale_plan.csv" in source_data else "derived_from_real_artifacts"
         counts = "yes" if row["paper_role"] == "main_positive_evidence" and evidence_kind != "planned_matrix" else "no"
         rows.append(
             _row(
                 evidence_id=f"headline:{row['panel_id']}",
-                source_table=path.name,
+                source_table=source_table,
                 paper_role=row["paper_role"],
                 evidence_kind=evidence_kind,
                 source_ref=source_data,

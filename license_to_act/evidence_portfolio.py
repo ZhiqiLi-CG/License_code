@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .model_in_loop_bridge import build_model_in_loop_bridge
+from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
 
 
 PORTFOLIO_FIELDS = [
@@ -29,6 +30,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     transfer_rows = _read_csv(data_dir / "transfer_ledger.csv")
     tau2_rows = _read_csv(data_dir / "tau2_commit_mining.csv")
     model_bridge = build_model_in_loop_bridge(root)
+    tau2_matched = build_tau2_matched_boundary_export(root)
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
@@ -45,8 +47,25 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
     faithful_trials = _sum_int(faithful_rows, "n_trials")
     faithful_passes = _weighted_passes(faithful_rows)
     bridge_summary = model_bridge["summary"]
+    tau2_matched_summary = tau2_matched["summary"]
 
     rows = [
+        {
+            "portfolio_id": "P0_TAU2_MATCHED_ACTION_BOUNDARY",
+            "story_role": "same actor, same task, same budget; only the action boundary changes",
+            "benchmarks": "tau2-Bench",
+            "state_substrates": "business records",
+            "actor_backbones": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B",
+            "comparison_kind": "matched_actor_action_boundary",
+            "positive_result": (
+                f"{tau2_matched_summary['complete_pairs']} paired seeds, reward "
+                f"{tau2_matched_summary['baseline_mean_reward']:.1f}->"
+                f"{tau2_matched_summary['boundary_mean_reward']:.1f}, "
+                f"{tau2_matched_summary['boundary_regressions']} boundary regressions"
+            ),
+            "paper_use": "main_argument",
+            "source_data": "tau2_matched_boundary.csv",
+        },
         {
             "portfolio_id": "P1_STAGE1_TRANSFER",
             "story_role": "same boundary update moves across state substrates",
@@ -55,7 +74,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "actor_backbones": "Qwen3.8-27B | Mistral-Small-3.2-24B | Codex GPT-5.5",
             "comparison_kind": "paired_or_diagnostic_transfer",
             "positive_result": f"{transfer_ftp} failure-to-pass, {transfer_ptf} pass-to-failure",
-            "paper_use": "main_argument",
+            "paper_use": "rsi_seed_support",
             "source_data": "stage1_cases.csv | transfer_ledger.csv",
         },
         {
@@ -80,7 +99,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "actor_backbones": "commit-controller runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(tb_clean_rows)}/{_sum_int(tb_clean_rows, 'n_trials')} official passes",
-            "paper_use": "runtime_reliability",
+            "paper_use": "supporting_reproduction",
             "source_data": "stage2_reliability.csv",
         },
         {
@@ -91,7 +110,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "actor_backbones": "commit-controller runtime",
             "comparison_kind": "official_k5_rerun",
             "positive_result": f"{_weighted_passes(sf_clean_rows)}/{_sum_int(sf_clean_rows, 'n_trials')} official passes",
-            "paper_use": "runtime_reliability",
+            "paper_use": "supporting_reproduction",
             "source_data": "stage2_reliability.csv",
         },
         {
@@ -135,6 +154,8 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         "faithful_baseline_trials": faithful_trials,
         "faithful_baseline_passes": faithful_passes,
         "tau2_read_correct_write_wrong_proxy": int(tau2_metrics["read_correct_write_wrong_proxy"]),
+        "tau2_matched_pairs": tau2_matched_summary["complete_pairs"],
+        "tau2_matched_boundary_regressions": tau2_matched_summary["boundary_regressions"],
         "qwen_skillflow_govkernel_passes": bridge_summary["qwen_skillflow_govkernel_passes"],
         "qwen_skillflow_govkernel_trials": bridge_summary["qwen_skillflow_govkernel_trials"],
         "qwen_all_govkernel_passes": bridge_summary["qwen_all_govkernel_passes"],

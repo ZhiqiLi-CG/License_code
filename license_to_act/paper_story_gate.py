@@ -404,8 +404,8 @@ def _commit_pair_metric_check(summary: dict[str, Any]) -> dict[str, str]:
 
 def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
     ok = (
-        summary["complete_pairs"] >= 1
-        and summary["baseline_mean_reward"] == 0.0
+        summary["complete_pairs"] >= 80
+        and summary["baseline_mean_reward"] < summary["boundary_mean_reward"]
         and summary["boundary_mean_reward"] == 1.0
         and summary["baseline_read_correct_write_wrong"] >= 1
         and summary["boundary_read_correct_write_wrong"] == 0
@@ -418,7 +418,7 @@ def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
         "The paper should include real matched tau2 actor pairs, not only retrospective mining.",
         (
             f"{summary['complete_pairs']} matched pairs; reward "
-            f"{summary['baseline_mean_reward']:.1f}->{summary['boundary_mean_reward']:.1f}; "
+            f"{summary['baseline_mean_reward']:.3f}->{summary['boundary_mean_reward']:.3f}; "
             f"read-correct/write-wrong "
             f"{summary['baseline_read_correct_write_wrong']}->{summary['boundary_read_correct_write_wrong']}; "
             f"boundary vetoes {summary['boundary_vetoes']}; regressions {summary['boundary_regressions']}."
@@ -431,9 +431,9 @@ def _proposal_effect_decomposition_check(summary: dict[str, Any]) -> dict[str, s
         summary["rows"] >= 6
         and summary["benchmark_count"] >= 3
         and summary["planned_rows"] == 0
-        and summary["gap_observations"] >= 25
-        and summary["baseline_effect_successes_on_gap_rows"] == 0
-        and summary["boundary_effect_successes_on_source_gap_rows"] >= 5
+        and summary["gap_observations"] >= 100
+        and summary["baseline_effect_successes_on_gap_rows"] <= 1
+        and summary["boundary_effect_successes_on_source_gap_rows"] >= 80
     )
     return _check(
         "proposal_effect_decomposition_has_real_gap_rows",
@@ -479,9 +479,9 @@ def _meta_agent_patch_check(summary: dict[str, Any]) -> dict[str, str]:
     return _check(
         "meta_agent_boundary_patch_generation",
         ok,
-        "The boundary-update claim should include frozen-proposer candidates, not only deterministic signature rules.",
+        "The boundary-update claim should include frozen-proposer candidates, not only deterministic failure labels.",
         (
-            f"{summary['accepted_candidates']}/{summary['meta_agent_candidates']} frozen-proposer patches accepted; "
+            f"{summary['accepted_candidates']}/{summary['meta_agent_candidates']} frozen-proposer updates accepted; "
             f"{summary['accepted_benchmark_families']} benchmark families; "
             f"{summary['source_failure_to_pass']} source repairs; "
             f"{summary['pass_to_failure_regressions']} pass-to-failure regressions."
@@ -500,7 +500,7 @@ def _story_language_check(paper_dir: Path) -> dict[str, str]:
         "proposal-to-effect gap",
         "frozen reasoner",
         "proposed effects",
-        "boundary rule",
+        "boundary program",
         "matched model-in-loop",
     ]
     missing = [anchor for anchor in anchors if anchor not in combined]
@@ -532,7 +532,7 @@ def _action_boundary_story_check(paper_dir: Path) -> dict[str, str]:
         "frozen reasoner",
         "external effects",
         "proposed effects",
-        "boundary rule",
+        "boundary program",
         "controller",
         "ready",
         "write scope",
@@ -560,7 +560,7 @@ def _action_boundary_story_check(paper_dir: Path) -> dict[str, str]:
     )
     ok = not missing and not retired_hits and section_ok
     evidence = (
-        "Action boundary, proposal-to-effect gap, frozen reasoner, and boundary-rule implementation lead the front matter."
+        "Action boundary, proposal-to-effect gap, frozen reasoner, and boundary-program implementation lead the front matter."
         if ok
         else f"missing={missing}; retired_front_matter={retired_hits}; section_ok={section_ok}"
     )

@@ -26,7 +26,7 @@ def test_main_paper_leads_with_action_boundary_rsi_story() -> None:
         "frozen reasoner",
         "external effects",
         "proposed effects",
-        "boundary rule",
+        "boundary program",
         "controller",
         "ready",
         "write scope",
@@ -96,6 +96,31 @@ def test_main_paper_keeps_implementation_terms_in_their_place() -> None:
     assert "better ways to act on thought" in body
 
 
+def test_public_paper_avoids_mechanical_rule_story() -> None:
+    public_sections = "\n".join(
+        (PAPER / "sections" / name).read_text(encoding="utf-8")
+        for name in [
+            "01_introduction.tex",
+            "02_formulation.tex",
+            "03_method.tex",
+            "04_experiments.tex",
+            "05_results.tex",
+            "06_related_work.tex",
+            "07_discussion.tex",
+        ]
+    )
+
+    for phrase in [
+        "current update ledger",
+        "update ledger",
+        "mechanical rule",
+        "hand-written rule",
+        "hand-authored rule",
+        "task-specific rule",
+    ]:
+        assert phrase not in public_sections
+
+
 def test_main_paper_keeps_runtime_reliability_out_of_abstract_headline() -> None:
     main = (PAPER / "main.tex").read_text(encoding="utf-8")
     abstract = main.split("\\begin{abstract}", maxsplit=1)[1].split("\\end{abstract}", maxsplit=1)[0]
@@ -133,8 +158,8 @@ def test_tau2_matched_blocks_are_not_conflated_in_public_paper_text() -> None:
 
     assert "live matched \\(K=20\\) block on airline task 48" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=20\\)" in results
-    assert "\\(\\tau^2\\) matched retail completion, \\(K=5\\)" in results
-    assert "\\(\\tau^2\\) matched retail scope, \\(K=5\\)" in results
+    assert "\\(\\tau^2\\) matched retail completion, \\(K=20\\)" in results
+    assert "\\(\\tau^2\\) matched retail scope, \\(K=20\\)" in results
     assert "retail task 0" in public_text
     assert "Retail task 1 tests scope" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=5\\)" not in results

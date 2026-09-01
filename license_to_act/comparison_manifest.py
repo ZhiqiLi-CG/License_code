@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .model_in_loop_bridge import build_model_in_loop_bridge
+from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
 
 
 MANIFEST_FIELDS = [
@@ -24,6 +25,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
     root = Path(project_root)
     stage2_rows = _read_csv(root / "License_paper" / "data" / "stage2_reliability.csv")
     model_bridge = build_model_in_loop_bridge(root)
+    tau2_matched = build_tau2_matched_boundary_export(root)
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
 
@@ -32,17 +34,22 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
     faithful_trials = _sum_int(faithful_rows, "n_trials")
     faithful_passes = _weighted_passes(faithful_rows)
     bridge_summary = model_bridge["summary"]
+    tau2_summary = tau2_matched["summary"]
 
     rows = [
         {
-            "comparison_id": "M1_FULL_ACTION_BOUNDARY_CLEAN_ANCHORS",
+            "comparison_id": "M1_TAU2_MATCHED_ACTION_BOUNDARY",
             "comparison_class": "method_condition",
-            "paper_role": "main_positive",
-            "condition": "Full action boundary with executable finalization checks",
-            "tests": "Does the executable boundary produce stable verifier-backed durable effects?",
+            "paper_role": "main_matched_evidence",
+            "condition": "Frozen action boundary under matched tau2 actor/user/budget settings",
+            "tests": "Does changing only the proposal-to-effect interface repair real state-changing tasks?",
             "evidence_status": "completed",
-            "current_result": f"{clean_passes}/{clean_trials} official passes",
-            "source_data": "stage2_reliability.csv",
+            "current_result": (
+                f"{tau2_summary['complete_pairs']} paired seeds, reward "
+                f"{tau2_summary['baseline_mean_reward']:.1f}->{tau2_summary['boundary_mean_reward']:.1f}, "
+                f"{tau2_summary['boundary_regressions']} boundary regressions"
+            ),
+            "source_data": "tau2_matched_boundary.csv",
         },
         {
             "comparison_id": "B1_QWEN32K_MINISWE_MATCHED",
@@ -98,7 +105,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "A5_NO_CONTRACT_REFINEMENT",
             "comparison_class": "mechanism_ablation",
             "paper_role": "mechanism_evidence",
-            "condition": "Static boundary rules without failure-driven updates",
+            "condition": "Static boundary programs without failure-driven updates",
             "tests": "Do gains remain local when the boundary cannot be updated from failures?",
             "evidence_status": "seed_evidence",
             "current_result": "Generated lineage accepts 4/4 boundary updates over three generations",
@@ -119,6 +126,18 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
                 f"{bridge_summary['qwen_all_govkernel_trials']} official passes"
             ),
             "source_data": "model_in_loop_bridge.csv",
+        },
+        {
+            "comparison_id": "R1_RUNTIME_RELIABILITY_SUPPORT",
+            "comparison_class": "runtime_reliability",
+            "paper_role": "supporting_reproduction",
+            "condition": "Runtime-only boundary protocols under official verifiers",
+            "tests": "Do the released executable protocols reproduce their verifier-visible states?",
+            "evidence_status": "completed",
+            "current_result": (
+                f"{clean_passes}/{clean_trials} official passes; not matched-agent evidence"
+            ),
+            "source_data": "stage2_reliability.csv",
         },
     ]
     summary = _summarize(rows, faithful_trials, faithful_passes)
@@ -168,6 +187,7 @@ def _summarize(rows: list[dict[str, str]], faithful_trials: int, faithful_passes
     ablation_rows = [row for row in rows if row["comparison_class"] == "mechanism_ablation"]
     completed_ablation_rows = [row for row in ablation_rows if row["evidence_status"] == "seed_evidence"]
     stress_rows = [row for row in rows if row["comparison_class"] == "integration_stress"]
+    runtime_rows = [row for row in rows if row["comparison_class"] == "runtime_reliability"]
     overlap = sum(1 for row in rows if _mixes_baseline_and_ablation(row))
     return {
         "comparison_rows": len(rows),
@@ -178,8 +198,9 @@ def _summarize(rows: list[dict[str, str]], faithful_trials: int, faithful_passes
         "mechanism_ablation_rows": len(ablation_rows),
         "completed_mechanism_ablation_rows": len(completed_ablation_rows),
         "integration_stress_rows": len(stress_rows),
+        "runtime_reliability_rows": len(runtime_rows),
         "baseline_ablation_overlap": overlap,
-}
+    }
 
 
 def _mixes_baseline_and_ablation(row: dict[str, str]) -> bool:
@@ -204,6 +225,7 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAFaithfulBaselineRows": summary["faithful_baseline_rows"],
         "LTAMechanismAblationRows": summary["mechanism_ablation_rows"],
         "LTACompletedMechanismAblationRows": summary["completed_mechanism_ablation_rows"],
+        "LTARuntimeReliabilityRows": summary["runtime_reliability_rows"],
         "LTABaselineAblationOverlap": summary["baseline_ablation_overlap"],
     }
     lines = [

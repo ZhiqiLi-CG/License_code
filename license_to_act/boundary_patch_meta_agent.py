@@ -59,11 +59,11 @@ def parse_patch_response(response: str) -> dict[str, Any]:
 
 
 def build_patch_prompt(case: dict[str, str]) -> str:
-    """Build a compact prompt that asks for a reusable action-boundary patch."""
+    """Build a compact prompt that asks for a reusable action-boundary update."""
 
     return "\n".join(
         [
-            "You are proposing one reusable action-boundary patch for a frozen state-changing agent.",
+            "You are proposing one reusable action-boundary update for a frozen state-changing agent.",
             "Do not solve the task. Do not write a task-id guard. Do not mention private chain of thought.",
             "Return only JSON with these keys:",
             (
@@ -94,7 +94,7 @@ def build_meta_agent_patch_report(
     response_path: str | Path,
     source_case_ids: Iterable[str] | None = None,
 ) -> dict[str, Any]:
-    """Evaluate meta-agent generated boundary patches against real evidence rows."""
+    """Evaluate meta-agent generated boundary updates against real evidence rows."""
 
     root = Path(project_root)
     source_case_ids = list(source_case_ids or DEFAULT_SOURCE_CASE_IDS)

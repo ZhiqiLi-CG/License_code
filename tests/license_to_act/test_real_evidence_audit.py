@@ -20,8 +20,11 @@ def test_real_evidence_audit_separates_real_results_from_scale_plans() -> None:
     assert summary["unparseable_artifact_rows"] == 0
 
     rows = {row["evidence_id"]: row for row in audit["rows"]}
-    assert rows["headline:H7_SUBMISSION_SCALE_PATH"]["evidence_kind"] == "planned_matrix"
-    assert rows["headline:H7_SUBMISSION_SCALE_PATH"]["counts_as_main_result"] == "no"
+    assert "headline:H7_SUBMISSION_SCALE_PATH" not in rows
+    assert rows["headline:H2_TAU2_MATCHED_BOUNDARY"]["evidence_kind"] == "derived_from_real_artifacts"
+    assert rows["headline:H2_TAU2_MATCHED_BOUNDARY"]["counts_as_main_result"] == "yes"
+    assert rows["headline:H7_RUNTIME_RELIABILITY_SUPPORT"]["evidence_kind"] == "derived_from_real_artifacts"
+    assert rows["headline:H7_RUNTIME_RELIABILITY_SUPPORT"]["counts_as_main_result"] == "no"
     scale_target_rows = [row for row in audit["rows"] if row["evidence_id"].startswith("scale_plan:")]
     assert all(row["paper_role"] == "planned_scale_target" for row in scale_target_rows)
     assert all("target role:" in row["notes"] for row in scale_target_rows)

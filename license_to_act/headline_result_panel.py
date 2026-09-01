@@ -10,7 +10,7 @@ from .commit_pair_metrics import compute_commit_pair_metrics, build_commit_pair_
 from .evidence_portfolio import build_evidence_portfolio
 from .model_in_loop_bridge import build_model_in_loop_bridge
 from .story_claims import build_story_claims
-from .submission_scale_plan import build_submission_scale_plan
+from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
 
 
 PANEL_FIELDS = [
@@ -32,14 +32,14 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
     comparison = build_comparison_manifest(root)
     commit_pairs = compute_commit_pair_metrics(build_commit_pair_member_rows(root))
     model_bridge = build_model_in_loop_bridge(root)
-    scale_plan = build_submission_scale_plan(root)
+    tau2_matched = build_tau2_matched_boundary_export(root)
 
     metrics = claims["headline_metrics"]
     portfolio_summary = portfolio["summary"]
     comparison_summary = comparison["summary"]
     pair_summary = commit_pairs["summary"]
     bridge_summary = model_bridge["summary"]
-    scale_summary = scale_plan["summary"]
+    tau2_matched_summary = tau2_matched["summary"]
 
     rows = [
         {
@@ -58,17 +58,23 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "evidence_portfolio.csv",
         },
         {
-            "panel_id": "H2_CLEAN_POSITIVE_MASS",
-            "paper_role": "runtime_reliability_evidence",
-            "story_question": "Is the positive evidence a stable block rather than one lucky case?",
+            "panel_id": "H2_TAU2_MATCHED_BOUNDARY",
+            "paper_role": "main_positive_evidence",
+            "story_question": "Does changing only the action boundary close real business-state gaps?",
             "result_sentence": (
-                f"Action-boundary reliability tasks achieve {portfolio_summary['clean_positive_passes']}/"
-                f"{portfolio_summary['clean_positive_trials']} official passes with zero errors."
+                f"Four live tau2 matched blocks change only the boundary and cover "
+                f"{tau2_matched_summary['complete_pairs']} paired seeds across "
+                f"{tau2_matched_summary['domains']} domains and "
+                f"{tau2_matched_summary['actor_models']} actor models; mean reward moves from "
+                f"{tau2_matched_summary['baseline_mean_reward']:.1f} to "
+                f"{tau2_matched_summary['boundary_mean_reward']:.1f} with "
+                f"{tau2_matched_summary['boundary_regressions']} boundary regressions."
             ),
             "why_it_matters": (
-                "The paper can report verifier-backed positive mass while keeping matched-agent rows separate."
+                "This is the cleanest current causal evidence: same model, task, user script, and budget; "
+                "only the proposal-to-effect interface changes."
             ),
-            "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
+            "source_data": "tau2_matched_boundary.csv",
         },
         {
             "panel_id": "H8_MODEL_IN_LOOP_BRIDGE",
@@ -138,33 +144,19 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "tau2_commit_mining.csv",
         },
         {
-            "panel_id": "H6_CONTRACT_REFINEMENT_TRANSFER",
-            "paper_role": "main_positive_evidence",
-            "story_question": "Does a failure-derived boundary update transfer across benchmarks?",
+            "panel_id": "H7_RUNTIME_RELIABILITY_SUPPORT",
+            "paper_role": "runtime_reliability_evidence",
+            "story_question": "Do the executable boundary protocols reproduce under official verifiers?",
             "result_sentence": (
-                f"The boundary-update ledger records {metrics['transfer_failure_to_pass']} failure-to-pass "
-                f"repairs across {metrics['transfer_cases']} audited cases with "
-                f"{metrics['transfer_pass_to_failure']} pass-to-failure regressions."
+                f"Runtime-only boundary protocols achieve {portfolio_summary['clean_positive_passes']}/"
+                f"{portfolio_summary['clean_positive_trials']} official passes with zero errors; these "
+                "rows are implementation reliability checks, not counted as matched-agent evidence."
             ),
             "why_it_matters": (
-                "The paper's self-improvement object is the reusable action-boundary update, not a "
-                "single-task wrapper."
+                "This keeps deterministic or task-family executors out of the main causal comparison while "
+                "still documenting that the released code reproduces the reported verifier states."
             ),
-            "source_data": "transfer_ledger.csv | stage1_cases.csv",
-        },
-        {
-            "panel_id": "H7_SUBMISSION_SCALE_PATH",
-            "paper_role": "scale_path",
-            "story_question": "What must be scaled before final top-conference claim freeze?",
-            "result_sentence": (
-                f"The submission plan contains {scale_summary['scale_target_rows']} frozen scale targets "
-                "covering tau2 write families, Terminal-Bench action-boundary pilots, SkillFlow completion triggers, "
-                "model breadth, faithful baselines, mechanism cuts, and statistics."
-            ),
-            "why_it_matters": (
-                "The next experiments are selected by the proposal-to-effect argument rather than by blind benchmark piling."
-            ),
-            "source_data": "submission_scale_plan.csv",
+            "source_data": "stage2_reliability.csv | evidence_portfolio.csv",
         },
     ]
 
@@ -187,11 +179,12 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "faithful_baseline_trials": comparison_summary["faithful_baseline_trials"],
         "model_loop_passes": bridge_summary["qwen_all_govkernel_passes"],
         "model_loop_trials": bridge_summary["qwen_all_govkernel_trials"],
+        "tau2_matched_pairs": tau2_matched_summary["complete_pairs"],
+        "tau2_matched_boundary_regressions": tau2_matched_summary["boundary_regressions"],
         "tau2_read_correct_write_wrong_proxy": metrics["tau2_read_correct_write_wrong_proxy"],
         "commit_pair_accuracy": pair_summary["commit_pair_accuracy"],
         "unauthorized_commit_rate": pair_summary["unauthorized_commit_rate"],
         "authorized_commit_recall": pair_summary["authorized_commit_recall"],
-        "submission_scale_rows": scale_summary["scale_target_rows"],
     }
     return {"summary": summary, "rows": rows}
 
@@ -253,11 +246,14 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAHeadlineFaithfulBaselineTrials": summary["faithful_baseline_trials"],
         "LTAHeadlineModelLoopPasses": summary["model_loop_passes"],
         "LTAHeadlineModelLoopTrials": summary["model_loop_trials"],
+        "LTAHeadlineTauTwoMatchedPairs": summary["tau2_matched_pairs"],
+        "LTAHeadlineTauTwoMatchedBoundaryRegressions": summary[
+            "tau2_matched_boundary_regressions"
+        ],
         "LTAHeadlineTauTwoRCWW": summary["tau2_read_correct_write_wrong_proxy"],
         "LTAHeadlineCommitPairAccuracy": f"{summary['commit_pair_accuracy']:.3f}",
         "LTAHeadlineUnauthorizedCommitRate": f"{summary['unauthorized_commit_rate']:.3f}",
         "LTAHeadlineAuthorizedCommitRecall": f"{summary['authorized_commit_recall']:.3f}",
-        "LTAHeadlineSubmissionScaleRows": summary["submission_scale_rows"],
     }
     lines = [
         "% Auto-generated by License_code/license_to_act/headline_result_panel.py.",

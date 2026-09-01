@@ -27,9 +27,12 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["faithful_baseline_trials"] == 30
     assert summary["faithful_baseline_passes"] == 8
     assert summary["tau2_read_correct_write_wrong_proxy"] == 20
+    assert summary["tau2_matched_pairs"] == 80
+    assert summary["tau2_matched_boundary_regressions"] == 0
 
     rows = portfolio["rows"]
     assert [row["portfolio_id"] for row in rows] == [
+        "P0_TAU2_MATCHED_ACTION_BOUNDARY",
         "P1_STAGE1_TRANSFER",
         "P2_TAU2_MINING",
         "P3_TB_OFFICIAL_RERUNS",
@@ -37,19 +40,21 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
         "P5_LONGCTX_FAITHFUL_BASELINE",
         "P6_QWEN_COMMIT_CONTROLLER_BRIDGE",
     ]
-    assert rows[4]["comparison_kind"] == "faithful_baseline"
-    assert rows[4]["paper_use"] == "main_counterpoint"
-    assert "ablation" not in rows[4]["comparison_kind"]
-    assert rows[5]["positive_result"] == "15/15 official passes"
-    assert rows[5]["benchmarks"] == "Terminal-Bench 2.1 | SkillFlow"
-    assert "boundary" in rows[5]["story_role"]
-    assert rows[5]["source_data"] == "model_in_loop_bridge.csv"
-    assert rows[5]["comparison_kind"] == "matched_agent_commit_controller"
-    assert rows[5]["paper_use"] == "main_argument"
-    assert rows[2]["portfolio_id"] == "P3_TB_OFFICIAL_RERUNS"
-    assert rows[2]["paper_use"] == "runtime_reliability"
-    assert rows[3]["portfolio_id"] == "P4_SKILLFLOW_OFFICIAL_RERUNS"
-    assert rows[3]["paper_use"] == "runtime_reliability"
+    by_id = {row["portfolio_id"]: row for row in rows}
+    assert by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["paper_use"] == "main_argument"
+    assert "80 paired seeds" in by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["positive_result"]
+    assert by_id["P1_STAGE1_TRANSFER"]["paper_use"] == "rsi_seed_support"
+    assert by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["comparison_kind"] == "faithful_baseline"
+    assert by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["paper_use"] == "main_counterpoint"
+    assert "ablation" not in by_id["P5_LONGCTX_FAITHFUL_BASELINE"]["comparison_kind"]
+    assert by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["positive_result"] == "15/15 official passes"
+    assert by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["benchmarks"] == "Terminal-Bench 2.1 | SkillFlow"
+    assert "boundary" in by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["story_role"]
+    assert by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["source_data"] == "model_in_loop_bridge.csv"
+    assert by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["comparison_kind"] == "matched_agent_commit_controller"
+    assert by_id["P6_QWEN_COMMIT_CONTROLLER_BRIDGE"]["paper_use"] == "main_argument"
+    assert by_id["P3_TB_OFFICIAL_RERUNS"]["paper_use"] == "supporting_reproduction"
+    assert by_id["P4_SKILLFLOW_OFFICIAL_RERUNS"]["paper_use"] == "supporting_reproduction"
 
 
 def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> None:
@@ -67,9 +72,9 @@ def test_write_evidence_portfolio_exports_csv_json_and_tex(tmp_path: Path) -> No
     rows = list(
         csv.DictReader(Path(output["outputs"]["portfolio_csv"]).open(newline="", encoding="utf-8"))
     )
-    assert len(rows) == 6
-    assert rows[0]["portfolio_id"] == "P1_STAGE1_TRANSFER"
-    assert rows[4]["comparison_kind"] == "faithful_baseline"
+    assert len(rows) == 7
+    assert rows[0]["portfolio_id"] == "P0_TAU2_MATCHED_ACTION_BOUNDARY"
+    assert rows[5]["comparison_kind"] == "faithful_baseline"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTAEvidenceBenchmarks}{3}" in tex

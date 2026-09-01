@@ -165,9 +165,9 @@ def _tau2_matched_rows(report: dict[str, Any]) -> list[dict[str, str]]:
     for block in report["blocks"]:
         if block["paper_use"] == "matched_tau2_k20":
             rows.append(_tau2_airline_matched_row(block))
-        elif block["paper_use"] == "matched_tau2_retail_completion_k5":
+        elif block["paper_use"] == "matched_tau2_retail_completion_k20":
             rows.append(_tau2_retail_completion_matched_row(block))
-        elif block["paper_use"] == "matched_tau2_retail_scope_k5":
+        elif block["paper_use"] == "matched_tau2_retail_scope_k20":
             rows.append(_tau2_retail_scope_matched_row(block))
         elif block["paper_use"] == "matched_tau2_retail_scope_family_k20":
             rows.append(_tau2_retail_scope_family_matched_row(block))
@@ -206,10 +206,10 @@ def _tau2_retail_completion_matched_row(summary: dict[str, Any]) -> dict[str, st
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
     boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
     return {
-        "decomposition_id": "TAU2_RETAIL0_QWEN_MATCHED_K5",
+        "decomposition_id": "TAU2_RETAIL0_QWEN_MATCHED_K20",
         "benchmark": "tau2-Bench",
         "task_family": "retail task 0 exchange",
-        "evidence_type": "matched_actor_k5_completion",
+        "evidence_type": "matched_actor_k20_completion",
         "actor_backbone": "Qwen3.8-27B-long32k",
         "comparison_kind": "same actor, same scripted user, boundary changed",
         "n_trials": str(summary["baseline_trials"]),
@@ -237,10 +237,10 @@ def _tau2_retail_scope_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
     boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
     return {
-        "decomposition_id": "TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K5",
+        "decomposition_id": "TAU2_RETAIL1_QWEN_SCOPE_MATCHED_K20",
         "benchmark": "tau2-Bench",
         "task_family": "retail task 1 scoped exchange",
-        "evidence_type": "matched_actor_k5_scope",
+        "evidence_type": "matched_actor_k20_scope",
         "actor_backbone": "Qwen3.8-27B-long32k",
         "comparison_kind": "same actor, same scripted user, boundary changed",
         "n_trials": str(summary["baseline_trials"]),

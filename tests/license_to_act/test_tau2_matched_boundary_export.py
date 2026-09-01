@@ -17,29 +17,29 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     report = build_tau2_matched_boundary_export(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["pairs"] == 50
-    assert summary["complete_pairs"] == 50
-    assert summary["baseline_trials"] == 50
-    assert summary["boundary_trials"] == 50
-    assert summary["baseline_mean_reward"] == 0.0
+    assert summary["pairs"] == 80
+    assert summary["complete_pairs"] == 80
+    assert summary["baseline_trials"] == 80
+    assert summary["boundary_trials"] == 80
+    assert summary["baseline_mean_reward"] == 0.0125
     assert summary["boundary_mean_reward"] == 1.0
-    assert summary["reward_delta"] == 1.0
+    assert summary["reward_delta"] == 0.9875
     assert summary["baseline_read_correct_write_wrong"] == 20
     assert summary["boundary_read_correct_write_wrong"] == 0
     assert summary["boundary_vetoes"] == 26
-    assert summary["boundary_allows"] == 30
-    assert summary["boundary_completion_triggers"] == 30
-    assert summary["baseline_retail_exchange_tool_calls"] == 0
-    assert summary["boundary_retail_exchange_tool_calls"] == 30
-    assert summary["baseline_state_change_tool_calls"] == 21
-    assert summary["boundary_state_change_tool_calls"] == 30
+    assert summary["boundary_allows"] == 60
+    assert summary["boundary_completion_triggers"] == 60
+    assert summary["baseline_retail_exchange_tool_calls"] == 1
+    assert summary["boundary_retail_exchange_tool_calls"] == 60
+    assert summary["baseline_state_change_tool_calls"] == 22
+    assert summary["boundary_state_change_tool_calls"] == 60
     assert summary["boundary_regressions"] == 0
     assert summary["domains"] == 2
     assert summary["actor_models"] == 2
     assert summary["blocks"] == 4
 
     rows = report["rows"]
-    assert len(rows) == 100
+    assert len(rows) == 160
     baseline = next(
         row
         for row in rows
@@ -60,18 +60,32 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
         row
         for row in rows
         if row["condition"] == "action_boundary"
-        and row["paper_use"] == "matched_tau2_retail_completion_k5"
+        and row["paper_use"] == "matched_tau2_retail_completion_k20"
     )
     assert retail_boundary["actor_model"] == "openai/Qwen3.8-27B-long32k"
     assert retail_boundary["task_id"] == "0"
     assert retail_boundary["reward"] == "1"
     assert retail_boundary["retail_exchange_tool_calls"] == "1"
     assert retail_boundary["state_change_tool_calls"] == "1"
+    retail_completion_rows = [
+        row for row in rows if row["paper_use"] == "matched_tau2_retail_completion_k20"
+    ]
+    assert len(retail_completion_rows) == 40
+    assert sum(
+        1
+        for row in retail_completion_rows
+        if row["condition"] == "baseline" and row["reward"] == "1"
+    ) == 1
+    assert sum(
+        1
+        for row in retail_completion_rows
+        if row["condition"] == "action_boundary" and row["reward"] == "1"
+    ) == 20
     retail_scope_boundary = next(
         row
         for row in rows
         if row["condition"] == "action_boundary"
-        and row["paper_use"] == "matched_tau2_retail_scope_k5"
+        and row["paper_use"] == "matched_tau2_retail_scope_k20"
     )
     assert retail_scope_boundary["actor_model"] == "openai/Qwen3.8-27B-long32k"
     assert retail_scope_boundary["task_id"] == "1"
@@ -88,20 +102,20 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
         for row in retail_scope_family_rows
         if row["condition"] == "action_boundary" and row["reward"] == "1"
     ) == 20
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 50
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 50
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 80
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 80
     assert sum(int(row["boundary_vetoes"]) for row in rows) == 26
-    assert sum(int(row["boundary_allows"]) for row in rows) == 30
+    assert sum(int(row["boundary_allows"]) for row in rows) == 60
 
     blocks = {block["paper_use"]: block for block in report["blocks"]}
     assert blocks["matched_tau2_k20"]["complete_pairs"] == 20
     assert blocks["matched_tau2_k20"]["boundary_vetoes"] == 26
-    assert blocks["matched_tau2_retail_completion_k5"]["complete_pairs"] == 5
-    assert blocks["matched_tau2_retail_completion_k5"]["boundary_allows"] == 5
-    assert blocks["matched_tau2_retail_completion_k5"]["boundary_completion_triggers"] == 5
-    assert blocks["matched_tau2_retail_scope_k5"]["complete_pairs"] == 5
-    assert blocks["matched_tau2_retail_scope_k5"]["boundary_allows"] == 5
-    assert blocks["matched_tau2_retail_scope_k5"]["boundary_completion_triggers"] == 5
+    assert blocks["matched_tau2_retail_completion_k20"]["complete_pairs"] == 20
+    assert blocks["matched_tau2_retail_completion_k20"]["boundary_allows"] == 20
+    assert blocks["matched_tau2_retail_completion_k20"]["boundary_completion_triggers"] == 20
+    assert blocks["matched_tau2_retail_scope_k20"]["complete_pairs"] == 20
+    assert blocks["matched_tau2_retail_scope_k20"]["boundary_allows"] == 20
+    assert blocks["matched_tau2_retail_scope_k20"]["boundary_completion_triggers"] == 20
     assert blocks["matched_tau2_retail_scope_family_k20"]["complete_pairs"] == 20
     assert blocks["matched_tau2_retail_scope_family_k20"]["boundary_allows"] == 20
     assert blocks["matched_tau2_retail_scope_family_k20"]["boundary_completion_triggers"] == 20
@@ -120,30 +134,30 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 100
+    assert len(rows) == 160
     assert [row["condition"] for row in rows[:2]] == ["baseline", "action_boundary"]
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 50
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 50
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 80
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 80
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTATauTwoMatchedPairs}{50}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedCompletePairs}{50}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBaselineTrials}{50}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBoundaryTrials}{50}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBaselineMeanReward}{0}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedPairs}{80}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedCompletePairs}{80}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBaselineTrials}{80}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBoundaryTrials}{80}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBaselineMeanReward}{0.013}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryMeanReward}{1}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedRewardDelta}{1}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedRewardDelta}{0.988}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBaselineRCWW}{20}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryVetoes}{26}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBoundaryAllows}{30}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBoundaryAllows}{60}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBlocks}{4}" in tex
     assert "\\newcommand{\\LTATauTwoAirlineMatchedCompletePairs}{20}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailMatchedCompletePairs}{5}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryCompletionTriggers}{5}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryRetailExchangeCalls}{5}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedCompletePairs}{5}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedBoundaryCompletionTriggers}{5}" in tex
-    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedBoundaryRetailExchangeCalls}{5}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailMatchedCompletePairs}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryCompletionTriggers}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryRetailExchangeCalls}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedCompletePairs}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedBoundaryCompletionTriggers}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetailScopeMatchedBoundaryRetailExchangeCalls}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedCompletePairs}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedBoundaryCompletionTriggers}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedBoundaryRetailExchangeCalls}{20}" in tex
@@ -225,6 +239,72 @@ def test_compact_tau2_matched_report_adds_paper_metadata(tmp_path: Path) -> None
     assert compact["runs"][0]["state_change_tool_calls"] == 1
     assert compact["runs"][0]["actor_model"] == "Mistral-Small-3.2-24B-Instruct-2506"
     assert compact["runs"][1]["paper_use"] == "matched_tau2_k20"
+
+
+def test_compact_tau2_matched_report_can_filter_task_ids(tmp_path: Path) -> None:
+    full_report = {
+        "runs": [
+            {
+                "pair_id": "retail-0-seed-1300",
+                "condition": "baseline",
+                "task_id": "0",
+                "reward": 0.0,
+                "retail_exchange_tool_calls": 0,
+                "state_change_tool_calls": 0,
+                "boundary_records": [],
+            },
+            {
+                "pair_id": "retail-0-seed-1300",
+                "condition": "action_boundary",
+                "task_id": "0",
+                "reward": 1.0,
+                "retail_exchange_tool_calls": 1,
+                "state_change_tool_calls": 1,
+                "boundary_records": [{"allowed": True, "completion_triggered": True}],
+            },
+            {
+                "pair_id": "retail-1-seed-1300",
+                "condition": "baseline",
+                "task_id": "1",
+                "reward": 0.0,
+                "retail_exchange_tool_calls": 0,
+                "state_change_tool_calls": 0,
+                "boundary_records": [],
+            },
+            {
+                "pair_id": "retail-1-seed-1300",
+                "condition": "action_boundary",
+                "task_id": "1",
+                "reward": 1.0,
+                "retail_exchange_tool_calls": 1,
+                "state_change_tool_calls": 1,
+                "boundary_records": [{"allowed": True, "completion_triggered": True}],
+            },
+        ]
+    }
+    source = tmp_path / "full.json"
+    source.write_text(json.dumps(full_report), encoding="utf-8")
+
+    compact = compact_tau2_matched_report(
+        source,
+        domain="retail",
+        actor_model="openai/Qwen3.8-27B-long32k",
+        user_mode="scripted_real_task_user",
+        paper_use="matched_tau2_retail_completion_k20",
+        expected_complete_pairs=1,
+        task_ids=["0"],
+    )
+
+    assert compact["summary"]["complete_pairs"] == 1
+    assert {run["task_id"] for run in compact["runs"]} == {"0"}
+    assert {run["pair_id"] for run in compact["runs"]} == {"retail-0-seed-1300"}
+    assert "simulation" not in compact["runs"][0]
+    assert compact["runs"][0]["domain"] == "retail"
+    assert compact["runs"][0]["seed"] == 1300
+    assert compact["runs"][0]["retail_exchange_tool_calls"] == 0
+    assert compact["runs"][0]["state_change_tool_calls"] == 0
+    assert compact["runs"][0]["actor_model"] == "openai/Qwen3.8-27B-long32k"
+    assert compact["runs"][1]["paper_use"] == "matched_tau2_retail_completion_k20"
 
 
 def test_compact_tau2_matched_boundary_cli_writes_requested_output(tmp_path: Path) -> None:

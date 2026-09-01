@@ -23,7 +23,7 @@ from license_to_act.paths import artifact_path, project_root  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Ask a frozen meta-agent to propose boundary patches.")
+    parser = argparse.ArgumentParser(description="Ask a frozen meta-agent to propose boundary updates.")
     parser.add_argument("--api-base", default="http://127.0.0.1:8001/v1")
     parser.add_argument("--model", default="Mistral-Small-3.2-24B-Instruct-2506")
     parser.add_argument("--max-tokens", type=int, default=700)
@@ -95,7 +95,7 @@ def _complete(
             {
                 "role": "system",
                 "content": (
-                    "You propose reusable action-boundary patches for frozen agents. "
+                    "You propose reusable action-boundary updates for frozen agents. "
                     "Return valid JSON only."
                 ),
             },

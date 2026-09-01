@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-08-31: 114 passed.
+2026-09-01: 135 passed.
 ```
 
 ## Official Harbor Anchors
@@ -102,18 +102,18 @@ never turns it into the required exchange.
 ```bash
 /data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
   --domain retail \
-  --task-ids 0 \
+  --task-ids 0 1 \
   --user-mode scripted \
-  --num-trials 5 \
-  --seed 950 \
-  --max-steps 45 \
+  --num-trials 20 \
+  --seed 1300 \
+  --max-steps 55 \
   --timeout 360 \
   --llm-agent openai/Qwen3.8-27B-long32k \
   --llm-user openai/Qwen3.8-27B-long32k \
   --agent-max-tokens 512 \
   --user-max-tokens 128 \
   --api-base http://127.0.0.1:8021/v1 \
-  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task0_qwen32k_completion_k5_maxtok512_20260901.json
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_tasks0_1_qwen32k_existing_boundary_k20_20260901.json
 ```
 
 ```bash
@@ -121,16 +121,16 @@ never turns it into the required exchange.
   --domain retail \
   --task-ids 1 \
   --user-mode scripted \
-  --num-trials 5 \
-  --seed 970 \
-  --max-steps 45 \
+  --num-trials 20 \
+  --seed 1300 \
+  --max-steps 55 \
   --timeout 360 \
   --llm-agent openai/Qwen3.8-27B-long32k \
   --llm-user openai/Qwen3.8-27B-long32k \
   --agent-max-tokens 512 \
   --user-max-tokens 128 \
   --api-base http://127.0.0.1:8021/v1 \
-  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task1_qwen32k_scope_k5_maxtok512_20260901.json
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task1_qwen32k_existing_boundary_k20_20260901.json
 ```
 
 ```bash
@@ -151,10 +151,10 @@ never turns it into the required exchange.
 ```
 
 The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
-paper table: across 50 matched seeds and two tau2 domains, the baseline has mean
-reward 0.0 and the action boundary has mean reward 1.0. The airline block has
+paper table: across 80 matched seeds and two tau2 domains, the baseline has mean
+reward 0.0125 and the action boundary has mean reward 1.0. The airline block has
 20 read-correct/write-wrong cancellation runs and 26 boundary vetoes. The retail
-blocks have 0 baseline exchange calls, 30 trace-derived boundary exchange calls,
+blocks have 1 baseline exchange call, 60 trace-derived boundary exchange calls,
 and zero regressions.
 
 ## Long-Context Faithful Baselines

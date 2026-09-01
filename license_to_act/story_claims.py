@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .model_in_loop_bridge import build_model_in_loop_bridge
+from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
 
 
 CLAIM_FIELDS = [
@@ -26,6 +27,7 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     stage2_rows = _read_csv(root / "License_paper/data/stage2_reliability.csv")
     tau2_rows = _read_csv(root / "License_paper/data/tau2_commit_mining.csv")
     model_bridge = build_model_in_loop_bridge(root)
+    tau2_matched = build_tau2_matched_boundary_export(root)
 
     clean_rows = [row for row in stage2_rows if row["paper_use"] == "clean_reliability_anchor"]
     faithful_rows = [row for row in stage2_rows if row["paper_use"] == "faithful_baseline"]
@@ -34,6 +36,7 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
     terminal_faithful_rows = [row for row in faithful_rows if row["benchmark"] == "Terminal-Bench 2.1"]
     skillflow_faithful_rows = [row for row in faithful_rows if row["benchmark"] == "SkillFlow"]
     tau2_metrics = {row["metric"]: _parse_number(row["value"]) for row in tau2_rows}
+    tau2_matched_summary = tau2_matched["summary"]
     transfer = stage1_summary["transfer_ledger"]
     transfer_n = sum(int(row["n"]) for row in transfer)
     transfer_ftp = sum(int(row["failure_to_pass"]) for row in transfer)
@@ -67,6 +70,12 @@ def build_story_claims(project_root: str | Path = Path("/data/zhiqi/License")) -
         "tau2_result_files": int(tau2_metrics["result_files"]),
         "tau2_simulations": int(tau2_metrics["simulations"]),
         "tau2_infrastructure_error_simulations": int(stage2_summary["tau2_infrastructure_error_simulations"]),
+        "tau2_matched_pairs": int(tau2_matched_summary["complete_pairs"]),
+        "tau2_matched_domains": int(tau2_matched_summary["domains"]),
+        "tau2_matched_actor_models": int(tau2_matched_summary["actor_models"]),
+        "tau2_matched_baseline_mean_reward": float(tau2_matched_summary["baseline_mean_reward"]),
+        "tau2_matched_boundary_mean_reward": float(tau2_matched_summary["boundary_mean_reward"]),
+        "tau2_matched_boundary_regressions": int(tau2_matched_summary["boundary_regressions"]),
         "transfer_cases": transfer_n,
         "transfer_failure_to_pass": transfer_ftp,
         "transfer_preserved_positive": transfer_positive,
@@ -135,11 +144,35 @@ def _claims(
                 "License_paper/data/tau2_commit_by_group.csv",
             ],
         },
+        "matched_action_boundary_closes_gap": {
+            "paper_section": "tau2 Matched Results",
+            "claim": (
+                "Under matched actor, task, user script, and budget settings, changing the "
+                "action boundary closes real business-state proposal-to-effect gaps."
+            ),
+            "positive_evidence": [
+                (
+                    f"{metrics['tau2_matched_pairs']} paired tau2 seeds across "
+                    f"{metrics['tau2_matched_domains']} domains and "
+                    f"{metrics['tau2_matched_actor_models']} actor models"
+                ),
+                (
+                    "Mean reward moves from "
+                    f"{metrics['tau2_matched_baseline_mean_reward']:.1f} to "
+                    f"{metrics['tau2_matched_boundary_mean_reward']:.1f}"
+                ),
+                f"{metrics['tau2_matched_boundary_regressions']} boundary regressions",
+            ],
+            "source_artifacts": [
+                "License_paper/data/tau2_matched_boundary.csv",
+                "License_code/data/tau2_matched_boundary/*.json",
+            ],
+        },
         "contracts_are_not_operation_blacklists": {
             "paper_section": "Results",
             "claim": (
                 "The method blocks unready or overbroad commits while preserving positive controls; "
-                "the boundary rule is specific to readiness, write scope, preservation, and done state."
+                "the boundary program evaluates readiness, write scope, preservation, and done state."
             ),
             "positive_evidence": [
                 f"{metrics['stage1_preserved_positive']} Stage-1 legal tau2 commit remains pass-to-pass",
@@ -150,19 +183,15 @@ def _claims(
                 "License_paper/data/diagnostic_cases.csv",
             ],
         },
-        "boundary_stabilizes_external_effects": {
-            "paper_section": "Stage-2 Reliability",
+        "runtime_reliability_is_supporting_evidence": {
+            "paper_section": "Reproducibility",
             "claim": (
-                "Executable boundary protocols are stable under official reruns, not just one-off scripts."
+                "Runtime-only boundary protocols reproduce their verifier-visible states, but they are supporting evidence rather than matched-agent causal evidence."
             ),
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} reliability tasks: {clean_tasks}",
                 f"{metrics['stage2_clean_trials']} reliability trials, {metrics['stage2_clean_errors']} errors, mean reward {metrics['stage2_clean_mean_reward']:.1f}",
-                (
-                    f"Matched faithful baseline rows: {baseline_tasks}; "
-                    f"{metrics['faithful_baseline_passes']}/{metrics['faithful_baseline_trials']} passes, "
-                    f"{metrics['faithful_baseline_errors']} errors, mean reward {metrics['faithful_baseline_mean_reward']:.2f}"
-                ),
+                "These rows are not counted as matched-agent comparisons.",
             ],
             "source_artifacts": [
                 "License_paper/data/stage2_reliability.csv",
@@ -194,14 +223,13 @@ def _claims(
                 "License_paper/data/model_in_loop_bridge.csv",
             ],
         },
-        "boundary_updates_transfer_across_state_substrates": {
-            "paper_section": "Boundary Update Transfer",
+        "boundary_updates_are_seed_evidence": {
+            "paper_section": "Boundary Update Seed Evidence",
             "claim": (
-                "A failure-derived boundary update transfers across business tools, terminal state, "
-                "and workflow artifacts."
+                "Failure-derived boundary updates are currently seed evidence for the recursive loop; the final claim requires inherited-versus-reset generation curves."
             ),
             "positive_evidence": [
-                f"{metrics['transfer_failure_to_pass']} failure-to-pass cases across {metrics['transfer_cases']} transfer ledger cases",
+                f"{metrics['transfer_failure_to_pass']} failure-to-pass cases across {metrics['transfer_cases']} boundary-update cases",
                 f"{metrics['transfer_preserved_positive']} preserved positive, {metrics['transfer_pass_to_failure']} pass-to-failure cases",
             ],
             "source_artifacts": [
@@ -274,6 +302,8 @@ def _write_metrics_csv(path: Path, metrics: dict[str, Any]) -> None:
         "stage2_clean_trials": "Main reliability numerator/denominator",
         "faithful_baseline_trials": "Matched long-context baseline denominator",
         "tau2_read_correct_write_wrong_proxy": "Commit-failure mining headline",
+        "tau2_matched_pairs": "Matched action-boundary headline denominator",
+        "tau2_matched_boundary_regressions": "Matched action-boundary regression count",
     }
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=METRIC_FIELDS, lineterminator="\n")
@@ -314,6 +344,10 @@ def _latex_numbers(metrics: dict[str, Any]) -> str:
         "LTATauTwoSimulations": metrics["tau2_simulations"],
         "LTATauTwoInfraErrors": metrics["tau2_infrastructure_error_simulations"],
         "LTATauTwoRCWW": metrics["tau2_read_correct_write_wrong_proxy"],
+        "LTAStoryTauTwoMatchedPairs": metrics["tau2_matched_pairs"],
+        "LTAStoryTauTwoMatchedDomains": metrics["tau2_matched_domains"],
+        "LTAStoryTauTwoMatchedActorModels": metrics["tau2_matched_actor_models"],
+        "LTAStoryTauTwoMatchedBoundaryRegressions": metrics["tau2_matched_boundary_regressions"],
         "LTATransferFtoP": metrics["transfer_failure_to_pass"],
         "LTATransferPtoF": metrics["transfer_pass_to_failure"],
     }

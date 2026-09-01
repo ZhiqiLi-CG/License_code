@@ -38,13 +38,13 @@ RETAIL_TASK0_FIXTURE = (
     Path(__file__).resolve().parents[1]
     / "data"
     / "tau2_matched_boundary"
-    / "retail_task0_qwen32k_scripted_completion_k5_summary.json"
+    / "retail_task0_qwen32k_scripted_completion_k20_summary.json"
 )
 RETAIL_TASK1_FIXTURE = (
     Path(__file__).resolve().parents[1]
     / "data"
     / "tau2_matched_boundary"
-    / "retail_task1_qwen32k_scripted_scope_k5_summary.json"
+    / "retail_task1_qwen32k_scripted_scope_k20_summary.json"
 )
 RETAIL_SCOPE_FAMILY_FIXTURE = (
     Path(__file__).resolve().parents[1]
@@ -94,11 +94,16 @@ def compact_tau2_matched_report(
     user_mode: str,
     paper_use: str,
     expected_complete_pairs: int | None = None,
+    task_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     """Convert a full tau2 live report into a small paper-facing fixture."""
 
     path = Path(source_path)
     payload = _read_json(path)
+    selected_task_ids = {str(task_id) for task_id in task_ids} if task_ids else None
+    source_runs = payload["runs"]
+    if selected_task_ids is not None:
+        source_runs = [run for run in source_runs if str(run.get("task_id", "")) in selected_task_ids]
     runs = [
         _compact_run(
             run,
@@ -107,8 +112,10 @@ def compact_tau2_matched_report(
             user_mode=user_mode,
             paper_use=paper_use,
         )
-        for run in payload["runs"]
+        for run in source_runs
     ]
+    if not runs:
+        raise ValueError(f"no runs found for task_ids={sorted(selected_task_ids or [])}")
     summary = summarize_tau2_matched_runs(runs)
     if expected_complete_pairs is not None and summary["complete_pairs"] != expected_complete_pairs:
         raise ValueError(
@@ -308,9 +315,9 @@ def _block_latex_commands(blocks: list[dict[str, Any]]) -> dict[str, str]:
         paper_use = block["paper_use"]
         if paper_use == "matched_tau2_k20":
             prefix = "LTATauTwoAirlineMatched"
-        elif paper_use == "matched_tau2_retail_completion_k5":
+        elif paper_use == "matched_tau2_retail_completion_k20":
             prefix = "LTATauTwoRetailMatched"
-        elif paper_use == "matched_tau2_retail_scope_k5":
+        elif paper_use == "matched_tau2_retail_scope_k20":
             prefix = "LTATauTwoRetailScopeMatched"
         elif paper_use == "matched_tau2_retail_scope_family_k20":
             prefix = "LTATauTwoRetailScopeFamilyMatched"
