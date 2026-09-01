@@ -36,7 +36,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     assert summary["faithful_baseline_trials"] == 30
     assert summary["faithful_baseline_passes"] == 8
     assert summary["tau2_read_correct_write_wrong_proxy"] == 20
-    assert summary["tau2_matched_pairs"] == 80
+    assert summary["tau2_matched_pairs"] == 100
     assert summary["tau2_matched_boundary_regressions"] == 0
 
     rows = portfolio["rows"]
@@ -52,7 +52,7 @@ def test_build_evidence_portfolio_separates_story_roles() -> None:
     ]
     by_id = {row["portfolio_id"]: row for row in rows}
     assert by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["paper_use"] == "main_argument"
-    assert "80 paired seeds" in by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["positive_result"]
+    assert "100 paired seeds" in by_id["P0_TAU2_MATCHED_ACTION_BOUNDARY"]["positive_result"]
     assert by_id["P1_STAGE1_TRANSFER"]["paper_use"] == "rsi_seed_support"
     assert by_id["P1_STAGE1_TRANSFER"]["comparison_kind"] == "seed_cross_substrate_casebook"
     assert "same proposal-to-effect failure class" in by_id["P1_STAGE1_TRANSFER"]["story_role"]

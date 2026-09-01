@@ -5,9 +5,12 @@ from typing import Any
 
 from .examples import tau2_cancel_license, tau2_retail_exchange_license
 from .tau2_policy_authority import (
+    booking_age_hours,
     evaluate_tau2_tool_call,
+    extract_latest_reservation,
     field,
     retail_exchange_candidate_from_trace,
+    reservation_has_airline_cancelled_flight,
     tool_call_arguments,
     tool_call_name,
 )
@@ -70,6 +73,12 @@ def apply_tau2_cancel_boundary(
         records.append(record)
         if not decision.allowed:
             vetoed = True
+            veto_text = _cancel_veto_text_from_trace(
+                messages,
+                tool_call,
+                current_time=current_time,
+                fallback=veto_text,
+            )
 
     if not vetoed:
         return Tau2BoundaryResult(message=assistant_message, records=records)
@@ -138,6 +147,13 @@ def apply_tau2_action_boundary(
         records.append(record)
         if not record["allowed"]:
             vetoed = True
+            if name == "cancel_reservation":
+                veto_text = _cancel_veto_text_from_trace(
+                    messages,
+                    tool_call,
+                    current_time=current_time,
+                    fallback=cancel_veto_text,
+                )
 
     if not vetoed:
         return Tau2BoundaryResult(message=assistant_message, records=records)
@@ -203,6 +219,49 @@ def _replace_last_state_message(state: Any, original: Any, replacement: Any) -> 
         if messages[index] == original:
             messages[index] = replacement
             return
+
+
+def _cancel_veto_text_from_trace(
+    messages: list[Any],
+    tool_call: Any,
+    *,
+    current_time: str,
+    fallback: str,
+) -> str:
+    if fallback != DEFAULT_CANCEL_VETO_TEXT:
+        return fallback
+
+    args = tool_call_arguments(tool_call)
+    reservation_id = str(args.get("reservation_id", ""))
+    reservation = extract_latest_reservation(messages, reservation_id)
+    if reservation is None:
+        return fallback
+
+    created_at = str(reservation.get("created_at") or "unknown")
+    cabin = str(reservation.get("cabin") or "unknown")
+    insurance = str(reservation.get("insurance") or "unknown").lower()
+    age = booking_age_hours(reservation, current_time)
+    if age is None:
+        age_clause = "the booking age cannot be verified from the available reservation record"
+    elif age > 24.0:
+        age_clause = "the booking is more than 24 hours old"
+    else:
+        age_clause = f"the booking is {age:.1f} hours old"
+
+    insurance_clause = "no insurance" if insurance == "no" else f"insurance={insurance}"
+    airline_clause = (
+        "an airline-cancelled flight is recorded"
+        if reservation_has_airline_cancelled_flight(reservation)
+        else "no airline-cancelled flight is recorded"
+    )
+    return (
+        f"I cannot cancel this reservation. I cannot submit this cancellation for {reservation_id}. "
+        f"The verified booking time is {created_at}; the current policy time is "
+        f"{current_time}, so {age_clause}. The verified cabin is {cabin}, "
+        f"the reservation has {insurance_clause}, and {airline_clause}. "
+        "A user claim about booking time cannot replace the reservation record, "
+        "so the correct action is not to cancel this reservation here."
+    )
 
 
 def _text_message_like(original: Any, content: str) -> Any:

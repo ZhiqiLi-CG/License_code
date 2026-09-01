@@ -25,6 +25,12 @@ SCALE_PLAN_FIELDS = [
     "next_run",
 ]
 
+TARGET_MODEL_SLOTS = [
+    "Qwen3.8-27B-long32k",
+    "Mistral/Gemma held-out open model",
+    "Codex/Claude strong terminal agent",
+]
+
 
 def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/License")) -> dict[str, Any]:
     root = Path(project_root)
@@ -33,406 +39,10 @@ def build_submission_scale_plan(project_root: str | Path = Path("/data/zhiqi/Lic
     story_gate = build_story_gate_report(root)
     metrics = claims["headline_metrics"]
     comparison_summary = comparison["summary"]
-    inclusion_rule = "Include only tasks that sharpen the proposal-to-effect boundary."
+    inclusion_rule = "Include proposal-to-effect tasks with frozen intermediate and final verifiers."
 
-    rows = [
-        {
-            "target_id": "S1_TAU2_WRITE_FAMILIES",
-            "benchmark": "tau2-Bench",
-            "task_type": "policy-invalid write",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "40",
-            "paper_use": "main_positive",
-            "story_axis": "Proposed effects must be ready before business writes commit.",
-            "current_positive_evidence": (
-                f"{metrics['tau2_read_correct_write_wrong_proxy']} read-correct/write-wrong cancellation commits "
-                f"from {metrics['tau2_result_files']} local result files; "
-                f"{metrics['stage1_preserved_positive']} legal tau2 commit preserved."
-            ),
-            "scale_target": "Run authorized and unauthorized write families across airline, retail, banking, and telecom.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Freeze write-family task list, then run full, prompt, static-boundary, and action-boundary conditions.",
-        },
-        {
-            "target_id": "S2_TAU2_AUTHORIZED_WRITES",
-            "benchmark": "tau2-Bench",
-            "task_type": "authorized write",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "24",
-            "paper_use": "positive_non_regression",
-            "story_axis": "Prepared business writes must still commit.",
-            "current_positive_evidence": (
-                f"{metrics['stage1_preserved_positive']} legal tau2 commit preserved in the seed record."
-            ),
-            "scale_target": "Pair invalid-write cases with legal same-operation commits across airline and retail.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run legal cancellation, upgrade, exchange, and update tasks under the same controller.",
-        },
-        {
-            "target_id": "S3_TAU2_REFUND_COMPENSATION",
-            "benchmark": "tau2-Bench",
-            "task_type": "refund or compensation",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "30",
-            "paper_use": "main_positive",
-            "story_axis": "Money-moving actions need readiness evidence, not intent alone.",
-            "current_positive_evidence": (
-                "Seed tau2 interventions already separate unsupported compensation from legal cancellation."
-            ),
-            "scale_target": "Add refund, certificate, and compensation families where policy preconditions are explicit.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Mine candidate tasks, then run paired precommit conditions before held-out model slices.",
-        },
-        {
-            "target_id": "S4_TAU2_RETAIL_EXCHANGE",
-            "benchmark": "tau2-Bench",
-            "task_type": "retail exchange",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "30",
-            "paper_use": "main_positive",
-            "story_axis": "The action boundary should transfer beyond airline policies.",
-            "current_positive_evidence": (
-                f"{metrics['tau2_result_files']} local tau2 result files include retail traces for scale mining."
-            ),
-            "scale_target": "Run delivered-item exchange and return/update slices with explicit user-consent receipts.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Use projected order evidence, source-bound write readiness, and legal non-write controls.",
-        },
-        {
-            "target_id": "S5_TAU2_ACCOUNT_PLAN_MUTATION",
-            "benchmark": "tau2-Bench",
-            "task_type": "account or plan mutation",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "30",
-            "paper_use": "main_positive",
-            "story_axis": "State-changing service actions should use the same proposal-to-effect boundary.",
-            "current_positive_evidence": (
-                "The local tau2 inventory contains banking and telecom write-heavy domains."
-            ),
-            "scale_target": "Add banking and telecom account/package mutations after airline and retail freeze.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Prioritize tasks with explicit policy preconditions and evaluable state outcomes.",
-        },
-        {
-            "target_id": "S6_TB_GIT_SCOPE",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "git scope",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "15",
-            "paper_use": "main_positive",
-            "story_axis": "Shell proposals need scoped write sets and preservation checks.",
-            "current_positive_evidence": (
-                f"{metrics['stage2_terminal_clean_trials']}/{metrics['stage2_terminal_clean_trials']} "
-                "official Terminal-Bench passes across Git, WAL, truncated-SQLite, and log-summary anchors."
-            ),
-            "scale_target": "Expand Git/history tasks from sanitize and leak recovery into a scoped-write pilot.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run full agent, prompt-only, static task-local boundary, and learned action-boundary conditions on frozen Git tasks.",
-        },
-        {
-            "target_id": "S7_TB_PRESERVING_READ",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "preserving read",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "15",
-            "paper_use": "main_positive",
-            "story_axis": "Some observations consume the evidence they read.",
-            "current_positive_evidence": (
-                "WAL recovery reaches 5/5 official passes only when the read itself is contracted."
-            ),
-            "scale_target": "Add database, archive, and recovery tasks where naive inspection can destroy evidence.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Audit read effects, then run preserve-first controllers against ordinary terminal agents.",
-        },
-        {
-            "target_id": "S8_TB_BINARY_RECOVERY",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "binary recovery",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "15",
-            "paper_use": "main_positive",
-            "story_axis": "Corrupt state can still license exact recovery commits.",
-            "current_positive_evidence": "SQLite truncate recovery reaches 5/5 official passes.",
-            "scale_target": "Add recovery tasks where low-level bytes must become verifier-visible output state.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Select tasks with explicit output schema and run state-witness controllers.",
-        },
-        {
-            "target_id": "S9_TB_SECURITY_PATCH_REPORT",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "security patch/report",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "15",
-            "paper_use": "main_positive",
-            "story_axis": "Security fixes require both code mutation and verifier-visible explanation.",
-            "current_positive_evidence": "Current Terminal-Bench evidence includes scoped code/security boundary anchors.",
-            "scale_target": "Run vulnerability-repair tasks with patch, side-effect, and report contracts.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Use source-code patch receipts plus original and added regression tests.",
-        },
-        {
-            "target_id": "S10_TB_ARTIFACT_FINALIZATION",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "data or image artifact finalization",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "18",
-            "paper_use": "main_positive",
-            "story_axis": "Observed evidence must become the exact judged file.",
-            "current_positive_evidence": "Current reliability results already contain missing-artifact and completion-trigger wins.",
-            "scale_target": "Add log/data, document, and image-output tasks to the 12-task pilot.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Use public task specs to bind output schemas before running agents.",
-        },
-        {
-            "target_id": "S11_TB_PROCESS_SERVICE_STATE",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "process or service state",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "method_scale",
-            "target_n": "12",
-            "paper_use": "main_positive",
-            "story_axis": "Running services are durable effects, not just shell transcripts.",
-            "current_positive_evidence": "The paper plan identifies service/process anchors as a required Terminal-Bench stratum.",
-            "scale_target": "Add service configuration and process lifecycle tasks with postcondition probes.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run package/config/service receipts with syntax, port, log, and probe checks.",
-        },
-        {
-            "target_id": "S12_SF_OCR_WORKBOOK_FINALIZATION",
-            "benchmark": "SkillFlow",
-            "task_type": "OCR workbook finalization",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "16",
-            "paper_use": "main_positive",
-            "story_axis": "Complete evidence can trigger missing workflow artifacts.",
-            "current_positive_evidence": (
-                f"{metrics['stage2_skillflow_clean_trials']}/{metrics['stage2_skillflow_clean_trials']} "
-                "official SkillFlow passes across invoice and travel-claim materialization."
-            ),
-            "scale_target": "Expand OCR completion triggers beyond invoice and travel-claim anchors.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run source-bound workbook finalizers with OCR candidate and schema evidence.",
-        },
-        {
-            "target_id": "S13_SF_TRAVEL_CLAIM_MERGE",
-            "benchmark": "SkillFlow",
-            "task_type": "travel claim merge",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "16",
-            "paper_use": "main_positive",
-            "story_axis": "Roster evidence and OCR evidence must meet before workbook commit.",
-            "current_positive_evidence": "Travel-claim merge reaches 5/5 official passes with source-bound finalization.",
-            "scale_target": "Add entity-join OCR tasks where a workbook is correct only after authority matching.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Bind extracted fields to authoritative roster or table state before final artifact write.",
-        },
-        {
-            "target_id": "S14_SF_HEALTHCARE_NUMERIC_ARTIFACTS",
-            "benchmark": "SkillFlow",
-            "task_type": "healthcare numeric artifacts",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "18",
-            "paper_use": "main_positive",
-            "story_axis": "Numeric evidence must be typed before report finalization.",
-            "current_positive_evidence": "Healthcare was selected as the next finalization family in the evidence plan.",
-            "scale_target": "Run cost-benefit JSON/Markdown tasks with money, unit, and exact-format contracts.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Add source-table joins and precision checks before artifact commit.",
-        },
-        {
-            "target_id": "S15_SF_CROSS_FORMAT_RECONCILIATION",
-            "benchmark": "SkillFlow",
-            "task_type": "cross-format reconciliation",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "16",
-            "paper_use": "main_positive",
-            "story_axis": "Evidence from multiple files needs one action boundary before output.",
-            "current_positive_evidence": "The paper plan keeps cross-format tasks as positive breadth, not off-story filler.",
-            "scale_target": "Run reconciliation tasks with source authority and output-schema boundary checks.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Use PDF/Excel/JSON source bindings and exact output schemas.",
-        },
-        {
-            "target_id": "S16_SF_DOCUMENT_FRAUD_ARTIFACTS",
-            "benchmark": "SkillFlow",
-            "task_type": "document-fraud artifacts",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "16",
-            "paper_use": "main_positive",
-            "story_axis": "Document evidence should trigger an auditable artifact, not a loose final answer.",
-            "current_positive_evidence": "Document-fraud is a target family with clear source/verifier boundaries.",
-            "scale_target": "Add fraud-detection families where source citations and output schema are both judged.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run evidence-citation and schema gates against ordinary and boundary-controlled agents.",
-        },
-        {
-            "target_id": "S17_SF_SKILL_QUARANTINE_CANARIES",
-            "benchmark": "SkillFlow",
-            "task_type": "skill quarantine",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "method_scale",
-            "target_n": "16",
-            "paper_use": "main_positive",
-            "story_axis": "Reusable skill bodies are context state that can pollute external effects.",
-            "current_positive_evidence": "The scale plan reserves skill-surface canaries for the final matrix.",
-            "scale_target": "Compare full visible skill bodies, names-only quarantine, body-on-demand, and action-boundary control.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Select families with large visible skill bodies and clear artifact verifiers.",
-        },
-        {
-            "target_id": "S18_TAU2_FAITHFUL_BASELINE",
-            "benchmark": "tau2-Bench",
-            "task_type": "faithful external-agent baseline",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "faithful_baseline",
-            "target_n": "40",
-            "paper_use": "faithful_counterpoint",
-            "story_axis": "Baselines attack the claim; ablations explain the mechanism.",
-            "current_positive_evidence": (
-                f"{comparison_summary['faithful_baseline_rows']} faithful baseline row, "
-                f"{metrics['faithful_baseline_trials']} trials, mean reward {metrics['faithful_baseline_mean_reward']:.1f}."
-            ),
-            "scale_target": "Run ordinary tau2 agents with faithful prompts and tool availability.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Keep baseline configs faithful and freeze them before mechanism ablations.",
-        },
-        {
-            "target_id": "S19_TB_FAITHFUL_BASELINE",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "faithful external-agent baseline",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "faithful_baseline",
-            "target_n": "36",
-            "paper_use": "faithful_counterpoint",
-            "story_axis": "A stronger terminal agent should face the same frozen tasks.",
-            "current_positive_evidence": (
-                f"{metrics['faithful_baseline_trials']} matched Qwen3.8-27B-long32k faithful-baseline trials."
-            ),
-            "scale_target": "Run mini-swe, Codex, and Claude on the same Terminal-Bench action-boundary strata.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Report official pass and false-done rates without relabeling failures as ablations.",
-        },
-        {
-            "target_id": "S20_SF_FAITHFUL_BASELINE",
-            "benchmark": "SkillFlow",
-            "task_type": "faithful external-agent baseline",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "faithful_baseline",
-            "target_n": "36",
-            "paper_use": "faithful_counterpoint",
-            "story_axis": "Workflow baselines must be evaluated as real agents, not mechanism cuts.",
-            "current_positive_evidence": (
-                "Current SkillFlow faithful baseline reaches 1/10 official passes on invoice and "
-                "travel anchors, with no runtime errors."
-            ),
-            "scale_target": "Run ordinary SkillFlow agents across OCR, healthcare, document, and cross-format families.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Keep no-skill and native-skill settings separate from action-boundary ablations.",
-        },
-        {
-            "target_id": "S21_TAU2_MECHANISM_ABLATIONS",
-            "benchmark": "tau2-Bench",
-            "task_type": "commit-readiness ablation",
-            "model_family": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "condition_role": "mechanism_ablation",
-            "target_n": "30",
-            "paper_use": "mechanism_explanation",
-            "story_axis": "Removing readiness should restore premature business commits.",
-            "current_positive_evidence": (
-                f"{comparison_summary['completed_mechanism_ablation_rows']} seed mechanism-ablation rows are complete."
-            ),
-            "scale_target": "Cut readiness, source authority, and user-confirmation fields on paired tau2 tasks.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run ablations after the full boundary condition and task list are frozen.",
-        },
-        {
-            "target_id": "S22_TB_MECHANISM_ABLATIONS",
-            "benchmark": "Terminal-Bench 2.1",
-            "task_type": "side-effect or preserving-read ablation",
-            "model_family": "Qwen3.8-27B-long32k | Codex GPT-5.5 | Claude Code",
-            "condition_role": "mechanism_ablation",
-            "target_n": "30",
-            "paper_use": "mechanism_explanation",
-            "story_axis": "Removing preserve/scope fields should reintroduce collateral mutation.",
-            "current_positive_evidence": (
-                f"{comparison_summary['mechanism_ablation_rows']} mechanism cuts are tracked separately."
-            ),
-            "scale_target": "Cut write scope, side-effect preservation, and destructive-read handling on terminal tasks.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Report these as our ablations, not external baselines.",
-        },
-        {
-            "target_id": "S23_SF_MECHANISM_ABLATIONS",
-            "benchmark": "SkillFlow",
-            "task_type": "finalization-trigger ablation",
-            "model_family": "Qwen3.8-27B | Qwen3.8-27B-long32k | Gemma-4-31B-it",
-            "condition_role": "mechanism_ablation",
-            "target_n": "30",
-            "paper_use": "mechanism_explanation",
-            "story_axis": "Removing completion triggers should leave evidence present but artifacts absent.",
-            "current_positive_evidence": "Seed ablations already include prompt-only and no-finalization-trigger cuts.",
-            "scale_target": "Cut finalization, schema, source-join, and skill-body quarantine mechanisms.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Run after full action-boundary and faithful baselines on the frozen SkillFlow families.",
-        },
-        {
-            "target_id": "S24_FREEZE_AND_STATISTICS",
-            "benchmark": "cross-benchmark",
-            "task_type": "statistical freeze",
-            "model_family": "all frozen model families",
-            "condition_role": "statistical_freeze",
-            "target_n": "1",
-            "paper_use": "claim_boundary",
-            "story_axis": "The story earns trust by freezing the camera before the final sweep.",
-            "current_positive_evidence": (
-                f"{story_gate['summary']['passed_checks']}/{story_gate['summary']['total_checks']} claim-consistency checks pass; "
-                f"{comparison_summary['baseline_ablation_overlap']} baseline/ablation overlaps."
-            ),
-            "scale_target": "Freeze task selection, claim boundaries, and metrics before the final positive-mass run.",
-            "inclusion_rule": inclusion_rule,
-            "next_run": "Report confidence intervals, paired tests, and pass-to-fail regression after final runs.",
-        },
-    ]
-
-    benchmark_task_types: dict[str, set[str]] = {}
-    model_families: set[str] = set()
-    for row in rows:
-        if row["benchmark"] != "cross-benchmark" and row["condition_role"] == "method_scale":
-            benchmark_task_types.setdefault(row["benchmark"], set()).add(row["task_type"])
-        for model in row["model_family"].split("|"):
-            model_families.add(model.strip())
-
-    summary = {
-        "scale_target_rows": len(rows),
-        "benchmarks_targeted": len(benchmark_task_types),
-        "model_families_targeted": len(model_families),
-        "min_task_types_per_benchmark": min(len(task_types) for task_types in benchmark_task_types.values()),
-        "faithful_baseline_scale_rows": sum(1 for row in rows if row["condition_role"] == "faithful_baseline"),
-        "mechanism_ablation_scale_rows": sum(1 for row in rows if row["condition_role"] == "mechanism_ablation"),
-        "baseline_ablation_overlap": comparison_summary["baseline_ablation_overlap"],
-        "total_target_trials": sum(int(row["target_n"]) for row in rows),
-        "current_clean_positive_passes": metrics["stage2_clean_trials"],
-        "current_clean_positive_trials": metrics["stage2_clean_trials"],
-        "current_faithful_baseline_trials": metrics["faithful_baseline_trials"],
-        "mechanism_ablation_rows": comparison_summary["mechanism_ablation_rows"],
-        "completed_mechanism_ablation_rows": comparison_summary["completed_mechanism_ablation_rows"],
-        "story_gate_checks": story_gate["summary"]["total_checks"],
-    }
+    rows = _closed_loop_rows(metrics, comparison_summary, story_gate["summary"], inclusion_rule)
+    summary = _summarize(rows, metrics, comparison_summary, story_gate["summary"])
     return {"summary": summary, "rows": rows}
 
 
@@ -471,6 +81,322 @@ def write_submission_scale_plan(
     }
     summary_path.write_text(json.dumps(plan, indent=2), encoding="utf-8")
     return plan
+
+
+def _closed_loop_rows(
+    metrics: dict[str, Any],
+    comparison_summary: dict[str, Any],
+    story_summary: dict[str, Any],
+    inclusion_rule: str,
+) -> list[dict[str, str]]:
+    current_tau2 = (
+        f"{metrics['tau2_matched_pairs']} matched tau2 pairs; reward "
+        f"{metrics['tau2_matched_baseline_mean_reward']:.2f}->"
+        f"{metrics['tau2_matched_boundary_mean_reward']:.1f}; "
+        f"{metrics['tau2_matched_boundary_regressions']} regressions."
+    )
+    current_model_loop = (
+        f"Qwen+boundary {story_summary['model_in_loop_govkernel_passes']}/"
+        f"{story_summary['model_in_loop_govkernel_trials']} official model-in-loop passes."
+    )
+    current_reliability = (
+        f"{metrics['stage2_clean_trials']}/{metrics['stage2_clean_trials']} boundary-run official passes; "
+        "used only as upper-bound reliability."
+    )
+
+    return [
+        _row(
+            "S1_CORE_RSI_STREAM",
+            "tau2-Bench",
+            "generation stream",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            45,
+            "main_positive",
+            "Inherited boundary updates should make correct proposals become correct business effects.",
+            current_tau2,
+            "Run inherited, reset, static, and text-memory conditions on source, validation, and frozen held-out tasks.",
+            inclusion_rule,
+            "Freeze generation orderings; start B0->B5 with no manual update edits after generation 0.",
+        ),
+        _row(
+            "S2_CORE_RSI_STREAM_TB",
+            "Terminal-Bench 2.1",
+            "generation stream",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            45,
+            "main_positive",
+            "The same inherited boundary should improve terminal effects without becoming a solver.",
+            current_model_loop,
+            "Run inherited, reset, static, and text-memory conditions on Git, data, DB, and service state tasks.",
+            inclusion_rule,
+            "Convert current reference-boundary anchors into model-in-loop fork-at-boundary tasks before scaling.",
+        ),
+        _row(
+            "S3_CORE_RSI_STREAM_SF",
+            "SkillFlow",
+            "generation stream",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            45,
+            "main_positive",
+            "Inherited boundaries should externalize completed workflow evidence into artifacts.",
+            current_model_loop,
+            "Run inherited, reset, static, and text-memory conditions across OCR, healthcare, and reconciliation families.",
+            inclusion_rule,
+            "Use generic table/workbook serializers fed by model-produced rows, not task-answer code.",
+        ),
+        _row(
+            "S4_TAU2_MATCHED_FORK",
+            "tau2-Bench",
+            "matched fork",
+            "Qwen3.8-27B-long32k | Mistral/Gemma held-out open model",
+            "method_scale",
+            25,
+            "main_positive",
+            "A precommit fork should change final state without changing the dialogue actor.",
+            current_tau2,
+            "Fork at ProposalOK on cancellation, refund, exchange, and account-write tasks.",
+            inclusion_rule,
+            "Hold actor, user condition, tool state, token budget, and wall clock fixed.",
+        ),
+        _row(
+            "S5_TB_MATCHED_FORK",
+            "Terminal-Bench 2.1",
+            "matched fork",
+            "Qwen3.8-27B-long32k | Codex/Claude strong terminal agent",
+            "method_scale",
+            25,
+            "main_positive",
+            "The boundary should stage and validate terminal effects rather than write the solution itself.",
+            current_reliability,
+            "Fork at ProposalOK on Git scope, preserving read, log artifact, security patch, and service-state tasks.",
+            inclusion_rule,
+            "Boundary may stage, diff, validate, and request revision; it may not infer XOR keys or author task patches.",
+        ),
+        _row(
+            "S6_SF_MATCHED_FORK",
+            "SkillFlow",
+            "matched fork",
+            "Qwen3.8-27B-long32k | Mistral/Gemma held-out open model",
+            "method_scale",
+            25,
+            "main_positive",
+            "Workflow rows produced by the actor should be the input to the boundary, not hidden constants.",
+            current_model_loop,
+            "Fork when structured rows become complete and compare natural continuation to boundary finalization.",
+            inclusion_rule,
+            "Boundary writes only from actor-generated rows plus declared schema and output path.",
+        ),
+        _row(
+            "S7_TAU2_ACTION_PAIRS",
+            "tau2-Bench",
+            "action pair geometry",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            15,
+            "main_positive",
+            "Ready and unready business writes should be evaluated as paired state geometries.",
+            current_tau2,
+            "Build legal/illegal cancellation, refund, exchange, and policy-shift pairs.",
+            inclusion_rule,
+            "Macro-average by unique pair; seeds are averaged within each task.",
+        ),
+        _row(
+            "S8_TB_ACTION_PAIRS",
+            "Terminal-Bench 2.1",
+            "action pair geometry",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            15,
+            "main_positive",
+            "The same terminal operation can be ready, out of scope, or destructive depending on state.",
+            current_reliability,
+            "Build pairs for working-tree-only edits, history rewrites, fragile reads, and existing output files.",
+            inclusion_rule,
+            "Score pair accuracy, collateral mutation, and missing finalization by unique task pair.",
+        ),
+        _row(
+            "S9_SF_ACTION_PAIRS",
+            "SkillFlow",
+            "action pair geometry",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            15,
+            "main_positive",
+            "Artifact completion should depend on row completeness, schema, source authority, and target freshness.",
+            current_model_loop,
+            "Build rows-complete/rows-missing, schema-ready/schema-ambiguous, and stale-output pairs.",
+            inclusion_rule,
+            "Use task family as the statistical cluster; do not count repeated seeds as independent tasks.",
+        ),
+        _row(
+            "S10_GENERALIZED_TRANSFER",
+            "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "generalized transfer",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            30,
+            "main_positive",
+            "Learned updates should apply by action structure rather than task ID.",
+            f"{story_summary['passed_checks']}/{story_summary['total_checks']} current paper-code consistency checks pass.",
+            "Compare abstract executable updates against task-local memory on frozen held-out target families.",
+            inclusion_rule,
+            "Freeze update text, applicability condition, and compiler settings before target verifier results are read.",
+        ),
+        _row(
+            "S11_REASONING_ACTION_2X2",
+            "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "reasoning-action 2x2",
+            "Qwen3.8-27B-long32k",
+            "method_scale",
+            48,
+            "main_positive",
+            "Reasoning-side RSI should raise ProposalOK; action-side RSI should raise realization.",
+            current_model_loop,
+            "Run base, text memory or skill, action-boundary update, and joint conditions.",
+            inclusion_rule,
+            "Report ProposalOK, EffectOK, RealizationRate, over-action, under-action, and cost.",
+        ),
+        _row(
+            "S12_SECOND_OPEN_MODEL_HELDOUT",
+            "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "held-out model",
+            "Mistral/Gemma held-out open model",
+            "method_scale",
+            30,
+            "main_positive",
+            "A frozen descendant boundary should help an open model that was not used to tune it.",
+            current_tau2,
+            "Run ancestor and final descendant only on the frozen held-out stream.",
+            inclusion_rule,
+            "No model-specific thresholds or boundary edits after the primary-model B5 is frozen.",
+        ),
+        _row(
+            "S13_STRONG_AGENT_BASELINE",
+            "Terminal-Bench 2.1 | SkillFlow",
+            "strong faithful baseline",
+            "Codex/Claude strong terminal agent",
+            "faithful_baseline",
+            20,
+            "faithful_counterpoint",
+            "A stronger ordinary agent should be evaluated faithfully on the same held-out task stream.",
+            f"{comparison_summary['faithful_baseline_rows']} faithful baseline row is already separated from ablations.",
+            "Run the strong agent's normal workflow on the frozen representative subset.",
+            inclusion_rule,
+            "Use the ordinary external-agent protocol and matched wall-clock budget; do not weaken tools or prompts.",
+        ),
+        _row(
+            "S14_MECHANISM_CUTS",
+            "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "mechanism cuts",
+            "Qwen3.8-27B-long32k",
+            "mechanism_ablation",
+            35,
+            "mechanism_explanation",
+            "Ablations should explain which boundary component carries the effect.",
+            f"{comparison_summary['completed_mechanism_ablation_rows']} completed mechanism-cut rows exist in the seed record.",
+            "Cut readiness, scope, preserve, completion trigger, regression selection, and inheritance.",
+            inclusion_rule,
+            "Report these as mechanism cuts, never as faithful external baselines.",
+        ),
+        _row(
+            "S15_ORACLE_BOUNDARY_UPPER_BOUND",
+            "Terminal-Bench 2.1 | SkillFlow",
+            "reference upper bound",
+            "action-boundary runtime",
+            "runtime_reliability",
+            10,
+            "supporting_reproduction",
+            "Existing executable adapters show what a correct boundary can express.",
+            current_reliability,
+            "Keep reference adapters as an upper-bound and reproducibility block.",
+            inclusion_rule,
+            "Do not include these rows in matched-agent treatment effects.",
+        ),
+        _row(
+            "S16_FREEZE_STATISTICS_RELEASE",
+            "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "statistical freeze",
+            "Qwen3.8-27B-long32k | Mistral/Gemma held-out open model | Codex/Claude strong terminal agent",
+            "statistical_freeze",
+            10,
+            "claim_boundary",
+            "Final claims should be generated from frozen splits and releasable artifacts.",
+            f"{story_summary['passed_checks']}/{story_summary['total_checks']} consistency checks pass.",
+            "Freeze task selection, metrics, exclusions, anonymization, and paper-number exports before final scoring.",
+            inclusion_rule,
+            "Use task-cluster bootstrap, paired tests, and generated paper/code consistency checks.",
+        ),
+    ]
+
+
+def _row(
+    target_id: str,
+    benchmark: str,
+    task_type: str,
+    model_family: str,
+    condition_role: str,
+    target_n: int,
+    paper_use: str,
+    story_axis: str,
+    current_positive_evidence: str,
+    scale_target: str,
+    inclusion_rule: str,
+    next_run: str,
+) -> dict[str, str]:
+    return {
+        "target_id": target_id,
+        "benchmark": benchmark,
+        "task_type": task_type,
+        "model_family": model_family,
+        "condition_role": condition_role,
+        "target_n": str(target_n),
+        "paper_use": paper_use,
+        "story_axis": story_axis,
+        "current_positive_evidence": current_positive_evidence,
+        "scale_target": scale_target,
+        "inclusion_rule": inclusion_rule,
+        "next_run": next_run,
+    }
+
+
+def _summarize(
+    rows: list[dict[str, str]],
+    metrics: dict[str, Any],
+    comparison_summary: dict[str, Any],
+    story_summary: dict[str, Any],
+) -> dict[str, Any]:
+    benchmark_task_types: dict[str, set[str]] = {}
+    model_families: set[str] = set()
+    for row in rows:
+        if row["condition_role"] == "method_scale":
+            for benchmark in _split_field(row["benchmark"]):
+                benchmark_task_types.setdefault(benchmark, set()).add(row["task_type"])
+        for model in _split_field(row["model_family"]):
+            model_families.add(model)
+
+    return {
+        "scale_target_rows": len(rows),
+        "benchmarks_targeted": len(benchmark_task_types),
+        "model_families_targeted": len(model_families),
+        "min_task_types_per_benchmark": min(len(task_types) for task_types in benchmark_task_types.values()),
+        "faithful_baseline_scale_rows": sum(1 for row in rows if row["condition_role"] == "faithful_baseline"),
+        "mechanism_ablation_scale_rows": sum(1 for row in rows if row["condition_role"] == "mechanism_ablation"),
+        "baseline_ablation_overlap": comparison_summary["baseline_ablation_overlap"],
+        "total_target_trials": sum(int(row["target_n"]) for row in rows),
+        "current_clean_positive_passes": metrics["stage2_clean_trials"],
+        "current_clean_positive_trials": metrics["stage2_clean_trials"],
+        "current_faithful_baseline_trials": metrics["faithful_baseline_trials"],
+        "mechanism_ablation_rows": comparison_summary["mechanism_ablation_rows"],
+        "completed_mechanism_ablation_rows": comparison_summary["completed_mechanism_ablation_rows"],
+        "story_gate_checks": story_summary["total_checks"],
+    }
+
+
+def _split_field(value: str) -> list[str]:
+    return [part.strip() for part in value.split("|") if part.strip()]
 
 
 def _write_scale_plan_csv(path: Path, rows: list[dict[str, str]]) -> None:

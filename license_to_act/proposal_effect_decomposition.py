@@ -165,6 +165,8 @@ def _tau2_matched_rows(report: dict[str, Any]) -> list[dict[str, str]]:
     for block in report["blocks"]:
         if block["paper_use"] == "matched_tau2_k20":
             rows.append(_tau2_airline_matched_row(block))
+        elif block["paper_use"] == "matched_tau2_airline_llmuser_k20":
+            rows.append(_tau2_airline_llm_user_matched_row(block))
         elif block["paper_use"] == "matched_tau2_retail_completion_k20":
             rows.append(_tau2_retail_completion_matched_row(block))
         elif block["paper_use"] == "matched_tau2_retail_scope_k20":
@@ -184,7 +186,7 @@ def _tau2_airline_matched_row(summary: dict[str, Any]) -> dict[str, str]:
         "task_family": "airline task 48",
         "evidence_type": "matched_actor_k20",
         "actor_backbone": "Mistral-Small-3.2-24B-Instruct-2506",
-        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "comparison_kind": "same actor, same user condition, boundary changed",
         "n_trials": str(summary["baseline_trials"]),
         "proposal_success_definition": "the reservation is read correctly before an unwarranted cancellation commit",
         "proposal_successes": str(proposal_successes),
@@ -201,6 +203,33 @@ def _tau2_airline_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def _tau2_airline_llm_user_matched_row(summary: dict[str, Any]) -> dict[str, str]:
+    proposal_successes = int(summary["baseline_read_correct_write_wrong"])
+    baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
+    boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
+    return {
+        "decomposition_id": "TAU2_A48_MISTRAL_LLMUSER_MATCHED_K20",
+        "benchmark": "tau2-Bench",
+        "task_family": "airline task 48 with LLM user",
+        "evidence_type": "matched_actor_llm_user_k20",
+        "actor_backbone": "Mistral-Small-3.2-24B-Instruct-2506",
+        "comparison_kind": "same actor, same LLM user condition, boundary changed",
+        "n_trials": str(summary["baseline_trials"]),
+        "proposal_success_definition": "the reservation is read correctly before an unwarranted cancellation commit under a natural LLM-user dialogue",
+        "proposal_successes": str(proposal_successes),
+        "effect_successes_without_boundary": str(baseline_effect),
+        "proposal_to_effect_gaps": str(proposal_successes - baseline_effect),
+        "effect_successes_with_boundary": str(boundary_effect),
+        "source_ref": str(summary["source_paths"][0]),
+        "counts_as_planned": "no",
+        "notes": (
+            f"{summary['complete_pairs']} matched LLM-user seeds; boundary vetoes "
+            f"{summary['boundary_vetoes']} unready cancellations with "
+            f"{summary['boundary_regressions']} regressions."
+        ),
+    }
+
+
 def _tau2_retail_completion_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     proposal_successes = int(summary["boundary_completion_triggers"])
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
@@ -211,7 +240,7 @@ def _tau2_retail_completion_matched_row(summary: dict[str, Any]) -> dict[str, st
         "task_family": "retail task 0 exchange",
         "evidence_type": "matched_actor_k20_completion",
         "actor_backbone": "Qwen3.8-27B-long32k",
-        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "comparison_kind": "same actor, same user condition, boundary changed",
         "n_trials": str(summary["baseline_trials"]),
         "proposal_success_definition": (
             "order, product variants, payment method, and explicit confirmation are present "
@@ -242,7 +271,7 @@ def _tau2_retail_scope_matched_row(summary: dict[str, Any]) -> dict[str, str]:
         "task_family": "retail task 1 scoped exchange",
         "evidence_type": "matched_actor_k20_scope",
         "actor_backbone": "Qwen3.8-27B-long32k",
-        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "comparison_kind": "same actor, same user condition, boundary changed",
         "n_trials": str(summary["baseline_trials"]),
         "proposal_success_definition": (
             "order and variant evidence are present, and the latest user confirmation "
@@ -273,7 +302,7 @@ def _tau2_retail_scope_family_matched_row(summary: dict[str, Any]) -> dict[str, 
         "task_family": "retail tasks 6-9 scoped desk-lamp exchange",
         "evidence_type": "matched_actor_k20_scope_family",
         "actor_backbone": "Qwen3.8-27B-long32k",
-        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "comparison_kind": "same actor, same user condition, boundary changed",
         "n_trials": str(summary["baseline_trials"]),
         "proposal_success_definition": (
             "order, product variants, comparative brightness preference, payment method, "

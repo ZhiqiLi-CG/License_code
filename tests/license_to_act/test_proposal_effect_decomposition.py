@@ -16,14 +16,14 @@ def test_build_proposal_effect_decomposition_uses_real_rows_not_plans() -> None:
     report = build_proposal_effect_decomposition(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["rows"] == 9
+    assert summary["rows"] == 10
     assert summary["benchmark_count"] == 3
     assert summary["planned_rows"] == 0
-    assert summary["gap_observations"] == 103
-    assert summary["gap_source_observations"] == 83
+    assert summary["gap_observations"] == 123
+    assert summary["gap_source_observations"] == 103
     assert summary["gap_distributional_observations"] == 20
     assert summary["baseline_effect_successes_on_gap_rows"] == 1
-    assert summary["boundary_effect_successes_on_source_gap_rows"] == 84
+    assert summary["boundary_effect_successes_on_source_gap_rows"] == 104
 
     rows = {row["decomposition_id"]: row for row in report["rows"]}
     assert rows["TAU2_MINED_CANCEL_RCWW"]["evidence_type"] == "distributional_mining"
@@ -32,6 +32,12 @@ def test_build_proposal_effect_decomposition_uses_real_rows_not_plans() -> None:
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["evidence_type"] == "matched_actor_k20"
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["proposal_successes"] == "20"
     assert rows["TAU2_A48_MISTRAL_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
+    assert (
+        rows["TAU2_A48_MISTRAL_LLMUSER_MATCHED_K20"]["evidence_type"]
+        == "matched_actor_llm_user_k20"
+    )
+    assert rows["TAU2_A48_MISTRAL_LLMUSER_MATCHED_K20"]["proposal_successes"] == "20"
+    assert rows["TAU2_A48_MISTRAL_LLMUSER_MATCHED_K20"]["effect_successes_with_boundary"] == "20"
     assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["evidence_type"] == "matched_actor_k20_completion"
     assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["proposal_successes"] == "20"
     assert rows["TAU2_RETAIL0_QWEN_MATCHED_K20"]["effect_successes_without_boundary"] == "1"
@@ -69,16 +75,16 @@ def test_write_proposal_effect_decomposition_exports_csv_json_and_tex(tmp_path: 
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 9
+    assert len(rows) == 10
     assert rows[0]["decomposition_id"] == "TAU2_MINED_CANCEL_RCWW"
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAProposalEffectRows}{9}" in tex
-    assert "\\newcommand{\\LTAProposalEffectGapObservations}{103}" in tex
-    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{84}" in tex
+    assert "\\newcommand{\\LTAProposalEffectRows}{10}" in tex
+    assert "\\newcommand{\\LTAProposalEffectGapObservations}{123}" in tex
+    assert "\\newcommand{\\LTAProposalEffectBoundarySourceSuccesses}{104}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
-    assert round(summary["gap_rate_on_gap_rows"], 3) == 0.99
+    assert round(summary["gap_rate_on_gap_rows"], 3) == 0.992
 
 
 def test_export_proposal_effect_decomposition_cli_writes_requested_outputs(tmp_path: Path) -> None:

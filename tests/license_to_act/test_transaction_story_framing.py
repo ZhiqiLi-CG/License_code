@@ -146,7 +146,7 @@ def test_runtime_reruns_are_not_described_as_primary_matched_evidence() -> None:
     assert "SkillFlow reruns & \\LTAStageTwoSFCleanTrials{}/\\LTAStageTwoSFCleanTrials{} official passes" in experiments
     assert "Terminal-Bench reruns & \\LTAStageTwoTBCleanTrials{}/\\LTAStageTwoTBCleanTrials{} official passes over four \\(K=5\\) boundary-run tasks. & Runtime support" in experiments
     assert "SkillFlow reruns & \\LTAStageTwoSFCleanTrials{}/\\LTAStageTwoSFCleanTrials{} official passes over invoice and travel-claim completion triggers. & Runtime support" in experiments
-    assert "runtime-only rows validate executable boundary obligations, but we do not count them as matched-agent evidence" in results
+    assert "reference-boundary rows validate executable boundary obligations, but we do not count them as matched-agent evidence" in results
     assert "Primary evidence: scoped commits are stable in terminal state" not in experiments
     assert "Primary evidence: ready evidence can trigger artifact finalization" not in experiments
 
@@ -156,7 +156,7 @@ def test_tau2_matched_blocks_are_not_conflated_in_public_paper_text() -> None:
     results = (PAPER / "sections" / "05_results.tex").read_text(encoding="utf-8")
     public_text = "\n".join([main, results])
 
-    assert "live matched \\(K=20\\) block on airline task 48" in public_text
+    assert "two live matched \\(K=20\\) blocks on airline task 48" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=20\\)" in results
     assert "\\(\\tau^2\\) matched retail completion, \\(K=20\\)" in results
     assert "\\(\\tau^2\\) matched retail scope, \\(K=20\\)" in results
@@ -171,9 +171,9 @@ def test_story_gate_exports_action_boundary_consistency_check() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
     checks = {check["check_id"]: check for check in report["checks"]}
 
-    assert report["summary"]["total_checks"] == 26
-    assert report["summary"]["passed_checks"] == 26
-    assert checks["real_result_scale_not_toy"]["status"] == "pass"
+    assert report["summary"]["total_checks"] == 27
+    assert report["summary"]["passed_checks"] == 27
+    assert checks["real_result_scale_is_substantive"]["status"] == "pass"
     assert checks["action_boundary_story_framing"]["status"] == "pass"
     assert checks["public_surface_uses_action_boundary_terms"]["status"] == "pass"
     assert checks["abstract_prioritizes_matched_action_boundary_evidence"]["status"] == "pass"

@@ -63,6 +63,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _proposal_effect_decomposition_check(proposal_effect["summary"]),
         _tau2_matched_boundary_check(tau2_matched["summary"]),
+        _tau2_llm_user_matched_block_check(tau2_matched["summary"]),
         _tau2_retention_control_check(tau2_matched["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
@@ -367,7 +368,7 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
     return _check(
         "model_in_loop_bridge_separates_runtime_reliability",
         ok,
-        "Model-in-loop evidence should not count runtime-only boundary programs as matched-agent causal evidence.",
+        "Model-in-loop evidence should not count reference-boundary programs as matched-agent causal evidence.",
         (
             f"{summary['ordinary_agent_rows']} ordinary, {summary['prompt_control_rows']} prompt-only, "
             f"{summary['matched_agent_controller_rows']} matched-boundary, and "
@@ -377,7 +378,7 @@ def _model_in_loop_bridge_check(bridge: dict[str, Any]) -> dict[str, str]:
             f"{summary['qwen_skillflow_faithful_baseline_trials']}; Qwen+boundary: "
             f"{summary['qwen_all_govkernel_passes']}/"
             f"{summary['qwen_all_govkernel_trials']} across log-summary and SkillFlow OCR tasks; "
-            f"runtime-adapter-as-agent rows: "
+            f"reference-adapter-as-agent rows: "
             f"{summary['runtime_adapter_rows_used_as_matched_agent']}; "
             f"bad public runtime labels: {bad_public_labels}."
         ),
@@ -396,12 +397,12 @@ def _real_evidence_audit_check(summary: dict[str, Any]) -> dict[str, str]:
     return _check(
         "real_evidence_audit_has_only_real_results",
         ok,
-        "The evidence audit must contain real artifacts or derived real-artifact analyses, not planned matrices.",
+        "The evidence audit must contain real artifacts or derived real-artifact analyses, not target-only matrices.",
         (
             f"{summary['real_harbor_rows']} parseable Harbor rows; "
             f"{summary['derived_real_rows']} derived real-artifact rows; "
-            f"{summary['planned_rows']} planned rows; "
-            f"planned main positives: {summary['main_positive_planned_rows']}; "
+            f"{summary['planned_rows']} target-only rows; "
+            f"target-only main positives: {summary['main_positive_planned_rows']}; "
             f"missing artifacts: {summary['missing_artifact_rows']}; "
             f"unparseable artifacts: {summary['unparseable_artifact_rows']}."
         ),
@@ -428,18 +429,18 @@ def _real_result_scale_check(
         and model_loop_summary["runtime_adapter_rows_used_as_matched_agent"] == 0
     )
     return _check(
-        "real_result_scale_not_toy",
+        "real_result_scale_is_substantive",
         ok,
-        "Main paper evidence should be real, matched where claimed, and large enough to avoid toy-example framing.",
+        "Main paper evidence should be real, matched where claimed, and large enough for substantive evaluation.",
         (
             f"{real_summary['real_harbor_rows']} parseable official Harbor rows; "
             f"{real_summary['main_result_rows']} main-result rows; "
-            f"{real_summary['planned_rows']} planned rows; "
+            f"{real_summary['planned_rows']} target-only rows; "
             f"{tau2_summary['complete_pairs']} tau2 matched pairs plus "
             f"{tau2_summary['retention_complete_pairs']} retention pairs; "
             f"Qwen+boundary {model_loop_summary['qwen_all_govkernel_passes']}/"
             f"{model_loop_summary['qwen_all_govkernel_trials']}; "
-            f"runtime-adapter-as-agent rows "
+            f"reference-adapter-as-agent rows "
             f"{model_loop_summary['runtime_adapter_rows_used_as_matched_agent']}."
         ),
     )
@@ -491,6 +492,38 @@ def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
     )
 
 
+def _tau2_llm_user_matched_block_check(summary: dict[str, Any]) -> dict[str, str]:
+    llm_user_blocks = [
+        block
+        for block in summary.get("block_summaries", [])
+        if "llm_user" in {str(mode) for mode in block.get("user_modes", [])}
+    ]
+    complete_pairs = sum(int(block["complete_pairs"]) for block in llm_user_blocks)
+    baseline_rewards = {float(block["baseline_mean_reward"]) for block in llm_user_blocks}
+    boundary_rewards = {float(block["boundary_mean_reward"]) for block in llm_user_blocks}
+    regressions = sum(int(block["boundary_regressions"]) for block in llm_user_blocks)
+    baseline_rcww = sum(int(block["baseline_read_correct_write_wrong"]) for block in llm_user_blocks)
+    boundary_rcww = sum(int(block["boundary_read_correct_write_wrong"]) for block in llm_user_blocks)
+    ok = (
+        complete_pairs >= 20
+        and baseline_rewards == {0.0}
+        and boundary_rewards == {1.0}
+        and regressions == 0
+        and baseline_rcww >= 20
+        and boundary_rcww == 0
+    )
+    return _check(
+        "tau2_llm_user_matched_block_present",
+        ok,
+        "At least one main tau2 matched block should use a natural LLM user condition, not only deterministic simulator users.",
+        (
+            f"{complete_pairs} LLM-user matched pairs; baseline rewards {sorted(baseline_rewards)}; "
+            f"boundary rewards {sorted(boundary_rewards)}; read-correct/write-wrong "
+            f"{baseline_rcww}->{boundary_rcww}; regressions {regressions}."
+        ),
+    )
+
+
 def _tau2_retention_control_check(summary: dict[str, Any]) -> dict[str, str]:
     ok = (
         summary["retention_complete_pairs"] >= 15
@@ -525,10 +558,10 @@ def _proposal_effect_decomposition_check(summary: dict[str, Any]) -> dict[str, s
     return _check(
         "proposal_effect_decomposition_has_real_gap_rows",
         ok,
-        "RQ1 should be backed by real proposal/effect rows, not planned matrices.",
+        "RQ1 should be backed by real proposal/effect rows, not target-only matrices.",
         (
             f"{summary['gap_observations']} proposal-to-effect gap observations across "
-            f"{summary['benchmark_count']} benchmark families; planned rows "
+            f"{summary['benchmark_count']} benchmark families; target-only rows "
             f"{summary['planned_rows']}; boundary source closures "
             f"{summary['boundary_effect_successes_on_source_gap_rows']}."
         ),
@@ -855,14 +888,14 @@ def _abstract_headline_check(paper_dir: Path) -> dict[str, str]:
     hits = [phrase for phrase in blocked if phrase in abstract]
     ok = not missing and not hits
     evidence = (
-        "Abstract leads with proposal/effect and matched action-boundary evidence, not runtime-only reliability."
+        "Abstract leads with proposal/effect and matched action-boundary evidence, not reference-boundary reliability."
         if ok
         else f"missing={missing}; blocked={hits}"
     )
     return _check(
         "abstract_prioritizes_matched_action_boundary_evidence",
         ok,
-        "The abstract should prioritize matched action-boundary evidence over runtime-only adapter reliability.",
+        "The abstract should prioritize matched action-boundary evidence over reference-boundary reliability.",
         evidence,
     )
 

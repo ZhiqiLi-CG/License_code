@@ -147,7 +147,7 @@ def _claims(
         "matched_action_boundary_closes_gap": {
             "paper_section": "tau2 Matched Results",
             "claim": (
-                "Under matched actor, task, user script, and budget settings, changing the "
+                "Under matched actor, task, user condition, and budget settings, changing the "
                 "action boundary closes real business-state proposal-to-effect gaps."
             ),
             "positive_evidence": [
@@ -186,7 +186,7 @@ def _claims(
         "runtime_reliability_is_supporting_evidence": {
             "paper_section": "Reproducibility",
             "claim": (
-                "Runtime-only boundary programs reproduce their verifier-visible states, but they are supporting evidence rather than matched-agent causal evidence."
+                "Reference-boundary programs reproduce their verifier-visible states, but they are supporting evidence rather than matched-agent causal evidence."
             ),
             "positive_evidence": [
                 f"{metrics['stage2_clean_anchor_count']} reliability tasks: {clean_tasks}",

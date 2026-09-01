@@ -17,8 +17,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 26
-    assert summary["passed_checks"] == 26
+    assert summary["total_checks"] == 27
+    assert summary["passed_checks"] == 27
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
@@ -28,15 +28,15 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["state_substrate_count"] == 3
     assert summary["actor_backbone_count"] == 5
     assert summary["main_matched_actor_backbone_count"] == 2
-    assert summary["tau2_matched_pairs"] == 80
-    assert summary["tau2_matched_reward_delta"] == 0.9875
+    assert summary["tau2_matched_pairs"] == 100
+    assert summary["tau2_matched_reward_delta"] == 0.99
     assert summary["tau2_retention_pairs"] == 15
     assert summary["tau2_retention_regressions"] == 0
     assert summary["meta_agent_candidates"] == 5
     assert summary["meta_agent_accepted"] == 5
     assert summary["meta_agent_source_f_to_p"] == 5
-    assert summary["proposal_effect_gap_observations"] == 103
-    assert summary["proposal_effect_boundary_source_successes"] == 84
+    assert summary["proposal_effect_gap_observations"] == 123
+    assert summary["proposal_effect_boundary_source_successes"] == 104
 
     checks = {check["check_id"]: check for check in report["checks"]}
     assert checks["portfolio_breadth"]["status"] == "pass"
@@ -50,18 +50,22 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
         "model_in_loop_bridge_separates_runtime_reliability"
     ]["evidence"]
     assert checks["proposal_effect_decomposition_has_real_gap_rows"]["status"] == "pass"
-    assert checks["real_result_scale_not_toy"]["status"] == "pass"
-    assert "26 parseable official Harbor rows" in checks["real_result_scale_not_toy"]["evidence"]
-    assert "80 tau2 matched pairs plus 15 retention pairs" in checks[
-        "real_result_scale_not_toy"
+    assert checks["real_result_scale_is_substantive"]["status"] == "pass"
+    assert "26 parseable official Harbor rows" in checks["real_result_scale_is_substantive"]["evidence"]
+    assert "100 tau2 matched pairs plus 15 retention pairs" in checks[
+        "real_result_scale_is_substantive"
     ]["evidence"]
-    assert "runtime-adapter-as-agent rows 0" in checks["real_result_scale_not_toy"]["evidence"]
+    assert "reference-adapter-as-agent rows 0" in checks["real_result_scale_is_substantive"]["evidence"]
     assert checks["tau2_matched_boundary_pair_present"]["status"] == "pass"
+    assert checks["tau2_llm_user_matched_block_present"]["status"] == "pass"
+    assert "20 LLM-user matched pairs" in checks["tau2_llm_user_matched_block_present"][
+        "evidence"
+    ]
     assert checks["tau2_retention_controls_preserve_legitimate_effects"]["status"] == "pass"
     assert summary["real_evidence_planned_rows"] == 0
     assert checks["real_evidence_audit_has_only_real_results"]["status"] == "pass"
-    assert "0 planned rows" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
-    assert "planned main positives: 0" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
+    assert "0 target-only rows" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
+    assert "target-only main positives: 0" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
     assert checks["license_workspace_only"]["status"] == "pass"
     assert checks["paper_imports_generated_numbers"]["status"] == "pass"
     assert "reproducibility numbers" in checks["paper_imports_generated_numbers"]["evidence"].lower()
@@ -114,12 +118,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 26
+    assert len(rows) == 27
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{26}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{26}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{27}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{27}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

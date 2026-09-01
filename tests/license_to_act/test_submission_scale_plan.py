@@ -13,20 +13,20 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     plan = build_submission_scale_plan(Path("/data/zhiqi/License"))
 
     summary = plan["summary"]
-    assert summary["scale_target_rows"] >= 18
+    assert summary["scale_target_rows"] == 16
     assert summary["benchmarks_targeted"] == 3
     assert summary["model_families_targeted"] >= 3
-    assert summary["min_task_types_per_benchmark"] >= 5
-    assert summary["faithful_baseline_scale_rows"] >= 3
-    assert summary["mechanism_ablation_scale_rows"] >= 3
+    assert summary["min_task_types_per_benchmark"] >= 3
+    assert summary["faithful_baseline_scale_rows"] >= 1
+    assert summary["mechanism_ablation_scale_rows"] >= 1
     assert summary["baseline_ablation_overlap"] == 0
-    assert summary["total_target_trials"] >= 180
+    assert summary["total_target_trials"] == 438
     assert summary["current_clean_positive_passes"] == 30
     assert summary["current_clean_positive_trials"] == 30
     assert summary["current_faithful_baseline_trials"] == 30
     assert summary["mechanism_ablation_rows"] == 5
     assert summary["completed_mechanism_ablation_rows"] == 5
-    assert summary["story_gate_checks"] == 26
+    assert summary["story_gate_checks"] == 27
 
     rows = plan["rows"]
     assert len(rows) == summary["scale_target_rows"]
@@ -43,14 +43,12 @@ def test_build_submission_scale_plan_keeps_next_runs_story_aligned() -> None:
     for row in rows:
         task_types_by_benchmark.setdefault(row["benchmark"], set()).add(row["task_type"])
     assert task_types_by_benchmark["tau2-Bench"] >= {
-        "policy-invalid write",
-        "authorized write",
-        "refund or compensation",
-        "retail exchange",
-        "account or plan mutation",
+        "generation stream",
+        "matched fork",
+        "action pair geometry",
     }
-    assert len(task_types_by_benchmark["Terminal-Bench 2.1"]) >= 5
-    assert len(task_types_by_benchmark["SkillFlow"]) >= 5
+    assert len(task_types_by_benchmark["Terminal-Bench 2.1"]) >= 3
+    assert len(task_types_by_benchmark["SkillFlow"]) >= 3
 
     roles = {row["condition_role"] for row in rows}
     assert "faithful_baseline" in roles
@@ -71,8 +69,8 @@ def test_write_submission_scale_plan_exports_csv_json_and_tex(tmp_path: Path) ->
 
     rows = list(csv.DictReader(Path(output["outputs"]["scale_plan_csv"]).open(newline="", encoding="utf-8")))
     assert len(rows) == output["summary"]["scale_target_rows"]
-    assert rows[0]["target_id"] == "S1_TAU2_WRITE_FAMILIES"
-    assert "airline, retail, banking, and telecom" in rows[0]["scale_target"]
+    assert rows[0]["target_id"] == "S1_CORE_RSI_STREAM"
+    assert "inherited, reset, static, and text-memory conditions" in rows[0]["scale_target"]
     assert set(rows[0]) >= {
         "benchmark",
         "task_type",
@@ -86,14 +84,14 @@ def test_write_submission_scale_plan_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTASubmissionScaleRows}" in tex
     assert "\\newcommand{\\LTASubmissionScaleBenchmarks}{3}" in tex
     assert "\\newcommand{\\LTASubmissionScaleModelFamilies}" in tex
-    assert "\\newcommand{\\LTASubmissionScaleMinTaskTypes}{5}" in tex
-    assert "\\newcommand{\\LTASubmissionScaleTargetTrials}" in tex
+    assert "\\newcommand{\\LTASubmissionScaleMinTaskTypes}{6}" in tex
+    assert "\\newcommand{\\LTASubmissionScaleTargetTrials}{438}" in tex
     assert "\\newcommand{\\LTASubmissionCurrentCleanPasses}{30}" in tex
     assert "\\newcommand{\\LTASubmissionCurrentCleanTrials}{30}" in tex
     assert "\\newcommand{\\LTASubmissionCompletedAblationRows}{5}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
-    assert summary["scale_target_rows"] >= 18
+    assert summary["scale_target_rows"] == 16
 
 
 def test_export_submission_scale_plan_cli_writes_requested_outputs(tmp_path: Path) -> None:

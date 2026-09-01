@@ -1,0 +1,885 @@
+{
+  "source_full_report": "/data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_llmuser_revise_k20_20260901.json",
+  "notes": "Compact export of a real matched tau2 run. The full local report contains official tau2 messages and reward_info; this file keeps only fields needed to regenerate the paper table and generated numbers.",
+  "summary": {
+    "pairs": 20,
+    "complete_pairs": 20,
+    "baseline_trials": 20,
+    "boundary_trials": 20,
+    "baseline_mean_reward": 0.0,
+    "boundary_mean_reward": 1.0,
+    "reward_delta": 1.0,
+    "baseline_read_correct_write_wrong": 20,
+    "boundary_read_correct_write_wrong": 0,
+    "boundary_vetoes": 20,
+    "boundary_allows": 0,
+    "boundary_completion_triggers": 0,
+    "baseline_retail_exchange_tool_calls": 0,
+    "boundary_retail_exchange_tool_calls": 0,
+    "baseline_state_change_tool_calls": 20,
+    "boundary_state_change_tool_calls": 0,
+    "boundary_regressions": 0
+  },
+  "runs": [
+    {
+      "pair_id": "airline-48-seed-92048",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92048,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92048",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92048,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92049",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92049,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92049",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92049,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92050",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92050,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92050",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92050,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92051",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92051,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92051",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92051,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92052",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92052,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92052",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92052,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92053",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92053,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92053",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92053,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92054",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92054,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92054",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92054,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92055",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92055,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92055",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92055,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92056",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92056,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92056",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92056,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92057",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92057,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92057",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92057,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92058",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92058,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92058",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92058,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92059",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92059,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92059",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92059,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92060",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92060,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92060",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92060,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92061",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92061,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92061",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92061,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92062",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92062,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92062",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92062,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92063",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92063,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92063",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92063,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92064",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92064,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92064",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92064,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92065",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92065,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92065",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92065,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92066",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92066,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92066",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92066,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92067",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92067,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "baseline",
+      "reward": 0.0,
+      "cancel_tool_calls": 1,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 1,
+      "read_correct_write_wrong": true,
+      "boundary_records": [],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    },
+    {
+      "pair_id": "airline-48-seed-92067",
+      "domain": "airline",
+      "task_id": "48",
+      "seed": 92067,
+      "actor_model": "Mistral-Small-3.2-24B-Instruct-2506",
+      "user_mode": "llm_user",
+      "condition": "action_boundary",
+      "reward": 1.0,
+      "cancel_tool_calls": 0,
+      "retail_exchange_tool_calls": 0,
+      "state_change_tool_calls": 0,
+      "read_correct_write_wrong": false,
+      "boundary_records": [
+        {
+          "allowed": false,
+          "missing_evidence": [
+            "CommitReadinessEvidence"
+          ],
+          "reason": "missing_required_evidence",
+          "replacement": "assistant_text_response",
+          "reservation_id": "3RK2T9",
+          "tool_name": "cancel_reservation"
+        }
+      ],
+      "paper_use": "matched_tau2_airline_llmuser_k20"
+    }
+  ]
+}

@@ -66,7 +66,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "main_positive_evidence",
             "story_question": "Does changing only the action boundary close real business-state gaps?",
             "result_sentence": (
-                f"Four live tau2 matched blocks change only the boundary and cover "
+                f"Five live tau2 matched blocks change only the boundary and cover "
                 f"{tau2_matched_summary['complete_pairs']} paired seeds across "
                 f"{tau2_matched_summary['domains']} domains and "
                 f"{tau2_matched_summary['actor_models']} actor models; mean reward moves from "
@@ -75,7 +75,7 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"{tau2_matched_summary['boundary_regressions']} boundary regressions."
             ),
             "why_it_matters": (
-                "This is the cleanest current causal evidence: same model, task, user script, and budget; "
+                "This is the cleanest current causal evidence: same model, task, user condition, and budget; "
                 "only the proposal-to-effect interface changes."
             ),
             "source_data": "tau2_matched_boundary.csv",
@@ -168,12 +168,12 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "paper_role": "runtime_reliability_evidence",
             "story_question": "Do the executable boundary programs reproduce under official verifiers?",
             "result_sentence": (
-                f"Runtime-only boundary programs achieve {portfolio_summary['clean_positive_passes']}/"
+                f"Reference-boundary programs achieve {portfolio_summary['clean_positive_passes']}/"
                 f"{portfolio_summary['clean_positive_trials']} official passes with zero errors; these "
                 "rows are implementation reliability checks, not counted as matched-agent evidence."
             ),
             "why_it_matters": (
-                "This keeps deterministic boundary-program checks out of the main causal comparison while "
+                "This keeps reference-boundary checks out of the main causal comparison while "
                 "still documenting that the released code reproduces the reported verifier states."
             ),
             "source_data": "stage2_reliability.csv | evidence_portfolio.csv",

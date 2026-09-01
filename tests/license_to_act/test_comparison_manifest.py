@@ -39,7 +39,7 @@ def test_build_comparison_manifest_separates_external_baselines_from_ablation_cu
     method = rows[0]
     assert method["comparison_class"] == "method_condition"
     assert method["paper_role"] == "main_matched_evidence"
-    assert "80 paired seeds" in method["current_result"]
+    assert "100 paired seeds" in method["current_result"]
     assert "0 boundary regressions" in method["current_result"]
 
     baseline = rows[1]

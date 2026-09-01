@@ -131,7 +131,7 @@ def build_comparison_manifest(project_root: str | Path = Path("/data/zhiqi/Licen
             "comparison_id": "R1_RUNTIME_RELIABILITY_SUPPORT",
             "comparison_class": "runtime_reliability",
             "paper_role": "supporting_reproduction",
-            "condition": "Runtime-only boundary programs under official verifiers",
+            "condition": "Reference-boundary programs under official verifiers",
             "tests": "Do the released executable protocols reproduce their verifier-visible states?",
             "evidence_status": "completed",
             "current_result": (

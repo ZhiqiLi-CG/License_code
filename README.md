@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-09-01: 136 passed.
+2026-09-01: 137 passed.
 ```
 
 ## Official Harbor Anchors
@@ -76,11 +76,27 @@ The three Stage-3 Qwen+boundary commands keep `Qwen3.8-27B-long32k` inside the o
 
 ## tau2 Matched Boundary Blocks
 
-The current live matched tau2 fixtures use the same actor, same scripted user,
+The current live matched tau2 fixtures use the same actor, same user condition,
 and same task budget in both conditions; the changed component is the action
-boundary. The airline block tests unready writes. The retail blocks test the
-opposite failure: complete or scoped evidence exists, but the ordinary actor
-never turns it into the required exchange.
+boundary. The airline blocks test unready writes under both scripted and LLM-user
+dialogues. The retail blocks test the opposite failure: complete or scoped
+evidence exists, but the ordinary actor never turns it into the required
+exchange.
+
+```bash
+/data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
+  --domain airline \
+  --task-ids 48 \
+  --user-mode llm \
+  --num-trials 20 \
+  --seed 92048 \
+  --max-steps 20 \
+  --timeout 180 \
+  --llm-agent openai/Mistral-Small-3.2-24B-Instruct-2506 \
+  --llm-user openai/Mistral-Small-3.2-24B-Instruct-2506 \
+  --api-base http://127.0.0.1:8001/v1 \
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_llmuser_revise_k20_20260901.json
+```
 
 ```bash
 /data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
@@ -151,11 +167,11 @@ never turns it into the required exchange.
 ```
 
 The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
-paper table: across 80 matched seeds and two tau2 domains, the baseline has mean
-reward 0.0125 and the action boundary has mean reward 1.0. The airline block has
-20 read-correct/write-wrong cancellation runs and 26 boundary vetoes. The retail
-blocks have 1 baseline exchange call, 60 trace-derived boundary exchange calls,
-and zero regressions.
+paper table: across 100 matched seeds and two tau2 domains, the baseline has
+mean reward 0.01 and the action boundary has mean reward 1.0. The two airline
+blocks have 40 read-correct/write-wrong cancellation runs and 46 boundary vetoes,
+including 20/20 LLM-user matched pairs. The retail blocks have 1 baseline
+exchange call, 60 trace-derived boundary exchange calls, and zero regressions.
 
 ## Long-Context Faithful Baselines
 

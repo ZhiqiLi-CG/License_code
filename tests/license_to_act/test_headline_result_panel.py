@@ -32,7 +32,7 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     assert summary["faithful_baseline_trials"] == 30
     assert summary["model_loop_passes"] == 15
     assert summary["model_loop_trials"] == 15
-    assert summary["tau2_matched_pairs"] == 80
+    assert summary["tau2_matched_pairs"] == 100
     assert summary["tau2_matched_boundary_regressions"] == 0
     assert summary["tau2_read_correct_write_wrong_proxy"] == 20
     assert summary["commit_pair_accuracy"] == 1.0
@@ -54,7 +54,7 @@ def test_build_headline_result_panel_compresses_story_first_evidence() -> None:
     rows = {row["panel_id"]: row for row in panel["rows"]}
     assert rows["H3_COMMIT_PAIR_ACCURACY"]["source_data"] == "commit_pair_metrics.csv | commit_pair_members.csv"
     assert rows["H2_TAU2_MATCHED_BOUNDARY"]["paper_role"] == "main_positive_evidence"
-    assert "80 paired seeds" in rows["H2_TAU2_MATCHED_BOUNDARY"]["result_sentence"]
+    assert "100 paired seeds" in rows["H2_TAU2_MATCHED_BOUNDARY"]["result_sentence"]
     assert "0 boundary regressions" in rows["H2_TAU2_MATCHED_BOUNDARY"]["result_sentence"]
     assert "2 primary matched actor models" in rows["H1_BREADTH"]["result_sentence"]
     assert "retention controls extend matched coverage to 3 actor models" in rows[
@@ -105,7 +105,7 @@ def test_write_headline_result_panel_exports_csv_json_and_tex(tmp_path: Path) ->
     assert "\\newcommand{\\LTAHeadlineCleanPositivePasses}{30}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopPasses}{15}" in tex
     assert "\\newcommand{\\LTAHeadlineModelLoopTrials}{15}" in tex
-    assert "\\newcommand{\\LTAHeadlineTauTwoMatchedPairs}{80}" in tex
+    assert "\\newcommand{\\LTAHeadlineTauTwoMatchedPairs}{100}" in tex
     assert "\\newcommand{\\LTAHeadlineTauTwoMatchedBoundaryRegressions}{0}" in tex
     assert "\\newcommand{\\LTAHeadlineTauTwoRCWW}{20}" in tex
     assert "\\newcommand{\\LTAHeadlineCommitPairAccuracy}{1.000}" in tex

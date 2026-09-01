@@ -56,6 +56,49 @@ def test_vetoed_cancel_tool_call_becomes_text_response():
     ]
 
 
+def test_vetoed_cancel_response_cites_verified_state():
+    messages = [
+        {"role": "user", "content": "I need to cancel because I booked this morning."},
+        {
+            "role": "tool",
+            "content": json.dumps(
+                {
+                    "reservation_id": "3RK2T9",
+                    "cabin": "basic_economy",
+                    "created_at": "2024-05-02T06:02:56",
+                    "insurance": "no",
+                    "flights": [{"status": "available"}],
+                }
+            ),
+        },
+    ]
+    assistant_message = {
+        "role": "assistant",
+        "content": None,
+        "tool_calls": [
+            {
+                "name": "cancel_reservation",
+                "arguments": {"reservation_id": "3RK2T9"},
+            }
+        ],
+    }
+
+    result = apply_tau2_action_boundary(
+        messages,
+        assistant_message,
+        current_time="2024-05-15T15:00:00",
+    )
+
+    content = result.message["content"]
+    assert "cannot submit this cancellation" in content
+    assert "3RK2T9" in content
+    assert "2024-05-02T06:02:56" in content
+    assert "2024-05-15T15:00:00" in content
+    assert "more than 24 hours" in content
+    assert "basic_economy" in content
+    assert "no insurance" in content
+
+
 def test_authorized_cancel_tool_call_passes_through():
     messages = [
         {"role": "user", "content": "I need to cancel because my plans changed."},

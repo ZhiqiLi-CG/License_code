@@ -26,10 +26,8 @@ BLUEPRINT_FIELDS = [
 ]
 
 TARGET_MODEL_SLOTS = [
-    "Qwen3.8-27B",
     "Qwen3.8-27B-long32k",
-    "Mistral-Small-3.2-24B",
-    "Gemma-4-31B-it",
+    "Mistral/Gemma held-out open model",
     "Codex/Claude strong terminal agent",
 ]
 
@@ -43,206 +41,159 @@ def build_submission_experiment_blueprint(project_root: str | Path = Path("/data
 
     rows = [
         {
-            "blueprint_id": "E1_TAU2_AIRLINE_COMMIT_READINESS",
-            "benchmark": "tau2-Bench",
-            "claim_axis": "Conversation can propose a write; verified state decides whether it is ready to commit.",
-            "split_policy": "Freeze airline write-family source, validation, and held-out tasks before final scoring.",
-            "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it | Qwen3.8-27B-long32k",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "80",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "unsafe write reduction with authorized-write recall",
-            "acceptance_gate": (
-                "Gate A/D: same backbone, same harness, same budget; McNemar p < 0.05; "
-                "authorized-commit recall loss <= 3pp; actual pre-commit interventions on mined traces."
-            ),
-            "baseline_boundary": "Faithful baselines use the same tau2 simulator and tool policy without runtime commit control.",
-        },
-        {
-            "blueprint_id": "E2_TAU2_CROSS_DOMAIN_COMMITS",
-            "benchmark": "tau2-Bench",
-            "claim_axis": "Commit-readiness contracts should survive outside airline cancellation.",
-            "split_policy": "Preselect retail, banking, and telecom write families by visible policy/state features.",
-            "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it | Qwen3.8-27B-long32k",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "120",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "reward, DB pass, communication pass, overblocking",
-            "acceptance_gate": (
-                "Gate A/D: >=15 tasks in each state substrate slice; unsafe writes decrease; "
-                "legal writes remain COMMIT with authorized-commit recall loss <= 3pp."
-            ),
-            "baseline_boundary": "Domain transfer is evaluated after the write-family list is frozen.",
-        },
-        {
-            "blueprint_id": "E3_TB_12_TASK_ACTION_BOUNDARY_PILOT",
-            "benchmark": "Terminal-Bench 2.1",
-            "claim_axis": "Terminal actions need write scope, preservation, and verifier-ready witnesses.",
-            "split_policy": "Freeze a 12-task pilot across Git, DB, security, data, image/document, and process state.",
-            "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "official reward plus collateral-mutation and missing-artifact rates",
-            "acceptance_gate": (
-                "Gate A: same backbone, same harness, same budget, +/- action boundary; "
-                "official pass rate improves and collateral mutation decreases."
-            ),
-            "baseline_boundary": "No public solution scripts may generate warrants for live runs.",
-        },
-        {
-            "blueprint_id": "E4_TB_STRATIFIED_ACTION_BOUNDARY_SWEEP",
-            "benchmark": "Terminal-Bench 2.1",
-            "claim_axis": "The terminal action-boundary pattern should scale beyond anchors.",
-            "split_policy": "Run a 45-task stratified sweep only after the 12-task pilot passes the acceptance gate.",
-            "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
-            "comparison_class": "method_condition",
+            "blueprint_id": "E1_CORE_RSI_GENERATION_CURVE",
+            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "The inherited action boundary should improve how correct proposals become external effects.",
+            "split_policy": "Freeze source, validation, and held-out streams before generation 0; use three independent task orderings.",
+            "model_slots": "Qwen3.8-27B-long32k",
+            "comparison_class": "inherited_vs_reset_rsi",
             "paper_role": "main_positive_scale",
             "target_run_cells": "180",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "pass rate, false-done rate, authorized commit success",
+            "inclusion_rule": "Include proposal-to-effect tasks with predeclared intermediate and final verifiers.",
+            "primary_metric": "held-out realization rate and EffectOK conditioned on ProposalOK",
             "acceptance_gate": (
-                "Gate A/E: frozen pilot success before sweep; pass-rate CI reported; "
-                "runtime failures separated from behavior claims."
+                "Inherited B5 beats reset and static on the frozen held-out stream; "
+                "no manual update edits after generation starts; source and validation outcomes select updates."
             ),
-            "baseline_boundary": "Report Harbor/runtime failures separately from behavioral failures.",
+            "baseline_boundary": "Static B0 and equal-budget reset updater receive the same source evidence but do not inherit past updates.",
         },
         {
-            "blueprint_id": "E5_SKILLFLOW_COMPLETION_TRIGGERS",
-            "benchmark": "SkillFlow",
-            "claim_axis": "Complete prepared evidence should trigger verifier-visible finalization.",
-            "split_policy": "Freeze OCR, healthcare, document-fraud, and cross-format families before outcome inspection.",
-            "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "96",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "artifact existence, schema pass, reward, completion-trigger success",
-            "acceptance_gate": (
-                "Gate A/C: same agent +/- action boundary; removing completion triggers restores missing-workbook failures; "
-                "wrong artifact-write rate is reported."
-            ),
-            "baseline_boundary": "Runtime-only boundary programs are separated from matched-agent comparisons and named mechanism cuts.",
-        },
-        {
-            "blueprint_id": "E6_SKILLFLOW_SKILL_COMMIT_TRANSFER",
-            "benchmark": "SkillFlow",
-            "claim_axis": "Skill reuse needs action scope, not only memory.",
-            "split_policy": "Evaluate skill/body visibility and held-out transfer after source-family compiler selection.",
-            "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "96",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "negative transfer, skill admission, held-out reward",
-            "acceptance_gate": (
-                "Gate B/C: source-generated boundary update improves held-out tasks; "
-                "positive-only skill growth and task-ID hand guard are separated from boundary ablations."
-            ),
-            "baseline_boundary": "Positive-only skill growth is an external-style baseline only when reproduced faithfully.",
-        },
-        {
-            "blueprint_id": "E7_MODEL_BREADTH_HELDOUT",
+            "blueprint_id": "E2_MATCHED_FORK_AT_BOUNDARY",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The action boundary should help frozen actors rather than one wrapper.",
-            "split_policy": "Hold Gemma and one strong terminal agent out until the compiler and tasks are frozen.",
-            "model_slots": "Gemma-4-31B-it | Codex/Claude strong terminal agent",
-            "comparison_class": "method_condition",
+            "claim_axis": "Changing the proposal-to-effect interface should close gaps without changing the actor.",
+            "split_policy": "Fork when ProposalOK first becomes true; preserve initial state, actor, tools, and remaining budget.",
+            "model_slots": "Qwen3.8-27B-long32k | Mistral/Gemma held-out open model",
+            "comparison_class": "matched_fork_at_boundary",
             "paper_role": "main_positive_scale",
-            "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "held-out reward lift and pass-to-fail regression",
+            "target_run_cells": "120",
+            "inclusion_rule": "Include proposal-to-effect pairs where the fork point and verifier are fixed before outcomes are scored.",
+            "primary_metric": "EffectOK without boundary versus with boundary at the same fork point",
             "acceptance_gate": (
-                "Gate A/B: second open model and one strong agent satisfy the same matched-causal criteria "
-                "after compiler freeze."
+                "same actor, task, state, tool surface, token budget, and wall clock; fork at ProposalOK; "
+                "Boundary cannot solve the domain algorithm or inject task answers."
             ),
-            "baseline_boundary": "Held-out actors are not used for boundary design choices.",
+            "baseline_boundary": "Direct execution continues with the same actor and tools; the boundary condition stages and validates the same candidate effects.",
         },
         {
-            "blueprint_id": "E8_STRONG_AGENT_BASELINES",
+            "blueprint_id": "E3_ACTION_PAIR_GEOMETRY_60",
+            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "The boundary should commit ready effects and refuse matched premature or out-of-scope effects.",
+            "split_policy": "Freeze 50-60 independent action pairs across business writes, terminal state, and workflow artifacts.",
+            "model_slots": "Qwen3.8-27B-long32k",
+            "comparison_class": "paired_action_geometry",
+            "paper_role": "main_positive_scale",
+            "target_run_cells": "120",
+            "inclusion_rule": "Include proposal-to-effect pairs selected by task geometry, not by observed pass/fail outcomes.",
+            "primary_metric": "pair accuracy macro-averaged by unique pair and benchmark family",
+            "acceptance_gate": (
+                "macro-average by unique pair; seeds are averaged within task; ready recall remains high while unauthorized "
+                "and missing-action rates decrease."
+            ),
+            "baseline_boundary": "No-boundary and generic B0 conditions are evaluated on the same frozen pair list.",
+        },
+        {
+            "blueprint_id": "E4_GENERALIZED_VS_TASK_LOCAL_TRANSFER",
+            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "Boundary updates should transfer by action pattern rather than task ID.",
+            "split_policy": "Generate updates from source families only; freeze applicability conditions before target families are evaluated.",
+            "model_slots": "Qwen3.8-27B-long32k",
+            "comparison_class": "generalized_vs_task-local",
+            "paper_role": "main_positive_scale",
+            "target_run_cells": "96",
+            "inclusion_rule": "Include proposal-to-effect source and held-out families with shared action structure.",
+            "primary_metric": "held-out gain, applicability precision, coverage, and target regression rate",
+            "acceptance_gate": (
+                "generalized update beats task-local memory on held-out families; no manual lowering to target task IDs; "
+                "negative transfer is reported."
+            ),
+            "baseline_boundary": "Task-local patches may memorize source cases but cannot inspect held-out target verifier outcomes.",
+        },
+        {
+            "blueprint_id": "E5_REASONING_RSI_X_ACTION_RSI",
+            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "Better proposal formation and better proposal realization should be complementary.",
+            "split_policy": "Run a 2x2 grid: base, text memory or skill, action-boundary update, and joint condition.",
+            "model_slots": "Qwen3.8-27B-long32k",
+            "comparison_class": "memory_x_action_boundary",
+            "paper_role": "main_positive_scale",
+            "target_run_cells": "96",
+            "inclusion_rule": "Include proposal-to-effect rows where ProposalOK and EffectOK are both measured.",
+            "primary_metric": "ProposalOK, EffectOK, realization rate, over-action, under-action, and cost",
+            "acceptance_gate": (
+                "Joint condition beats either single side; memory primarily raises ProposalOK, while the boundary raises "
+                "EffectOK conditioned on ProposalOK."
+            ),
+            "baseline_boundary": "Textual memory/skill conditions are faithful reasoning-side RSI controls, not boundary ablations.",
+        },
+        {
+            "blueprint_id": "E6_SECOND_OPEN_MODEL_HELDOUT",
+            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "A learned boundary should help a held-out open-model actor after the boundary is frozen.",
+            "split_policy": "Hold the second open model out until B5, task pairs, and metrics are frozen.",
+            "model_slots": "Mistral/Gemma held-out open model",
+            "comparison_class": "heldout_model_method",
+            "paper_role": "main_positive_scale",
+            "target_run_cells": "54",
+            "inclusion_rule": "Include proposal-to-effect pairs from the frozen held-out stream.",
+            "primary_metric": "held-out reward lift, realization-rate lift, and pass-to-failure regression",
+            "acceptance_gate": "held out until B5 is frozen; same matched protocol as the primary actor; no model-specific boundary edits.",
+            "baseline_boundary": "The held-out actor is not used during update generation or threshold selection.",
+        },
+        {
+            "blueprint_id": "E7_STRONG_AGENT_SUBSET",
             "benchmark": "Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "A strong ordinary agent is the cleanest counterpoint to action-boundary improvement.",
-            "split_policy": "Run Codex or Claude baselines on the frozen anchor and pilot sets.",
+            "claim_axis": "A high-capability ordinary agent is the cleanest counterpoint to action-boundary improvement.",
+            "split_policy": "Run the frozen representative pair subset after the boundary and task list are fixed.",
             "model_slots": "Codex/Claude strong terminal agent",
             "comparison_class": "faithful_baseline",
             "paper_role": "main_counterpoint",
-            "target_run_cells": "25",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "official reward under the external agent's normal protocol",
-            "acceptance_gate": (
-                "Gate A: faithful baseline uses normal external-agent protocol, same task set, and matched budget."
-            ),
-            "baseline_boundary": "Do not weaken prompts, tools, or budgets to create a baseline failure.",
+            "target_run_cells": "40",
+            "inclusion_rule": "Include proposal-to-effect tasks from the frozen representative subset.",
+            "primary_metric": "official reward and proposal-to-effect failure class under the agent's normal protocol",
+            "acceptance_gate": "faithful baseline uses the external agent's ordinary workflow, same task subset, and matched wall-clock budget.",
+            "baseline_boundary": "Do not weaken prompts, tools, or budget to create failures.",
         },
         {
-            "blueprint_id": "E9_FAITHFUL_OPEN_MODEL_LADDER",
+            "blueprint_id": "E8_MECHANISM_CUTS",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "Long context and ordinary agency must be tested before claiming action-boundary lift.",
-            "split_policy": "Run matched open-model baselines on every final headline family.",
-            "model_slots": "Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "comparison_class": "faithful_baseline",
-            "paper_role": "main_counterpoint",
-            "target_run_cells": "60",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "official reward and failure class without the action boundary",
-            "acceptance_gate": (
-                "Gate A/E: same backbone and budget as the boundary condition; all pass rates include confidence intervals."
-            ),
-            "baseline_boundary": "Baseline configs reproduce the external agent; they are not mechanism ablations.",
-        },
-        {
-            "blueprint_id": "E10_MECHANISM_CUTS",
-            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "Ablations explain which part of the action boundary carries the result.",
-            "split_policy": "Run cuts only after the full boundary condition and task selection are frozen.",
-            "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k",
+            "claim_axis": "Ablations should explain the learned boundary without masquerading as external baselines.",
+            "split_policy": "Run cuts only after the full boundary and task selection are frozen.",
+            "model_slots": "Qwen3.8-27B-long32k",
             "comparison_class": "mechanism_ablation",
             "paper_role": "mechanism_explanation",
-            "target_run_cells": "120",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "delta in commit accuracy, completion-trigger success, and collateral mutation",
-            "acceptance_gate": (
-                "Gate C: each ablation restores its paired failure class; task-ID hand guard ties source tasks "
-                "but loses on held-out families."
-            ),
-            "baseline_boundary": "Ablations are internal cuts; they must not be described as faithful baselines.",
+            "target_run_cells": "80",
+            "inclusion_rule": "Include proposal-to-effect cases touched by the removed boundary mechanism.",
+            "primary_metric": "delta in realization rate, over-action, under-action, and collateral mutation",
+            "acceptance_gate": "each mechanism cut restores its paired failure class without being labeled a faithful baseline.",
+            "baseline_boundary": "Ablations are internal cuts of our own boundary, not reproductions of outside methods.",
         },
         {
-            "blueprint_id": "E11_CONTRACT_REFINEMENT_TRANSFER",
-            "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The recursively improving object is the action boundary.",
-            "split_policy": "Generate boundary updates from source tasks, validate on regression tasks, then freeze for held-out transfer.",
-            "model_slots": "Qwen3.8-27B | Mistral-Small-3.2-24B | Gemma-4-31B-it",
-            "comparison_class": "method_condition",
-            "paper_role": "main_positive_scale",
-            "target_run_cells": "72",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "failure-to-pass transfer with pass-to-fail regression",
-            "acceptance_gate": (
-                "Gate B: at least two automatic boundary updates are accepted; held-out transfer has >=3 F-to-P "
-                "and P-to-F = 0 across the regression set."
-            ),
-            "baseline_boundary": "Source, validation, and held-out splits are declared before target verifier inspection.",
+            "blueprint_id": "E9_ORACLE_BOUNDARY_UPPER_BOUND",
+            "benchmark": "Terminal-Bench 2.1 | SkillFlow",
+            "claim_axis": "Reference boundary programs are an upper bound on what the learned boundary should approach.",
+            "split_policy": "Keep existing executable adapters out of the main matched causal comparison.",
+            "model_slots": "action-boundary runtime",
+            "comparison_class": "runtime_reliability",
+            "paper_role": "upper_bound_reliability",
+            "target_run_cells": "30",
+            "inclusion_rule": "Include proposal-to-effect anchors only as implementation reliability or reference upper-bound rows.",
+            "primary_metric": "official verifier pass rate and reproducibility under K=5 reruns",
+            "acceptance_gate": "upper-bound rows must be labeled separately from matched-agent treatment effects.",
+            "baseline_boundary": "These rows show boundary expressivity and release reliability, not actor-level treatment effect.",
         },
         {
-            "blueprint_id": "E12_FREEZE_STATISTICS_REGRESSION",
+            "blueprint_id": "E10_FREEZE_STATISTICS_RELEASE",
             "benchmark": "tau2-Bench | Terminal-Bench 2.1 | SkillFlow",
-            "claim_axis": "The claim earns trust by freezing the action-boundary evaluation before final scoring.",
-            "split_policy": "Lock task list, model list, metrics, and exclusion rules before the final positive-mass run.",
-            "model_slots": "Qwen3.8-27B | Qwen3.8-27B-long32k | Mistral-Small-3.2-24B | Gemma-4-31B-it | Codex/Claude strong terminal agent",
+            "claim_axis": "The final claim should be backed by frozen splits, generated numbers, and releasable artifacts.",
+            "split_policy": "Lock task list, model list, metrics, exclusion rules, and anonymization before final scoring.",
+            "model_slots": "Qwen3.8-27B-long32k | Mistral/Gemma held-out open model | Codex/Claude strong terminal agent",
             "comparison_class": "scale_statistics",
             "paper_role": "submission_gate",
-            "target_run_cells": "36",
-            "inclusion_rule": "Include only tasks that sharpen the proposal-to-effect boundary.",
-            "primary_metric": "confidence intervals, paired tests, and no-regression checks",
-            "acceptance_gate": (
-                "Gate E/F: source-validation-held-out split is committed before verifier runs; "
-                "all main-text numbers are generated from data files; raw logs are anonymized for release."
-            ),
-            "baseline_boundary": "Exploratory failures that do not test the action-boundary mechanism stay outside the paper package.",
+            "target_run_cells": "10",
+            "inclusion_rule": "Include proposal-to-effect results only when raw artifacts, generated tables, and paper text agree.",
+            "primary_metric": "cluster bootstrap intervals, paired tests, role separation, and paper-code consistency",
+            "acceptance_gate": "all main-text numbers are generated from data files; task is the statistical unit; infrastructure failures are separated.",
+            "baseline_boundary": "Faithful baselines, mechanism ablations, and upper-bound adapters remain separate fields in the released CSVs.",
         },
     ]
 

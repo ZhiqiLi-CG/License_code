@@ -17,21 +17,21 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     report = build_tau2_matched_boundary_export(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["pairs"] == 80
-    assert summary["complete_pairs"] == 80
-    assert summary["baseline_trials"] == 80
-    assert summary["boundary_trials"] == 80
-    assert summary["baseline_mean_reward"] == 0.0125
+    assert summary["pairs"] == 100
+    assert summary["complete_pairs"] == 100
+    assert summary["baseline_trials"] == 100
+    assert summary["boundary_trials"] == 100
+    assert summary["baseline_mean_reward"] == 0.01
     assert summary["boundary_mean_reward"] == 1.0
-    assert summary["reward_delta"] == 0.9875
-    assert summary["baseline_read_correct_write_wrong"] == 20
+    assert summary["reward_delta"] == 0.99
+    assert summary["baseline_read_correct_write_wrong"] == 40
     assert summary["boundary_read_correct_write_wrong"] == 0
-    assert summary["boundary_vetoes"] == 26
+    assert summary["boundary_vetoes"] == 46
     assert summary["boundary_allows"] == 60
     assert summary["boundary_completion_triggers"] == 60
     assert summary["baseline_retail_exchange_tool_calls"] == 1
     assert summary["boundary_retail_exchange_tool_calls"] == 60
-    assert summary["baseline_state_change_tool_calls"] == 22
+    assert summary["baseline_state_change_tool_calls"] == 42
     assert summary["boundary_state_change_tool_calls"] == 60
     assert summary["boundary_regressions"] == 0
     assert summary["domains"] == 2
@@ -45,11 +45,11 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     assert summary["retention_boundary_mean_reward"] == 1.0
     assert summary["retention_boundary_regressions"] == 0
     assert summary["retention_actor_models"] == 2
-    assert summary["blocks"] == 4
+    assert summary["blocks"] == 5
     assert summary["support_blocks"] == 1
 
     rows = report["rows"]
-    assert len(rows) == 190
+    assert len(rows) == 230
     baseline = next(
         row
         for row in rows
@@ -66,6 +66,25 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     assert baseline["read_correct_write_wrong"] == "yes"
     assert boundary["reward"] == "1"
     assert boundary["read_correct_write_wrong"] == "no"
+    llm_user_baseline = next(
+        row
+        for row in rows
+        if row["condition"] == "baseline"
+        and row["paper_use"] == "matched_tau2_airline_llmuser_k20"
+    )
+    llm_user_boundary = next(
+        row
+        for row in rows
+        if row["condition"] == "action_boundary"
+        and row["paper_use"] == "matched_tau2_airline_llmuser_k20"
+    )
+    assert llm_user_baseline["actor_model"] == "Mistral-Small-3.2-24B-Instruct-2506"
+    assert llm_user_baseline["user_mode"] == "llm_user"
+    assert llm_user_baseline["task_id"] == "48"
+    assert llm_user_baseline["reward"] == "0"
+    assert llm_user_baseline["read_correct_write_wrong"] == "yes"
+    assert llm_user_boundary["reward"] == "1"
+    assert llm_user_boundary["read_correct_write_wrong"] == "no"
     retail_boundary = next(
         row
         for row in rows
@@ -112,9 +131,9 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
         for row in retail_scope_family_rows
         if row["condition"] == "action_boundary" and row["reward"] == "1"
     ) == 20
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 95
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 95
-    assert sum(int(row["boundary_vetoes"]) for row in rows) == 26
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 115
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 115
+    assert sum(int(row["boundary_vetoes"]) for row in rows) == 46
     assert sum(int(row["boundary_allows"]) for row in rows) == 60
     retention_rows = [row for row in rows if row["paper_use"] == "matched_tau2_retention_k5"]
     assert len(retention_rows) == 30
@@ -130,6 +149,14 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     blocks = {block["paper_use"]: block for block in report["blocks"]}
     assert blocks["matched_tau2_k20"]["complete_pairs"] == 20
     assert blocks["matched_tau2_k20"]["boundary_vetoes"] == 26
+    assert blocks["matched_tau2_airline_llmuser_k20"]["complete_pairs"] == 20
+    assert blocks["matched_tau2_airline_llmuser_k20"]["baseline_mean_reward"] == 0.0
+    assert blocks["matched_tau2_airline_llmuser_k20"]["boundary_mean_reward"] == 1.0
+    assert blocks["matched_tau2_airline_llmuser_k20"]["baseline_read_correct_write_wrong"] == 20
+    assert blocks["matched_tau2_airline_llmuser_k20"]["boundary_read_correct_write_wrong"] == 0
+    assert blocks["matched_tau2_airline_llmuser_k20"]["boundary_vetoes"] == 20
+    assert blocks["matched_tau2_airline_llmuser_k20"]["boundary_regressions"] == 0
+    assert blocks["matched_tau2_airline_llmuser_k20"]["user_modes"] == ["llm_user"]
     assert blocks["matched_tau2_retail_completion_k20"]["complete_pairs"] == 20
     assert blocks["matched_tau2_retail_completion_k20"]["boundary_allows"] == 20
     assert blocks["matched_tau2_retail_completion_k20"]["boundary_completion_triggers"] == 20
@@ -158,23 +185,23 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 190
+    assert len(rows) == 230
     assert [row["condition"] for row in rows[:2]] == ["baseline", "action_boundary"]
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 95
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 95
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 115
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 115
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTATauTwoMatchedPairs}{80}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedCompletePairs}{80}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBaselineTrials}{80}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBoundaryTrials}{80}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBaselineMeanReward}{0.013}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedPairs}{100}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedCompletePairs}{100}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBaselineTrials}{100}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBoundaryTrials}{100}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBaselineMeanReward}{0.01}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryMeanReward}{1}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedRewardDelta}{0.988}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBaselineRCWW}{20}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBoundaryVetoes}{26}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedRewardDelta}{0.99}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBaselineRCWW}{40}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBoundaryVetoes}{46}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryAllows}{60}" in tex
-    assert "\\newcommand{\\LTATauTwoMatchedBlocks}{4}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedBlocks}{5}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedMainActorModels}{2}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedActorModelsIncludingRetention}{3}" in tex
     assert "\\newcommand{\\LTATauTwoRetentionCompletePairs}{15}" in tex
@@ -183,6 +210,11 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert "\\newcommand{\\LTATauTwoRetentionBoundaryRegressions}{0}" in tex
     assert "\\newcommand{\\LTATauTwoRetentionActorModels}{2}" in tex
     assert "\\newcommand{\\LTATauTwoAirlineMatchedCompletePairs}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoAirlineLLMUserMatchedCompletePairs}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoAirlineLLMUserMatchedBaselineMeanReward}{0}" in tex
+    assert "\\newcommand{\\LTATauTwoAirlineLLMUserMatchedBoundaryMeanReward}{1}" in tex
+    assert "\\newcommand{\\LTATauTwoAirlineLLMUserMatchedBaselineRCWW}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoAirlineLLMUserMatchedBoundaryVetoes}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailMatchedCompletePairs}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryCompletionTriggers}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryRetailExchangeCalls}{20}" in tex

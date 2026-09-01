@@ -52,6 +52,12 @@ RETAIL_SCOPE_FAMILY_FIXTURE = (
     / "tau2_matched_boundary"
     / "retail_tasks6_9_qwen32k_scripted_scope_family_k20_summary.json"
 )
+AIRLINE_LLM_USER_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "airline_task48_mistral_llmuser_revise_k20_summary.json"
+)
 RETENTION_FIXTURES = (
     Path(__file__).resolve().parents[1]
     / "data"
@@ -68,6 +74,7 @@ RETENTION_FIXTURES = (
 )
 DEFAULT_FIXTURES = (
     DEFAULT_FIXTURE,
+    AIRLINE_LLM_USER_FIXTURE,
     RETAIL_TASK0_FIXTURE,
     RETAIL_TASK1_FIXTURE,
     RETAIL_SCOPE_FAMILY_FIXTURE,
@@ -396,6 +403,8 @@ def _block_latex_commands(blocks: list[dict[str, Any]]) -> dict[str, str]:
         paper_use = block["paper_use"]
         if paper_use == "matched_tau2_k20":
             prefix = "LTATauTwoAirlineMatched"
+        elif paper_use == "matched_tau2_airline_llmuser_k20":
+            prefix = "LTATauTwoAirlineLLMUserMatched"
         elif paper_use == "matched_tau2_retail_completion_k20":
             prefix = "LTATauTwoRetailMatched"
         elif paper_use == "matched_tau2_retail_scope_k20":
