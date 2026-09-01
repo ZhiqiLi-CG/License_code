@@ -50,6 +50,8 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
                 f"The current result set spans {portfolio_summary['benchmark_count']} benchmark families, "
                 f"{portfolio_summary['state_substrate_count']} state substrates, and "
                 f"{portfolio_summary['main_matched_actor_backbone_count']} primary matched actor models; "
+                f"tau2 retention controls extend matched coverage to "
+                f"{portfolio_summary['matched_actor_backbone_count_with_retention']} actor models, and "
                 f"broader diagnostic and counterpoint evidence touches "
                 f"{portfolio_summary['actor_backbone_count']} actor backbones."
             ),
@@ -115,6 +117,22 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
             "source_data": "commit_pair_metrics.csv | commit_pair_members.csv",
         },
         {
+            "panel_id": "H9_TAU2_RETENTION_CONTROLS",
+            "paper_role": "supporting_positive_evidence",
+            "story_question": "Does the boundary preserve already-correct business actions?",
+            "result_sentence": (
+                f"On {portfolio_summary['tau2_retention_complete_pairs']} held-out tau2 airline "
+                f"retention pairs across Gemma-4-31B-it and Mistral-Small-3.2-24B, baseline "
+                f"and boundary both reach reward 1.0 with "
+                f"{portfolio_summary['tau2_retention_boundary_regressions']} regressions."
+            ),
+            "why_it_matters": (
+                "The action boundary is not only a blocker; it preserves prepared effects when "
+                "ordinary execution is already correct."
+            ),
+            "source_data": "tau2_matched_boundary.csv",
+        },
+        {
             "panel_id": "H4_FAITHFUL_BASELINE_COUNTERPOINT",
             "paper_role": "faithful_baseline_counterpoint",
             "story_question": "Does a stronger ordinary task agent solve the same proposal-to-effect boundary?",
@@ -165,6 +183,9 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
     summary = {
         "headline_rows": len(rows),
         "main_positive_rows": sum(1 for row in rows if row["paper_role"] == "main_positive_evidence"),
+        "supporting_positive_rows": sum(
+            1 for row in rows if row["paper_role"] == "supporting_positive_evidence"
+        ),
         "runtime_reliability_rows": sum(
             1 for row in rows if row["paper_role"] == "runtime_reliability_evidence"
         ),
@@ -176,6 +197,13 @@ def build_headline_result_panel(project_root: str | Path = Path("/data/zhiqi/Lic
         "state_substrates": portfolio_summary["state_substrate_count"],
         "actor_backbones": portfolio_summary["actor_backbone_count"],
         "main_matched_actor_backbones": portfolio_summary["main_matched_actor_backbone_count"],
+        "matched_actor_backbones_with_retention": portfolio_summary[
+            "matched_actor_backbone_count_with_retention"
+        ],
+        "tau2_retention_complete_pairs": portfolio_summary["tau2_retention_complete_pairs"],
+        "tau2_retention_boundary_regressions": portfolio_summary[
+            "tau2_retention_boundary_regressions"
+        ],
         "clean_positive_passes": portfolio_summary["clean_positive_passes"],
         "clean_positive_trials": portfolio_summary["clean_positive_trials"],
         "faithful_baseline_passes": comparison_summary["faithful_baseline_passes"],
@@ -240,6 +268,7 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
     commands = {
         "LTAHeadlinePanelRows": summary["headline_rows"],
         "LTAHeadlineMainPositiveRows": summary["main_positive_rows"],
+        "LTAHeadlineSupportingPositiveRows": summary["supporting_positive_rows"],
         "LTAHeadlineRuntimeReliabilityRows": summary["runtime_reliability_rows"],
         "LTAHeadlineFaithfulCounterpointRows": summary["faithful_counterpoint_rows"],
         "LTAHeadlineScalePathRows": summary["scale_path_rows"],

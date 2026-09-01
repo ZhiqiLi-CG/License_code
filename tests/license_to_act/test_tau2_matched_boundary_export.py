@@ -36,10 +36,20 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     assert summary["boundary_regressions"] == 0
     assert summary["domains"] == 2
     assert summary["actor_models"] == 2
+    assert summary["main_actor_models"] == 2
+    assert summary["actor_models_including_retention"] == 3
+    assert summary["retention_complete_pairs"] == 15
+    assert summary["retention_baseline_trials"] == 15
+    assert summary["retention_boundary_trials"] == 15
+    assert summary["retention_baseline_mean_reward"] == 1.0
+    assert summary["retention_boundary_mean_reward"] == 1.0
+    assert summary["retention_boundary_regressions"] == 0
+    assert summary["retention_actor_models"] == 2
     assert summary["blocks"] == 4
+    assert summary["support_blocks"] == 1
 
     rows = report["rows"]
-    assert len(rows) == 160
+    assert len(rows) == 190
     baseline = next(
         row
         for row in rows
@@ -102,10 +112,20 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
         for row in retail_scope_family_rows
         if row["condition"] == "action_boundary" and row["reward"] == "1"
     ) == 20
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 80
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 80
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 95
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 95
     assert sum(int(row["boundary_vetoes"]) for row in rows) == 26
     assert sum(int(row["boundary_allows"]) for row in rows) == 60
+    retention_rows = [row for row in rows if row["paper_use"] == "matched_tau2_retention_k5"]
+    assert len(retention_rows) == 30
+    assert {row["actor_model"] for row in retention_rows} == {
+        "Gemma-4-31B-it",
+        "Mistral-Small-3.2-24B-Instruct-2506",
+    }
+    assert sum(1 for row in retention_rows if row["condition"] == "baseline" and row["reward"] == "1") == 15
+    assert sum(
+        1 for row in retention_rows if row["condition"] == "action_boundary" and row["reward"] == "1"
+    ) == 15
 
     blocks = {block["paper_use"]: block for block in report["blocks"]}
     assert blocks["matched_tau2_k20"]["complete_pairs"] == 20
@@ -119,6 +139,10 @@ def test_build_tau2_matched_boundary_export_uses_real_matched_pair() -> None:
     assert blocks["matched_tau2_retail_scope_family_k20"]["complete_pairs"] == 20
     assert blocks["matched_tau2_retail_scope_family_k20"]["boundary_allows"] == 20
     assert blocks["matched_tau2_retail_scope_family_k20"]["boundary_completion_triggers"] == 20
+    assert blocks["matched_tau2_retention_k5"]["complete_pairs"] == 15
+    assert blocks["matched_tau2_retention_k5"]["baseline_mean_reward"] == 1.0
+    assert blocks["matched_tau2_retention_k5"]["boundary_mean_reward"] == 1.0
+    assert blocks["matched_tau2_retention_k5"]["boundary_regressions"] == 0
 
 
 def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: Path) -> None:
@@ -134,10 +158,10 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 160
+    assert len(rows) == 190
     assert [row["condition"] for row in rows[:2]] == ["baseline", "action_boundary"]
-    assert sum(1 for row in rows if row["condition"] == "baseline") == 80
-    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 80
+    assert sum(1 for row in rows if row["condition"] == "baseline") == 95
+    assert sum(1 for row in rows if row["condition"] == "action_boundary") == 95
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
     assert "\\newcommand{\\LTATauTwoMatchedPairs}{80}" in tex
@@ -151,6 +175,13 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryVetoes}{26}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBoundaryAllows}{60}" in tex
     assert "\\newcommand{\\LTATauTwoMatchedBlocks}{4}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedMainActorModels}{2}" in tex
+    assert "\\newcommand{\\LTATauTwoMatchedActorModelsIncludingRetention}{3}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionCompletePairs}{15}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionBaselineMeanReward}{1}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionBoundaryMeanReward}{1}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionBoundaryRegressions}{0}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionActorModels}{2}" in tex
     assert "\\newcommand{\\LTATauTwoAirlineMatchedCompletePairs}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailMatchedCompletePairs}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailMatchedBoundaryCompletionTriggers}{20}" in tex
@@ -161,9 +192,11 @@ def test_write_tau2_matched_boundary_export_outputs_csv_json_and_tex(tmp_path: P
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedCompletePairs}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedBoundaryCompletionTriggers}{20}" in tex
     assert "\\newcommand{\\LTATauTwoRetailScopeFamilyMatchedBoundaryRetailExchangeCalls}{20}" in tex
+    assert "\\newcommand{\\LTATauTwoRetentionMatchedCompletePairs}{15}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]
     assert summary["boundary_regressions"] == 0
+    assert summary["retention_boundary_regressions"] == 0
 
 
 def test_export_tau2_matched_boundary_cli_writes_requested_outputs(tmp_path: Path) -> None:

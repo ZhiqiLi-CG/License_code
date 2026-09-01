@@ -58,6 +58,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _commit_pair_metric_check(commit_pair_metrics["summary"]),
         _proposal_effect_decomposition_check(proposal_effect["summary"]),
         _tau2_matched_boundary_check(tau2_matched["summary"]),
+        _tau2_retention_control_check(tau2_matched["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
@@ -114,6 +115,10 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "authorized_commit_recall": commit_pair_metrics["summary"]["authorized_commit_recall"],
             "tau2_matched_pairs": tau2_matched["summary"]["complete_pairs"],
             "tau2_matched_reward_delta": tau2_matched["summary"]["reward_delta"],
+            "tau2_retention_pairs": tau2_matched["summary"]["retention_complete_pairs"],
+            "tau2_retention_regressions": tau2_matched["summary"][
+                "retention_boundary_regressions"
+            ],
             "meta_agent_candidates": meta_agent_patches["summary"]["meta_agent_candidates"],
             "meta_agent_accepted": meta_agent_patches["summary"]["accepted_candidates"],
             "meta_agent_source_f_to_p": meta_agent_patches["summary"]["source_failure_to_pass"],
@@ -178,6 +183,7 @@ def _portfolio_breadth_check(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['benchmark_count']} benchmark families; "
             f"{summary['state_substrate_count']} state substrates; "
             f"{summary['main_matched_actor_backbone_count']} primary matched actor models; "
+            f"{summary['matched_actor_backbone_count_with_retention']} matched actor models with retention controls; "
             f"{summary['actor_backbone_count']} broader actor backbones."
         ),
     )
@@ -439,6 +445,28 @@ def _tau2_matched_boundary_check(summary: dict[str, Any]) -> dict[str, str]:
             f"read-correct/write-wrong "
             f"{summary['baseline_read_correct_write_wrong']}->{summary['boundary_read_correct_write_wrong']}; "
             f"boundary vetoes {summary['boundary_vetoes']}; regressions {summary['boundary_regressions']}."
+        ),
+    )
+
+
+def _tau2_retention_control_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["retention_complete_pairs"] >= 15
+        and summary["retention_baseline_mean_reward"] == 1.0
+        and summary["retention_boundary_mean_reward"] == 1.0
+        and summary["retention_actor_models"] >= 2
+        and summary["retention_boundary_regressions"] == 0
+    )
+    return _check(
+        "tau2_retention_controls_preserve_legitimate_effects",
+        ok,
+        "The action boundary should preserve already-correct business effects, not only block failures.",
+        (
+            f"{summary['retention_complete_pairs']} retention pairs across "
+            f"{summary['retention_actor_models']} actor models; reward "
+            f"{summary['retention_baseline_mean_reward']:.3f}->"
+            f"{summary['retention_boundary_mean_reward']:.3f}; regressions "
+            f"{summary['retention_boundary_regressions']}."
         ),
     )
 

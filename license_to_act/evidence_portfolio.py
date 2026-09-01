@@ -39,7 +39,6 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
 
     tau2_metrics = {row["metric"]: _parse_number(row["value"]) for row in tau2_rows}
     benchmarks = sorted({row["benchmark"] for row in stage1_rows} | {row["benchmark"] for row in stage2_rows})
-    actor_backbones = _actor_backbones(stage1_rows, stage2_rows)
     transfer_ftp = _sum_int(transfer_rows, "failure_to_pass")
     transfer_ptf = _sum_int(transfer_rows, "pass_to_failure")
     clean_trials = _sum_int(clean_rows, "n_trials")
@@ -76,6 +75,22 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
             "positive_result": f"{transfer_ftp} failure-to-pass seed repairs, {transfer_ptf} pass-to-failure",
             "paper_use": "rsi_seed_support",
             "source_data": "stage1_cases.csv | transfer_ledger.csv",
+        },
+        {
+            "portfolio_id": "P7_TAU2_RETENTION_CONTROLS",
+            "story_role": "action boundaries should preserve already-correct state changes",
+            "benchmarks": "tau2-Bench",
+            "state_substrates": "business records",
+            "actor_backbones": "Gemma-4-31B-it | Mistral-Small-3.2-24B",
+            "comparison_kind": "matched_actor_retention_control",
+            "positive_result": (
+                f"{tau2_matched_summary['retention_complete_pairs']} paired retention controls, "
+                f"reward {tau2_matched_summary['retention_baseline_mean_reward']:.1f}->"
+                f"{tau2_matched_summary['retention_boundary_mean_reward']:.1f}, "
+                f"{tau2_matched_summary['retention_boundary_regressions']} boundary regressions"
+            ),
+            "paper_use": "supporting_non_regression",
+            "source_data": "tau2_matched_boundary.csv",
         },
         {
             "portfolio_id": "P2_TAU2_MINING",
@@ -140,6 +155,7 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         },
     ]
 
+    actor_backbones = _actor_backbones(stage1_rows, stage2_rows, rows)
     main_matched_actor_backbones = _main_matched_actor_backbones(rows)
 
     summary = {
@@ -151,6 +167,13 @@ def build_evidence_portfolio(project_root: str | Path = Path("/data/zhiqi/Licens
         "actor_backbones": actor_backbones,
         "main_matched_actor_backbone_count": len(main_matched_actor_backbones),
         "main_matched_actor_backbones": main_matched_actor_backbones,
+        "matched_actor_backbone_count_with_retention": tau2_matched_summary[
+            "actor_models_including_retention"
+        ],
+        "tau2_retention_complete_pairs": tau2_matched_summary["retention_complete_pairs"],
+        "tau2_retention_boundary_regressions": tau2_matched_summary[
+            "retention_boundary_regressions"
+        ],
         "stage1_failure_to_pass": transfer_ftp,
         "stage1_pass_to_failure": transfer_ptf,
         "clean_positive_trials": clean_trials,
@@ -205,13 +228,20 @@ def write_evidence_portfolio(
     return portfolio
 
 
-def _actor_backbones(stage1_rows: list[dict[str, str]], stage2_rows: list[dict[str, str]]) -> list[str]:
+def _actor_backbones(
+    stage1_rows: list[dict[str, str]],
+    stage2_rows: list[dict[str, str]],
+    portfolio_rows: list[dict[str, Any]],
+) -> list[str]:
     raw_names: set[str] = set()
     for row in stage1_rows:
         raw_names.add(row["baseline_agent"])
         raw_names.add(row["lta_agent"])
     for row in stage2_rows:
         raw_names.add(row["condition"])
+    for row in portfolio_rows:
+        for name in str(row["actor_backbones"]).split("|"):
+            raw_names.add(name.strip())
     normalized = {_normalize_actor_name(name) for name in raw_names}
     normalized.discard("")
     normalized.discard("action-boundary runtime")
@@ -236,6 +266,8 @@ def _normalize_actor_name(name: str) -> str:
         return "Codex GPT-5.5"
     if "Mistral" in name:
         return "Mistral-Small-3.2-24B"
+    if "Gemma" in name or "gemma" in name:
+        return "Gemma-4-31B-it"
     if "long32k" in name:
         return "Qwen3.8-27B-long32k"
     if "Qwen" in name:
@@ -258,6 +290,11 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAEvidenceSubstrates": summary["state_substrate_count"],
         "LTAEvidenceBackbones": summary["actor_backbone_count"],
         "LTAEvidenceMainMatchedBackbones": summary["main_matched_actor_backbone_count"],
+        "LTAEvidenceMatchedBackbonesWithRetention": summary[
+            "matched_actor_backbone_count_with_retention"
+        ],
+        "LTAEvidenceTauTwoRetentionPairs": summary["tau2_retention_complete_pairs"],
+        "LTAEvidenceTauTwoRetentionRegressions": summary["tau2_retention_boundary_regressions"],
         "LTAEvidenceCleanPositivePasses": summary["clean_positive_passes"],
         "LTAEvidenceCleanPositiveTrials": summary["clean_positive_trials"],
         "LTAEvidenceFaithfulBaselinePasses": summary["faithful_baseline_passes"],

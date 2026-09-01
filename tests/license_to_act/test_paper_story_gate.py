@@ -17,8 +17,8 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
 
     summary = report["summary"]
-    assert summary["total_checks"] == 24
-    assert summary["passed_checks"] == 24
+    assert summary["total_checks"] == 25
+    assert summary["passed_checks"] == 25
     assert summary["failed_checks"] == 0
     assert summary["clean_positive_passes"] == 30
     assert summary["clean_positive_trials"] == 30
@@ -26,10 +26,12 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     assert summary["faithful_baseline_trials"] == 30
     assert summary["benchmark_count"] == 3
     assert summary["state_substrate_count"] == 3
-    assert summary["actor_backbone_count"] == 4
+    assert summary["actor_backbone_count"] == 5
     assert summary["main_matched_actor_backbone_count"] == 2
     assert summary["tau2_matched_pairs"] == 80
     assert summary["tau2_matched_reward_delta"] == 0.9875
+    assert summary["tau2_retention_pairs"] == 15
+    assert summary["tau2_retention_regressions"] == 0
     assert summary["meta_agent_candidates"] == 5
     assert summary["meta_agent_accepted"] == 5
     assert summary["meta_agent_source_f_to_p"] == 5
@@ -49,6 +51,7 @@ def test_build_story_gate_report_checks_top_conference_spine() -> None:
     ]["evidence"]
     assert checks["proposal_effect_decomposition_has_real_gap_rows"]["status"] == "pass"
     assert checks["tau2_matched_boundary_pair_present"]["status"] == "pass"
+    assert checks["tau2_retention_controls_preserve_legitimate_effects"]["status"] == "pass"
     assert summary["real_evidence_planned_rows"] == 0
     assert checks["real_evidence_audit_has_only_real_results"]["status"] == "pass"
     assert "0 planned rows" in checks["real_evidence_audit_has_only_real_results"]["evidence"]
@@ -105,12 +108,12 @@ def test_write_story_gate_report_exports_csv_json_and_tex(tmp_path: Path) -> Non
     assert Path(output["outputs"]["latex_numbers"]).exists()
 
     rows = list(csv.DictReader(Path(output["outputs"]["checks_csv"]).open(newline="", encoding="utf-8")))
-    assert len(rows) == 24
+    assert len(rows) == 25
     assert {row["status"] for row in rows} == {"pass"}
 
     tex = Path(output["outputs"]["latex_numbers"]).read_text(encoding="utf-8")
-    assert "\\newcommand{\\LTAStoryGateChecks}{24}" in tex
-    assert "\\newcommand{\\LTAStoryGatePassed}{24}" in tex
+    assert "\\newcommand{\\LTAStoryGateChecks}{25}" in tex
+    assert "\\newcommand{\\LTAStoryGatePassed}{25}" in tex
     assert "\\newcommand{\\LTAStoryGateFailed}{0}" in tex
 
     summary = json.loads(Path(output["outputs"]["summary_json"]).read_text(encoding="utf-8"))["summary"]

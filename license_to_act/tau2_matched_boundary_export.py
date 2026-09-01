@@ -52,6 +52,20 @@ RETAIL_SCOPE_FAMILY_FIXTURE = (
     / "tau2_matched_boundary"
     / "retail_tasks6_9_qwen32k_scripted_scope_family_k20_summary.json"
 )
+RETENTION_FIXTURES = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "airline_task1_gemma_scripted_retention_k5_summary.json",
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "airline_task1_mistral_scripted_retention_k5_summary.json",
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "airline_task48_gemma_scripted_retention_k5_summary.json",
+)
 DEFAULT_FIXTURES = (
     DEFAULT_FIXTURE,
     RETAIL_TASK0_FIXTURE,
@@ -67,20 +81,49 @@ def build_tau2_matched_boundary_export(
 ) -> dict[str, Any]:
     root = Path(project_root)
     paths = [Path(source_path)] if source_path is not None else list(DEFAULT_FIXTURES)
+    support_paths = [] if source_path is not None else list(RETENTION_FIXTURES)
     payloads = [(path, _read_json(path)) for path in paths]
+    support_payloads = [(path, _read_json(path)) for path in support_paths]
     runs = [run for _, payload in payloads for run in payload["runs"]]
-    rows = [_row_from_run(run, path) for path, payload in payloads for run in payload["runs"]]
+    support_runs = [run for _, payload in support_payloads for run in payload["runs"]]
+    all_runs = runs + support_runs
+    main_rows = [
+        _row_from_run(run, path)
+        for path, payload in payloads
+        for run in payload["runs"]
+    ]
+    support_rows = [
+        _row_from_run(run, path)
+        for path, payload in support_payloads
+        for run in payload["runs"]
+    ]
+    rows = main_rows + support_rows
     summary = summarize_tau2_matched_runs(runs)
-    blocks = _block_summaries(runs, rows)
+    retention_summary = summarize_tau2_matched_runs(support_runs) if support_runs else _empty_summary()
+    main_blocks = _block_summaries(runs, main_rows)
+    support_blocks = _block_summaries(support_runs, support_rows)
+    blocks = main_blocks + support_blocks
     summary.update(
         {
             "source_path": str(paths[0]),
             "source_paths": [str(path) for path in paths],
-            "blocks": len(blocks),
+            "support_source_paths": [str(path) for path in support_paths],
+            "blocks": len(main_blocks),
+            "support_blocks": len(support_blocks),
             "block_summaries": blocks,
             "project_root": str(root),
-            "domains": len({row["domain"] for row in rows}),
-            "actor_models": len({row["actor_model"] for row in rows}),
+            "domains": len({row["domain"] for row in main_rows}),
+            "actor_models": len({row["actor_model"] for row in main_rows}),
+            "main_actor_models": len({run["actor_model"] for run in runs}),
+            "actor_models_including_retention": len({run["actor_model"] for run in all_runs}),
+            "retention_pairs": retention_summary["pairs"],
+            "retention_complete_pairs": retention_summary["complete_pairs"],
+            "retention_baseline_trials": retention_summary["baseline_trials"],
+            "retention_boundary_trials": retention_summary["boundary_trials"],
+            "retention_baseline_mean_reward": retention_summary["baseline_mean_reward"],
+            "retention_boundary_mean_reward": retention_summary["boundary_mean_reward"],
+            "retention_boundary_regressions": retention_summary["boundary_regressions"],
+            "retention_actor_models": len({run["actor_model"] for run in support_runs}),
         }
     )
     return {"summary": summary, "blocks": blocks, "rows": rows}
@@ -258,6 +301,28 @@ def _block_summaries(runs: list[dict[str, Any]], rows: list[dict[str, str]]) -> 
     return blocks
 
 
+def _empty_summary() -> dict[str, int | float]:
+    return {
+        "pairs": 0,
+        "complete_pairs": 0,
+        "baseline_trials": 0,
+        "boundary_trials": 0,
+        "baseline_mean_reward": 0.0,
+        "boundary_mean_reward": 0.0,
+        "reward_delta": 0.0,
+        "baseline_read_correct_write_wrong": 0,
+        "boundary_read_correct_write_wrong": 0,
+        "boundary_vetoes": 0,
+        "boundary_allows": 0,
+        "boundary_completion_triggers": 0,
+        "baseline_retail_exchange_tool_calls": 0,
+        "boundary_retail_exchange_tool_calls": 0,
+        "baseline_state_change_tool_calls": 0,
+        "boundary_state_change_tool_calls": 0,
+        "boundary_regressions": 0,
+    }
+
+
 def _seed_from_pair_id(pair_id: str) -> int:
     prefix = "seed-"
     if prefix not in pair_id:
@@ -296,8 +361,24 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTATauTwoMatchedBoundaryStateChanges": summary["boundary_state_change_tool_calls"],
         "LTATauTwoMatchedBoundaryRegressions": summary["boundary_regressions"],
         "LTATauTwoMatchedActorModels": summary["actor_models"],
+        "LTATauTwoMatchedMainActorModels": summary["main_actor_models"],
+        "LTATauTwoMatchedActorModelsIncludingRetention": summary[
+            "actor_models_including_retention"
+        ],
         "LTATauTwoMatchedDomains": summary["domains"],
         "LTATauTwoMatchedBlocks": summary["blocks"],
+        "LTATauTwoRetentionPairs": summary["retention_pairs"],
+        "LTATauTwoRetentionCompletePairs": summary["retention_complete_pairs"],
+        "LTATauTwoRetentionBaselineTrials": summary["retention_baseline_trials"],
+        "LTATauTwoRetentionBoundaryTrials": summary["retention_boundary_trials"],
+        "LTATauTwoRetentionBaselineMeanReward": _format_number(
+            summary["retention_baseline_mean_reward"]
+        ),
+        "LTATauTwoRetentionBoundaryMeanReward": _format_number(
+            summary["retention_boundary_mean_reward"]
+        ),
+        "LTATauTwoRetentionBoundaryRegressions": summary["retention_boundary_regressions"],
+        "LTATauTwoRetentionActorModels": summary["retention_actor_models"],
     }
     commands.update(_block_latex_commands(summary.get("block_summaries", [])))
     lines = [
@@ -321,6 +402,8 @@ def _block_latex_commands(blocks: list[dict[str, Any]]) -> dict[str, str]:
             prefix = "LTATauTwoRetailScopeMatched"
         elif paper_use == "matched_tau2_retail_scope_family_k20":
             prefix = "LTATauTwoRetailScopeFamilyMatched"
+        elif paper_use == "matched_tau2_retention_k5":
+            prefix = "LTATauTwoRetentionMatched"
         else:
             continue
         commands.update(
