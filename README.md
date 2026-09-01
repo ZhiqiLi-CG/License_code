@@ -78,9 +78,9 @@ The three Stage-3 Qwen+boundary commands keep `Qwen3.8-27B-long32k` inside the o
 
 The current live matched tau2 fixtures use the same actor, same scripted user,
 and same task budget in both conditions; the changed component is the action
-boundary. The airline block tests unready writes. The retail block tests the
-opposite failure: complete evidence exists, but the ordinary actor never turns it
-into the required exchange.
+boundary. The airline block tests unready writes. The retail blocks test the
+opposite failure: complete or scoped evidence exists, but the ordinary actor
+never turns it into the required exchange.
 
 ```bash
 /data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
@@ -116,11 +116,45 @@ into the required exchange.
   --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task0_qwen32k_completion_k5_maxtok512_20260901.json
 ```
 
+```bash
+/data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
+  --domain retail \
+  --task-ids 1 \
+  --user-mode scripted \
+  --num-trials 5 \
+  --seed 970 \
+  --max-steps 45 \
+  --timeout 360 \
+  --llm-agent openai/Qwen3.8-27B-long32k \
+  --llm-user openai/Qwen3.8-27B-long32k \
+  --agent-max-tokens 512 \
+  --user-max-tokens 128 \
+  --api-base http://127.0.0.1:8021/v1 \
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task1_qwen32k_scope_k5_maxtok512_20260901.json
+```
+
+```bash
+/data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
+  --domain retail \
+  --task-ids 6 7 8 9 \
+  --user-mode scripted \
+  --num-trials 5 \
+  --seed 1000 \
+  --max-steps 55 \
+  --timeout 360 \
+  --llm-agent openai/Qwen3.8-27B-long32k \
+  --llm-user openai/Qwen3.8-27B-long32k \
+  --agent-max-tokens 512 \
+  --user-max-tokens 128 \
+  --api-base http://127.0.0.1:8021/v1 \
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_tasks6_9_qwen32k_scope_family_k5_20260901.json
+```
+
 The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
-paper table: across 25 matched seeds and two tau2 domains, the baseline has mean
+paper table: across 50 matched seeds and two tau2 domains, the baseline has mean
 reward 0.0 and the action boundary has mean reward 1.0. The airline block has
 20 read-correct/write-wrong cancellation runs and 26 boundary vetoes. The retail
-block has 0 baseline exchange calls, 5 trace-derived boundary exchange calls,
+blocks have 0 baseline exchange calls, 30 trace-derived boundary exchange calls,
 and zero regressions.
 
 ## Long-Context Faithful Baselines
