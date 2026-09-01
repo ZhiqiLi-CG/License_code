@@ -197,7 +197,7 @@ def _tau2_airline_matched_row(summary: dict[str, Any]) -> dict[str, str]:
         "counts_as_planned": "no",
         "notes": (
             f"{summary['complete_pairs']} matched seeds; boundary vetoes "
-            f"{summary['boundary_vetoes']} unready cancellations with "
+            f"{summary['boundary_vetoes']} attempted unready cancellations with "
             f"{summary['boundary_regressions']} regressions."
         ),
     }

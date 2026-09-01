@@ -21,7 +21,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/license_
 Current local check:
 
 ```text
-2026-09-01: 137 passed.
+2026-09-01: 140 passed.
 ```
 
 ## Official Harbor Anchors
@@ -217,6 +217,7 @@ python scripts/export_contract_refinement_lineage.py
 python scripts/export_mechanism_ablation_panel.py
 python scripts/export_model_in_loop_bridge.py
 python scripts/export_tau2_matched_boundary.py
+python scripts/export_tau2_task_independence_audit.py
 python scripts/export_commit_pair_metrics.py
 python scripts/export_submission_scale_plan.py
 python scripts/export_real_evidence_audit.py
@@ -232,12 +233,13 @@ and write paper-facing CSVs into `/data/zhiqi/License/License_paper/data`.
 `export_boundary_patch_meta_agent.py`,
 `export_contract_refinement_lineage.py`,
 `export_mechanism_ablation_panel.py`, `export_model_in_loop_bridge.py`,
-`export_tau2_matched_boundary.py`, `export_commit_pair_metrics.py`,
+`export_tau2_matched_boundary.py`, `export_tau2_task_independence_audit.py`,
+`export_commit_pair_metrics.py`,
 `export_submission_scale_plan.py`,
 `export_real_evidence_audit.py`, and `export_story_gate.py` also write generated LaTeX number files under
 `License_paper/sections`. The paper imports those files for result counts,
 baseline and ablation separation, full-study targets, boundary updates,
-proposal/effect decomposition, meta-agent update generation, model-in-loop comparisons, matched tau2 evidence, commit-pair metrics,
+proposal/effect decomposition, meta-agent update generation, model-in-loop comparisons, matched tau2 evidence, tau2 task-unit auditing, commit-pair metrics,
 real-evidence auditing, and paper-code consistency numbers.
 `export_state_contract_examples.py` writes the paper-facing boundary-program JSON examples used in the appendix.
 `export_boundary_patch_meta_agent.py` defaults to the tracked frozen-proposer

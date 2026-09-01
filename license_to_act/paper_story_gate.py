@@ -17,6 +17,7 @@ from .real_evidence_audit import build_real_evidence_audit
 from .recursive_amendment_lineage import build_recursive_amendment_lineage
 from .story_claims import build_story_claims
 from .tau2_matched_boundary_export import build_tau2_matched_boundary_export
+from .tau2_task_independence_audit import build_tau2_task_independence_audit
 
 
 CHECK_FIELDS = ["check_id", "status", "criterion", "evidence"]
@@ -41,6 +42,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
     proposal_effect = build_proposal_effect_decomposition(root)
     claims = build_story_claims(root)
     tau2_matched = build_tau2_matched_boundary_export(root)
+    tau2_independence = build_tau2_task_independence_audit(root)
     stage2_rows = _read_csv(data_dir / "stage2_reliability.csv")
     portfolio_rows = portfolio["rows"]
     portfolio_summary = portfolio["summary"]
@@ -65,6 +67,7 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
         _tau2_matched_boundary_check(tau2_matched["summary"]),
         _tau2_llm_user_matched_block_check(tau2_matched["summary"]),
         _tau2_retention_control_check(tau2_matched["summary"]),
+        _tau2_task_independence_check(tau2_independence["summary"]),
         _workspace_only_check(portfolio_rows, claims["claims"].values(), stage2_rows),
         _generated_import_check(paper_dir / "main.tex"),
         _recursive_lineage_check(recursive_lineage["summary"]),
@@ -121,6 +124,10 @@ def build_story_gate_report(project_root: str | Path = Path("/data/zhiqi/License
             "authorized_commit_recall": commit_pair_metrics["summary"]["authorized_commit_recall"],
             "tau2_matched_pairs": tau2_matched["summary"]["complete_pairs"],
             "tau2_matched_reward_delta": tau2_matched["summary"]["reward_delta"],
+            "tau2_unique_matched_tasks": tau2_independence["summary"]["unique_task_count"],
+            "tau2_task_condition_blocks": tau2_independence["summary"][
+                "task_condition_block_count"
+            ],
             "tau2_retention_pairs": tau2_matched["summary"]["retention_complete_pairs"],
             "tau2_retention_regressions": tau2_matched["summary"][
                 "retention_boundary_regressions"
@@ -293,6 +300,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "\\input{sections/generated_ablation_numbers}",
         "\\input{sections/generated_model_loop_numbers}",
         "\\input{sections/generated_tau2_matched_boundary_numbers}",
+        "\\input{sections/generated_tau2_independence_numbers}",
         "\\input{sections/generated_commit_pair_numbers}",
         "\\input{sections/generated_scale_plan_numbers}",
         "\\input{sections/generated_real_evidence_numbers}",
@@ -303,7 +311,7 @@ def _generated_import_check(main_path: Path) -> dict[str, str]:
         "paper_imports_generated_numbers",
         ok,
         "Headline paper numbers should be imported from generated files.",
-        "main.tex imports generated result, comparison, scale-matrix, proposal/effect, boundary-update, meta-agent update, ablation, model-in-loop, matched tau2, commit-pair, real-evidence, and reproducibility numbers.",
+        "main.tex imports generated result, comparison, scale-matrix, proposal/effect, boundary-update, meta-agent update, ablation, model-in-loop, matched tau2, tau2 independence, commit-pair, real-evidence, and reproducibility numbers.",
     )
 
 
@@ -542,6 +550,36 @@ def _tau2_retention_control_check(summary: dict[str, Any]) -> dict[str, str]:
             f"{summary['retention_baseline_mean_reward']:.3f}->"
             f"{summary['retention_boundary_mean_reward']:.3f}; regressions "
             f"{summary['retention_boundary_regressions']}."
+        ),
+    )
+
+
+def _tau2_task_independence_check(summary: dict[str, Any]) -> dict[str, str]:
+    ok = (
+        summary["complete_pairs"] >= 100
+        and summary["unique_task_count"] >= 7
+        and summary["domain_count"] >= 2
+        and summary["actor_model_count"] >= 2
+        and summary["user_mode_count"] >= 2
+        and summary["task_condition_block_count"] >= 8
+        and summary["macro_task_boundary_mean_reward"]
+        > summary["macro_task_baseline_mean_reward"]
+        and summary["boundary_regressions"] == 0
+    )
+    return _check(
+        "tau2_task_independence_units",
+        ok,
+        "Matched tau2 evidence should report unique task units separately from repeated seeds.",
+        (
+            f"{summary['complete_pairs']} complete pairs over "
+            f"{summary['unique_task_count']} unique tasks, "
+            f"{summary['domain_count']} domains, "
+            f"{summary['actor_model_count']} actor models, "
+            f"{summary['user_mode_count']} user conditions, and "
+            f"{summary['task_condition_block_count']} task-condition blocks; "
+            f"macro task reward {summary['macro_task_baseline_mean_reward']:.3f}->"
+            f"{summary['macro_task_boundary_mean_reward']:.3f}; "
+            f"regressions {summary['boundary_regressions']}."
         ),
     )
 
@@ -1022,6 +1060,8 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTAStoryGateChecks": summary["total_checks"],
         "LTAStoryGatePassed": summary["passed_checks"],
         "LTAStoryGateFailed": summary["failed_checks"],
+        "LTAStoryGateTauTwoUniqueTasks": summary["tau2_unique_matched_tasks"],
+        "LTAStoryGateTauTwoTaskConditionBlocks": summary["tau2_task_condition_blocks"],
     }
     lines = [
         "% Auto-generated by License_code/license_to_act/paper_story_gate.py.",

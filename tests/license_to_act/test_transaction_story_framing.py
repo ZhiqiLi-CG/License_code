@@ -171,9 +171,10 @@ def test_story_gate_exports_action_boundary_consistency_check() -> None:
     report = build_story_gate_report(Path("/data/zhiqi/License"))
     checks = {check["check_id"]: check for check in report["checks"]}
 
-    assert report["summary"]["total_checks"] == 27
-    assert report["summary"]["passed_checks"] == 27
+    assert report["summary"]["total_checks"] == 28
+    assert report["summary"]["passed_checks"] == 28
     assert checks["real_result_scale_is_substantive"]["status"] == "pass"
+    assert checks["tau2_task_independence_units"]["status"] == "pass"
     assert checks["action_boundary_story_framing"]["status"] == "pass"
     assert checks["public_surface_uses_action_boundary_terms"]["status"] == "pass"
     assert checks["abstract_prioritizes_matched_action_boundary_evidence"]["status"] == "pass"
