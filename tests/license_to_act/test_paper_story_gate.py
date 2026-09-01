@@ -142,6 +142,31 @@ def test_public_surface_hygiene_flags_retired_names_inside_public_text(tmp_path:
     assert "License_paper/sections/appendix.tex" in check["evidence"]
 
 
+def test_public_surface_hygiene_flags_hand_rule_framing(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    paper = root / "License_paper"
+    appendix = paper / "sections" / "appendix.tex"
+    appendix.parent.mkdir(parents=True)
+    (root / "README.md").write_text("clean root\n", encoding="utf-8")
+    appendix.write_text("This is a task-specific executor baseline.\n", encoding="utf-8")
+
+    for repo in [root, paper]:
+        subprocess.run(["git", "init"], cwd=repo, text=True, capture_output=True, check=True)
+    subprocess.run(["git", "add", "README.md"], cwd=root, text=True, capture_output=True, check=True)
+    subprocess.run(
+        ["git", "add", "sections/appendix.tex"],
+        cwd=paper,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    check = _public_surface_hygiene_check(root)
+
+    assert check["status"] == "fail"
+    assert "License_paper/sections/appendix.tex" in check["evidence"]
+
+
 def test_export_story_gate_cli_writes_requested_outputs(tmp_path: Path) -> None:
     summary_path = tmp_path / "artifacts" / "story_gate.json"
     result = subprocess.run(

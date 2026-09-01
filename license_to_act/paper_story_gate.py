@@ -589,6 +589,12 @@ def _public_surface_hygiene_check(root: Path) -> dict[str, str]:
         "authority compiler",
         "positive obligation",
         "Agency Gap",
+        "boundary-rule",
+        "hand-written rule",
+        "hand-authored rule",
+        "task-specific executor",
+        "task-specific boundary executor",
+        "scripting is a real baseline",
     ]
     tracked_paths = _tracked_public_paths(root)
     existing_paths = [path for path in tracked_paths if (root / path).exists()]
