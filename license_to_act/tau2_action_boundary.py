@@ -3,14 +3,24 @@ from __future__ import annotations
 from dataclasses import dataclass, field as dataclass_field
 from typing import Any
 
-from .examples import tau2_cancel_license
-from .tau2_policy_authority import evaluate_tau2_tool_call, field, tool_call_arguments, tool_call_name
+from .examples import tau2_cancel_license, tau2_retail_exchange_license
+from .tau2_policy_authority import (
+    evaluate_tau2_tool_call,
+    field,
+    retail_exchange_candidate_from_trace,
+    tool_call_arguments,
+    tool_call_name,
+)
 
 
 DEFAULT_CANCEL_VETO_TEXT = (
     "I cannot cancel this reservation under the current policy because the "
     "available reservation evidence does not show that a cancellation exception "
     "applies. I can continue checking alternatives or explain the policy."
+)
+DEFAULT_RETAIL_EXCHANGE_VETO_TEXT = (
+    "I need explicit confirmation before submitting the exchange. I can list the "
+    "items, replacements, and payment method, then proceed after you confirm yes."
 )
 
 
@@ -69,6 +79,74 @@ def apply_tau2_cancel_boundary(
     )
 
 
+def apply_tau2_action_boundary(
+    messages: list[Any],
+    assistant_message: Any,
+    *,
+    current_time: str,
+    cancel_veto_text: str = DEFAULT_CANCEL_VETO_TEXT,
+    retail_exchange_veto_text: str = DEFAULT_RETAIL_EXCHANGE_VETO_TEXT,
+) -> Tau2BoundaryResult:
+    """Apply supported tau2 action-boundary checks to one proposed action."""
+    tool_calls = field(assistant_message, "tool_calls") or []
+    if not tool_calls:
+        completion = _retail_exchange_completion_from_trace(messages, assistant_message, current_time)
+        if completion is not None:
+            return completion
+        return Tau2BoundaryResult(message=assistant_message, records=[])
+
+    records: list[dict[str, Any]] = []
+    vetoed = False
+    veto_text = cancel_veto_text
+    for tool_call in tool_calls:
+        name = tool_call_name(tool_call)
+        args = tool_call_arguments(tool_call)
+        if name == "cancel_reservation":
+            decision = evaluate_tau2_tool_call(
+                messages,
+                tool_call,
+                current_time,
+                [tau2_cancel_license()],
+            )
+            record = {
+                "tool_name": "cancel_reservation",
+                "reservation_id": str(args.get("reservation_id", "")),
+                "allowed": decision.allowed,
+                "reason": decision.reason,
+                "missing_evidence": sorted(decision.missing_evidence),
+                "replacement": "none" if decision.allowed else "assistant_text_response",
+            }
+        elif name == "exchange_delivered_order_items":
+            decision = evaluate_tau2_tool_call(
+                messages,
+                tool_call,
+                current_time,
+                [tau2_retail_exchange_license()],
+            )
+            record = {
+                "tool_name": "exchange_delivered_order_items",
+                "state_id": str(args.get("order_id", "")),
+                "allowed": decision.allowed,
+                "reason": decision.reason,
+                "missing_evidence": sorted(decision.missing_evidence),
+                "replacement": "none" if decision.allowed else "assistant_text_response",
+            }
+            if not decision.allowed:
+                veto_text = retail_exchange_veto_text
+        else:
+            continue
+        records.append(record)
+        if not record["allowed"]:
+            vetoed = True
+
+    if not vetoed:
+        return Tau2BoundaryResult(message=assistant_message, records=records)
+    return Tau2BoundaryResult(
+        message=_text_message_like(assistant_message, veto_text),
+        records=records,
+    )
+
+
 class Tau2ActionBoundaryAgent:
     """Wrap a tau2 agent and intercept unsupported cancellation commits."""
 
@@ -100,11 +178,11 @@ class Tau2ActionBoundaryAgent:
             if history and (history[-1] is assistant_message or history[-1] == assistant_message)
             else history
         )
-        result = apply_tau2_cancel_boundary(
+        result = apply_tau2_action_boundary(
             prior_messages,
             assistant_message,
             current_time=self.current_time,
-            veto_text=self.veto_text,
+            cancel_veto_text=self.veto_text,
         )
         if result.records:
             self.boundary_records.extend(result.records)
@@ -145,3 +223,66 @@ def _text_message_like(original: Any, content: str) -> Any:
     if callable(text_factory):
         return text_factory(content, **kwargs)
     return message_class(role="assistant", content=content, tool_calls=None, **kwargs)
+
+
+def _retail_exchange_completion_from_trace(
+    messages: list[Any],
+    assistant_message: Any,
+    current_time: str,
+) -> Tau2BoundaryResult | None:
+    if _has_observed_tool_call(messages, "exchange_delivered_order_items"):
+        return None
+    candidate = retail_exchange_candidate_from_trace(messages)
+    if candidate is None:
+        return None
+    tool_call = {
+        "name": "exchange_delivered_order_items",
+        "arguments": candidate,
+        "requestor": "assistant",
+    }
+    decision = evaluate_tau2_tool_call(
+        messages,
+        tool_call,
+        current_time,
+        [tau2_retail_exchange_license()],
+    )
+    if not decision.allowed:
+        return None
+    return Tau2BoundaryResult(
+        message=_tool_call_message_like(assistant_message, [tool_call]),
+        records=[
+            {
+                "tool_name": "exchange_delivered_order_items",
+                "state_id": str(candidate.get("order_id", "")),
+                "allowed": True,
+                "reason": decision.reason,
+                "missing_evidence": [],
+                "replacement": "completion_tool_call",
+            }
+        ],
+    )
+
+
+def _has_observed_tool_call(messages: list[Any], tool_name: str) -> bool:
+    for message in messages:
+        for tool_call in field(message, "tool_calls", []) or []:
+            if tool_call_name(tool_call) == tool_name:
+                return True
+    return False
+
+
+def _tool_call_message_like(original: Any, tool_calls: list[dict[str, Any]]) -> Any:
+    if isinstance(original, dict):
+        message = dict(original)
+        message["role"] = "assistant"
+        message["content"] = None
+        message["tool_calls"] = tool_calls
+        return message
+
+    message_class = original.__class__
+    kwargs = {
+        name: field(original, name)
+        for name in ("cost", "usage", "raw_data", "generation_time_seconds")
+        if field(original, name) is not None
+    }
+    return message_class(role="assistant", content=None, tool_calls=tool_calls, **kwargs)

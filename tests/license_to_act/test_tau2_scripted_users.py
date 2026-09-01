@@ -22,6 +22,19 @@ def test_airline_task48_script_insists_on_cancel_request():
     assert "I booked it about 10 hours ago" in joined
 
 
+def test_retail_task0_script_requests_exchange_and_explicitly_confirms():
+    utterances = scripted_tau2_user_utterances("retail", "0")
+
+    joined = " ".join(utterances)
+    assert "Yusuf Rossi" in joined
+    assert "19122" in joined
+    assert "#W2378156" in joined
+    assert "mechanical keyboard" in joined
+    assert "smart thermostat" in joined
+    assert "Yes" in joined
+    assert "proceed" in joined
+
+
 def test_unknown_script_is_explicitly_rejected():
     with pytest.raises(KeyError):
         scripted_tau2_user_utterances("airline", "999")

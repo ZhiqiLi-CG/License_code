@@ -126,14 +126,15 @@ def test_runtime_reruns_are_not_described_as_primary_matched_evidence() -> None:
     assert "Primary evidence: ready evidence can trigger artifact finalization" not in experiments
 
 
-def test_tau2_matched_block_uses_k20_in_public_paper_text() -> None:
+def test_tau2_matched_blocks_are_not_conflated_in_public_paper_text() -> None:
     main = (PAPER / "main.tex").read_text(encoding="utf-8")
     results = (PAPER / "sections" / "05_results.tex").read_text(encoding="utf-8")
     public_text = "\n".join([main, results])
 
-    assert "live matched \\(K=20\\) \\(\\tau^2\\) block" in public_text
+    assert "live matched \\(K=20\\) block on airline task 48" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=20\\)" in results
-    assert "live matched \\(K=5\\) \\(\\tau^2\\) block" not in public_text
+    assert "\\(\\tau^2\\) matched retail exchange, \\(K=5\\)" in results
+    assert "retail task 0" in public_text
     assert "\\(\\tau^2\\) matched A48, \\(K=5\\)" not in results
 
 

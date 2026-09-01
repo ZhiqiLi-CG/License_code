@@ -18,6 +18,8 @@ TAU2_MATCHED_BOUNDARY_FIELDS = [
     "condition",
     "reward",
     "cancel_tool_calls",
+    "retail_exchange_tool_calls",
+    "state_change_tool_calls",
     "read_correct_write_wrong",
     "boundary_vetoes",
     "boundary_allows",
@@ -32,6 +34,13 @@ DEFAULT_FIXTURE = (
     / "tau2_matched_boundary"
     / "airline_task48_mistral_scripted_v2_summary.json"
 )
+RETAIL_TASK0_FIXTURE = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "tau2_matched_boundary"
+    / "retail_task0_qwen32k_scripted_completion_k5_summary.json"
+)
+DEFAULT_FIXTURES = (DEFAULT_FIXTURE, RETAIL_TASK0_FIXTURE)
 
 
 def build_tau2_matched_boundary_export(
@@ -40,20 +49,24 @@ def build_tau2_matched_boundary_export(
     source_path: str | Path | None = None,
 ) -> dict[str, Any]:
     root = Path(project_root)
-    path = Path(source_path) if source_path is not None else DEFAULT_FIXTURE
-    payload = _read_json(path)
-    runs = payload["runs"]
-    rows = [_row_from_run(run, path) for run in runs]
+    paths = [Path(source_path)] if source_path is not None else list(DEFAULT_FIXTURES)
+    payloads = [(path, _read_json(path)) for path in paths]
+    runs = [run for _, payload in payloads for run in payload["runs"]]
+    rows = [_row_from_run(run, path) for path, payload in payloads for run in payload["runs"]]
     summary = summarize_tau2_matched_runs(runs)
+    blocks = _block_summaries(runs, rows)
     summary.update(
         {
-            "source_path": str(path),
+            "source_path": str(paths[0]),
+            "source_paths": [str(path) for path in paths],
+            "blocks": len(blocks),
+            "block_summaries": blocks,
             "project_root": str(root),
             "domains": len({row["domain"] for row in rows}),
             "actor_models": len({row["actor_model"] for row in rows}),
         }
     )
-    return {"summary": summary, "rows": rows}
+    return {"summary": summary, "blocks": blocks, "rows": rows}
 
 
 def compact_tau2_matched_report(
@@ -136,6 +149,11 @@ def write_tau2_matched_boundary_export(
 
 def _row_from_run(run: dict[str, Any], source_path: Path) -> dict[str, str]:
     boundary_records = run.get("boundary_records") or []
+    cancel_tool_calls = int(run.get("cancel_tool_calls") or 0)
+    retail_exchange_tool_calls = int(run.get("retail_exchange_tool_calls") or 0)
+    state_change_tool_calls = run.get("state_change_tool_calls")
+    if state_change_tool_calls is None:
+        state_change_tool_calls = cancel_tool_calls + retail_exchange_tool_calls
     return {
         "pair_id": str(run["pair_id"]),
         "domain": str(run.get("domain", "")),
@@ -145,7 +163,9 @@ def _row_from_run(run: dict[str, Any], source_path: Path) -> dict[str, str]:
         "user_mode": str(run.get("user_mode", "")),
         "condition": str(run["condition"]),
         "reward": _format_number(float(run.get("reward") or 0.0)),
-        "cancel_tool_calls": str(int(run.get("cancel_tool_calls") or 0)),
+        "cancel_tool_calls": str(cancel_tool_calls),
+        "retail_exchange_tool_calls": str(retail_exchange_tool_calls),
+        "state_change_tool_calls": str(int(state_change_tool_calls or 0)),
         "read_correct_write_wrong": "yes" if run.get("read_correct_write_wrong") else "no",
         "boundary_vetoes": str(sum(1 for record in boundary_records if not record.get("allowed"))),
         "boundary_allows": str(sum(1 for record in boundary_records if record.get("allowed"))),
@@ -162,6 +182,11 @@ def _compact_run(
     user_mode: str,
     paper_use: str,
 ) -> dict[str, Any]:
+    cancel_tool_calls = int(run.get("cancel_tool_calls") or 0)
+    retail_exchange_tool_calls = int(run.get("retail_exchange_tool_calls") or 0)
+    state_change_tool_calls = run.get("state_change_tool_calls")
+    if state_change_tool_calls is None:
+        state_change_tool_calls = cancel_tool_calls + retail_exchange_tool_calls
     return {
         "pair_id": str(run["pair_id"]),
         "domain": domain,
@@ -171,11 +196,42 @@ def _compact_run(
         "user_mode": user_mode,
         "condition": str(run["condition"]),
         "reward": float(run.get("reward") or 0.0),
-        "cancel_tool_calls": int(run.get("cancel_tool_calls") or 0),
+        "cancel_tool_calls": cancel_tool_calls,
+        "retail_exchange_tool_calls": retail_exchange_tool_calls,
+        "state_change_tool_calls": int(state_change_tool_calls or 0),
         "read_correct_write_wrong": bool(run.get("read_correct_write_wrong")),
         "boundary_records": run.get("boundary_records") or [],
         "paper_use": paper_use,
     }
+
+
+def _block_summaries(runs: list[dict[str, Any]], rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+    by_paper_use: dict[str, list[dict[str, Any]]] = {}
+    by_paper_use_rows: dict[str, list[dict[str, str]]] = {}
+    for run in runs:
+        key = str(run.get("paper_use") or "unspecified")
+        by_paper_use.setdefault(key, []).append(run)
+    for row in rows:
+        key = row["paper_use"] or "unspecified"
+        by_paper_use_rows.setdefault(key, []).append(row)
+
+    blocks = []
+    for paper_use in sorted(by_paper_use):
+        block_runs = by_paper_use[paper_use]
+        block_rows = by_paper_use_rows[paper_use]
+        summary = summarize_tau2_matched_runs(block_runs)
+        summary.update(
+            {
+                "paper_use": paper_use,
+                "domains": sorted({row["domain"] for row in block_rows}),
+                "task_ids": sorted({row["task_id"] for row in block_rows}),
+                "actor_models": sorted({row["actor_model"] for row in block_rows}),
+                "user_modes": sorted({row["user_mode"] for row in block_rows}),
+                "source_paths": sorted({row["source_path"] for row in block_rows}),
+            }
+        )
+        blocks.append(summary)
+    return blocks
 
 
 def _seed_from_pair_id(pair_id: str) -> int:
@@ -204,9 +260,22 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
         "LTATauTwoMatchedBaselineRCWW": summary["baseline_read_correct_write_wrong"],
         "LTATauTwoMatchedBoundaryRCWW": summary["boundary_read_correct_write_wrong"],
         "LTATauTwoMatchedBoundaryVetoes": summary["boundary_vetoes"],
+        "LTATauTwoMatchedBoundaryAllows": summary["boundary_allows"],
+        "LTATauTwoMatchedBoundaryCompletionTriggers": summary["boundary_completion_triggers"],
+        "LTATauTwoMatchedBaselineRetailExchangeCalls": summary[
+            "baseline_retail_exchange_tool_calls"
+        ],
+        "LTATauTwoMatchedBoundaryRetailExchangeCalls": summary[
+            "boundary_retail_exchange_tool_calls"
+        ],
+        "LTATauTwoMatchedBaselineStateChanges": summary["baseline_state_change_tool_calls"],
+        "LTATauTwoMatchedBoundaryStateChanges": summary["boundary_state_change_tool_calls"],
         "LTATauTwoMatchedBoundaryRegressions": summary["boundary_regressions"],
         "LTATauTwoMatchedActorModels": summary["actor_models"],
+        "LTATauTwoMatchedDomains": summary["domains"],
+        "LTATauTwoMatchedBlocks": summary["blocks"],
     }
+    commands.update(_block_latex_commands(summary.get("block_summaries", [])))
     lines = [
         "% Auto-generated by License_code/license_to_act/tau2_matched_boundary_export.py.",
         "% Regenerate with License_code/scripts/export_tau2_matched_boundary.py.",
@@ -214,6 +283,44 @@ def _latex_numbers(summary: dict[str, Any]) -> str:
     for name, value in commands.items():
         lines.append(f"\\newcommand{{\\{name}}}{{{value}}}")
     return "\n".join(lines) + "\n"
+
+
+def _block_latex_commands(blocks: list[dict[str, Any]]) -> dict[str, str]:
+    commands: dict[str, str] = {}
+    for block in blocks:
+        paper_use = block["paper_use"]
+        if paper_use == "matched_tau2_k20":
+            prefix = "LTATauTwoAirlineMatched"
+        elif paper_use == "matched_tau2_retail_completion_k5":
+            prefix = "LTATauTwoRetailMatched"
+        else:
+            continue
+        commands.update(
+            {
+                f"{prefix}Pairs": str(block["pairs"]),
+                f"{prefix}CompletePairs": str(block["complete_pairs"]),
+                f"{prefix}BaselineTrials": str(block["baseline_trials"]),
+                f"{prefix}BoundaryTrials": str(block["boundary_trials"]),
+                f"{prefix}BaselineMeanReward": _format_number(block["baseline_mean_reward"]),
+                f"{prefix}BoundaryMeanReward": _format_number(block["boundary_mean_reward"]),
+                f"{prefix}RewardDelta": _format_number(block["reward_delta"]),
+                f"{prefix}BaselineRCWW": str(block["baseline_read_correct_write_wrong"]),
+                f"{prefix}BoundaryRCWW": str(block["boundary_read_correct_write_wrong"]),
+                f"{prefix}BoundaryVetoes": str(block["boundary_vetoes"]),
+                f"{prefix}BoundaryAllows": str(block["boundary_allows"]),
+                f"{prefix}BoundaryCompletionTriggers": str(block["boundary_completion_triggers"]),
+                f"{prefix}BaselineRetailExchangeCalls": str(
+                    block["baseline_retail_exchange_tool_calls"]
+                ),
+                f"{prefix}BoundaryRetailExchangeCalls": str(
+                    block["boundary_retail_exchange_tool_calls"]
+                ),
+                f"{prefix}BaselineStateChanges": str(block["baseline_state_change_tool_calls"]),
+                f"{prefix}BoundaryStateChanges": str(block["boundary_state_change_tool_calls"]),
+                f"{prefix}BoundaryRegressions": str(block["boundary_regressions"]),
+            }
+        )
+    return commands
 
 
 def _format_number(value: float) -> str:

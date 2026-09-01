@@ -15,6 +15,16 @@ def tau2_cancel_license() -> ActionLicense:
     )
 
 
+def tau2_retail_exchange_license() -> ActionLicense:
+    return ActionLicense(
+        name="tau2_retail_exchange_policy",
+        actor_role="customer_service_agent",
+        state_region="order:*",
+        operation="CommitExchangeDeliveredOrderItems",
+        required_evidence={"RetailExchangeReadinessEvidence"},
+    )
+
+
 def tb21_sanitize_license() -> ActionLicense:
     return ActionLicense(
         name="tb21_sanitize_git_repo_working_tree",

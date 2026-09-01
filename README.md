@@ -74,11 +74,13 @@ The three Stage-3 Qwen+boundary commands keep `Qwen3.8-27B-long32k` inside the o
 
 `configs/tb21_terminus_qwen_sqlite_db_truncate.json` is the matched Qwen/Terminus baseline config for the SQLite task. The first successful local run scored reward 1.0 but also recorded an `AgentTimeoutError`, so it is kept as a mixed baseline artifact rather than a clean reliability anchor.
 
-## tau2 Matched Boundary Block
+## tau2 Matched Boundary Blocks
 
-The current live matched tau2 seed uses the same Mistral actor and the same
-scripted user in both conditions; the only changed component is the action
-boundary around `cancel_reservation`.
+The current live matched tau2 fixtures use the same actor, same scripted user,
+and same task budget in both conditions; the changed component is the action
+boundary. The airline block tests unready writes. The retail block tests the
+opposite failure: complete evidence exists, but the ordinary actor never turns it
+into the required exchange.
 
 ```bash
 /data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
@@ -97,10 +99,29 @@ boundary around `cancel_reservation`.
   --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_airline_task48_mistral_scripted_k20b_20260831.json
 ```
 
+```bash
+/data/zhiqi/License/datasets/tau2-bench/.venv/bin/python scripts/run_tau2_action_boundary_live.py \
+  --domain retail \
+  --task-ids 0 \
+  --user-mode scripted \
+  --num-trials 5 \
+  --seed 950 \
+  --max-steps 45 \
+  --timeout 360 \
+  --llm-agent openai/Qwen3.8-27B-long32k \
+  --llm-user openai/Qwen3.8-27B-long32k \
+  --agent-max-tokens 512 \
+  --user-max-tokens 128 \
+  --api-base http://127.0.0.1:8021/v1 \
+  --output /data/zhiqi/License/artifacts/experiments/tau2_action_boundary_matched_retail_task0_qwen32k_completion_k5_maxtok512_20260901.json
+```
+
 The compact tracked fixture in `data/tau2_matched_boundary/` regenerates the
-paper table: across 20 matched seeds, the baseline has mean reward 0.0 with
-20 read-correct/write-wrong cancellations, while the action boundary has mean
-reward 1.0 with 26 vetoes and zero regressions.
+paper table: across 25 matched seeds and two tau2 domains, the baseline has mean
+reward 0.0 and the action boundary has mean reward 1.0. The airline block has
+20 read-correct/write-wrong cancellation runs and 26 boundary vetoes. The retail
+block has 0 baseline exchange calls, 5 trace-derived boundary exchange calls,
+and zero regressions.
 
 ## Long-Context Faithful Baselines
 

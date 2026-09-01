@@ -45,7 +45,7 @@ def build_proposal_effect_decomposition(
             evidence_type="paired_intervention_single",
             proposal_success_definition="reservation and user-intent evidence are present before the invalid business write",
         ),
-        _tau2_matched_row(tau2_matched),
+        *_tau2_matched_rows(tau2_matched),
         _stage1_source_row(
             stage1_by_id["TB-SAN"],
             decomposition_id="TB_SAN_CODEX_SCOPE",
@@ -160,8 +160,17 @@ def _stage1_source_row(
     }
 
 
-def _tau2_matched_row(report: dict[str, Any]) -> dict[str, str]:
-    summary = report["summary"]
+def _tau2_matched_rows(report: dict[str, Any]) -> list[dict[str, str]]:
+    rows = []
+    for block in report["blocks"]:
+        if block["paper_use"] == "matched_tau2_k20":
+            rows.append(_tau2_airline_matched_row(block))
+        elif block["paper_use"] == "matched_tau2_retail_completion_k5":
+            rows.append(_tau2_retail_matched_row(block))
+    return rows
+
+
+def _tau2_airline_matched_row(summary: dict[str, Any]) -> dict[str, str]:
     proposal_successes = int(summary["baseline_read_correct_write_wrong"])
     baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
     boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
@@ -178,12 +187,43 @@ def _tau2_matched_row(report: dict[str, Any]) -> dict[str, str]:
         "effect_successes_without_boundary": str(baseline_effect),
         "proposal_to_effect_gaps": str(proposal_successes - baseline_effect),
         "effect_successes_with_boundary": str(boundary_effect),
-        "source_ref": str(summary["source_path"]),
+        "source_ref": str(summary["source_paths"][0]),
         "counts_as_planned": "no",
         "notes": (
             f"{summary['complete_pairs']} matched seeds; boundary vetoes "
             f"{summary['boundary_vetoes']} unready cancellations with "
             f"{summary['boundary_regressions']} regressions."
+        ),
+    }
+
+
+def _tau2_retail_matched_row(summary: dict[str, Any]) -> dict[str, str]:
+    proposal_successes = int(summary["boundary_completion_triggers"])
+    baseline_effect = int(round(float(summary["baseline_mean_reward"]) * int(summary["baseline_trials"])))
+    boundary_effect = int(round(float(summary["boundary_mean_reward"]) * int(summary["boundary_trials"])))
+    return {
+        "decomposition_id": "TAU2_RETAIL0_QWEN_MATCHED_K5",
+        "benchmark": "tau2-Bench",
+        "task_family": "retail task 0 exchange",
+        "evidence_type": "matched_actor_k5_completion",
+        "actor_backbone": "Qwen3.8-27B-long32k",
+        "comparison_kind": "same actor, same scripted user, boundary changed",
+        "n_trials": str(summary["baseline_trials"]),
+        "proposal_success_definition": (
+            "order, product variants, payment method, and explicit confirmation are present "
+            "before the exchange remains only a text response"
+        ),
+        "proposal_successes": str(proposal_successes),
+        "effect_successes_without_boundary": str(baseline_effect),
+        "proposal_to_effect_gaps": str(proposal_successes - baseline_effect),
+        "effect_successes_with_boundary": str(boundary_effect),
+        "source_ref": str(summary["source_paths"][0]),
+        "counts_as_planned": "no",
+        "notes": (
+            f"{summary['complete_pairs']} matched seeds; baseline makes "
+            f"{summary['baseline_retail_exchange_tool_calls']} exchange calls, boundary makes "
+            f"{summary['boundary_retail_exchange_tool_calls']} trace-derived exchange calls through "
+            f"{summary['boundary_completion_triggers']} completion triggers."
         ),
     }
 

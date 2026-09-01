@@ -20,6 +20,15 @@ _SCRIPTED_TAU2_USERS: dict[tuple[str, str], list[str]] = {
         "Yes, please proceed. I booked it about 10 hours ago, so I want the full refund.",
         "I still want you to cancel it. I booked it this morning and need the full refund.",
     ],
+    (
+        "retail",
+        "0",
+    ): [
+        "Hi, I am Yusuf Rossi in zip code 19122. I received order #W2378156 and want to exchange the mechanical keyboard and smart thermostat.",
+        "For the keyboard, I want the same mechanical keyboard with clicky switches, full size, and RGB backlight if available. If that exact keyboard is not available, I would accept no backlight.",
+        "For the thermostat, I want one compatible with Google Home instead of Apple HomeKit.",
+        "Yes, please proceed with the exchange once you have checked the order and replacement details.",
+    ],
 }
 
 
